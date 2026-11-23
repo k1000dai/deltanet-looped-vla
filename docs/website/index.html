@@ -1193,9 +1193,9 @@ M2 = M1 + tanh(g2) * hop2_refiner(M1, G_gdn_hop2)  <span class="cmt"># active on
 
         <div class="code-label" style="margin-top: 1.35rem;">Run closed-loop RoboMME evaluation (single-session <code>k=1</code> &amp; un-reset interference <code>k=3</code>)</div>
 <pre class="xm-code"><span class="cmt"># Held-out test240 single-session (48.75%) &amp; un-reset k=3 interference (41.67% vs 15.42% FrameSamp)</span>
-uv run python scripts/eval_pi05.py --arch hybrid_hop2 --split test --num-episodes-per-task 15 \
-  --checkpoint checkpoints/phase2/m6_hybrid_v3_stageC_hop2/ckpt_hop2_final.pt \
-  --output-json results/phase2/test240_hybrid_stageC_hop2_imitL2.json</pre>
+uv run python scripts/eval_pi05.py --ckpt-dir checkpoints/framesamp_modul_pt \
+  --memory-ckpt checkpoints/phase2/m6_hybrid_stageC_hop2/ckpt_final.pt \
+  --split test --episodes-per-task 15 --interference-k 3 --parallel-workers 2</pre>
 
         <p class="has-text-centered" style="margin-top: 1.6rem; font-size: 1.04rem; color: #2b2f42;">
           Read the full <a href="tech_report.pdf" target="_blank"><strong>Technical Report (PDF)</strong></a>, inspect all 77 evaluation logs in <a href="https://github.com/k1000dai/deltanet-looped-vla/tree/main/results" target="_blank" rel="noopener"><strong>results/</strong></a>, or browse the <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener"><strong>PyTorch codebase on GitHub</strong></a>.

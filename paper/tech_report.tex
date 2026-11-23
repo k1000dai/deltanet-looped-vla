@@ -1,0 +1,237 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.88in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{placeins}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK JP}
+
+\definecolor{linkblue}{HTML}{1D4ED8}
+\definecolor{notebg}{HTML}{F8FAFC}
+\definecolor{warnborder}{HTML}{D97706}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=linkblue,
+  citecolor=linkblue,
+  urlcolor=linkblue,
+  pdftitle={DeltaLoop-VLA and DeltaMem-pi0.5 Technical Report},
+  pdfauthor={DeltaLoop-VLA Research Project}
+}
+
+\setlength{\parskip}{0.42em}
+\setlength{\parindent}{0pt}
+\emergencystretch=2em
+
+\title{\textbf{DeltaLoop-VLA and DeltaMem-$\pi_{0.5}$:\\Multi-Timescale Gated DeltaNet Memory, Non-Privileged Surprise Landmarks, and Interference-Robust Multi-Hop Readout for Long-Horizon Visuomotor Manipulation}}
+
+\author{
+  \textbf{Technical Report} \\[0.2em]
+  \small Repository: \href{https://github.com/k1000dai/deltanet-looped-vla}{\texttt{github.com/k1000dai/deltanet-looped-vla}} \\
+  \small Project Page: \href{https://k1000dai.github.io/deltanet-looped-vla/}{\texttt{k1000dai.github.io/deltanet-looped-vla}}
+}
+
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Long-horizon robotic manipulation under partial observability requires memory architectures that simultaneously track discrete state permutations, preserve fine spatial landmarks across hundreds of video demonstration frames, and remain stable across continuous multi-episode deployments without privileged human-issued memory resets. In this technical report, we present a two-phase empirical investigation spanning controlled synthetic benchmarks, a cached $450\text{M}$ \texttt{SmolVLA} backbone, and end-to-end $3.44\text{B}$ $\pi_{0.5}$ visuomotor policies on the 16-task \texttt{RoboMME} benchmark.
+In \textbf{Phase 1 (\texttt{DeltaLoop-VLA})}, across $87$ synthetic runs and $10{,}720$ closed-loop rollouts, we establish a sharp mechanistic dissociation between \emph{expressive associative writing} (expanding the Gated DeltaNet step size to $\beta_t \in (0, 2)$ lifts $S_8$ swap tracking from $25.1\%$ to $100.0\%$) and \emph{weight-tied multi-hop readout} ($97.1\%$ in-distribution and $80.4\%$ zero-shot out-of-distribution pointer chasing), while showing via linear probes that a $520\text{ KB}$ 2-layer \texttt{fp32} Gated DeltaNet retains $93.52\%$ of action counts and $4.36\text{ px}$ target coordinates even when frozen $450\text{M}$ \texttt{SmolVLA} actuation imposes a $<10\%$ motor ceiling.
+In \textbf{Phase 2 (\texttt{DeltaMem-$\pi_{0.5}$})}, across $16$ training waves, $77$ closed-loop evaluations, and $m=146$ step-down Holm--Bonferroni multiplicity-corrected tests on $3.44\text{B}$ $\pi_{0.5}$, our \texttt{Hybrid\allowbreak Surprise\allowbreak GDNBridge} + \texttt{Episode\allowbreak Boundary\allowbreak ForgetGate} + \texttt{Stage-C Hop-2} architecture achieves:
+(1)~\textbf{family-wise-significant superiority under un-reset $k=3$ cross-session interference} on held-out \texttt{test240} ($N=240$, $720$ rollouts), retaining \textbf{$41.67\%$ ($100/240$) vs.\ $15.42\%$ ($37/240$)} for \texttt{FrameSamp+Modulator} ($+26.25\text{ pp}$, $2.70\times$, exact paired McNemar $p = 1.16 \times 10^{-14}$, $p_{\mathrm{Holm}} = 0.0292$);
+(2)~\textbf{$48.75\%$ ($117/240$)} on single-session held-out \texttt{test240} at $387.8\text{ ms/chunk}$ and $7.04\text{ GiB}$ VRAM ($+27.08\text{ pp}$ over memoryless $\pi_{0.5}$ Base [$21.67\%$, $p_{\mathrm{Holm}} = 0.0292$], $+2.92\text{ pp}$ non-significant point-estimate gain over matched \texttt{FrameSamp+Modulator} [$45.83\%$, $p = 0.349$], and $-8.08\text{ pp}$ below $1{,}536$-H200-hour \texttt{T\textsuperscript{2}Mem} [$56.83\%$], while exceeding \texttt{T\textsuperscript{2}Mem} on the \texttt{Reference} suite [$45.00\%$ vs.\ $38.67\%$]); and
+(3)~$60.00\%$ ($48/80$) specialist and $57.50\%$ ($46/80$, $8.19\text{ GiB}$ single-checkpoint, $16/16$ tasks $\ge 20\%$) model-selection point estimates on \texttt{val80}, alongside full documentation of negative results and statistical limitations.
+\end{abstract}
+
+% =============================================================================
+\section{Introduction and Problem Setting}
+% =============================================================================
+Standard Vision-Language-Action (VLA) policies condition action generation almost exclusively on the current camera frame and static language prompt \cite{pi05_2025,smolvla2025}, rendering them effectively Markovian. On non-Markovian manipulation suites such as \texttt{RoboMME} \cite{mmevla2026}---which evaluates $16$ ManiSkill3 tabletop tasks across \texttt{Counting}, \texttt{Permanence}, \texttt{Reference}, and \texttt{Imitation}---memoryless $\pi_{0.5}$ achieves only $17.93\%$ published macro-average success ($21.67\%$ in our PyTorch reproduction). Existing embodied memory approaches face an acute trilemma:
+\begin{enumerate}[leftmargin=1.6em,nosep]
+  \item \textbf{Explicit token buffers (\texttt{FrameSamp+Modulator} \cite{mmevla2026}, $44.51\%$):} Uniformly subsampling $32$ past frames ($512$ tokens, $4.0\text{ MiB}$) drops brief occlusion-reveal flashes and \textbf{collapses catastrophically when deployed across continuous multi-episode streams without oracle \texttt{reset()} calls} \cite{robommeinterf2026} ($45.83\% \to 15.42\%$ in our held-out $k=3$ test).
+  \item \textbf{External VLM keyframe reasoners (\texttt{MemER} \cite{mmevla2026}, $42.38\%$):} Autoregressive VLM subgoal decoding incurs $10{,}135\text{ ms/chunk}$ latency ($<0.1\text{ Hz}$) and fails on fine motion imitation ($29.50\%$) and reactive timing (\texttt{StopCube} $0.00\%$).
+  \item \textbf{Heavy per-layer MLP fast weights (\texttt{T\textsuperscript{2}Mem} \cite{t2mem2026}, $56.83\%$):} Maintaining $18 \times 16$ per-head GeLU MLPs requires $36.35\text{ MiB}$ of fast state per episode, $1{,}536\text{ H200}$ GPU-hours of alternating second-order JVP/secant training, lacks an exponential forget gate for un-reset multi-session streaming, and struggles on container swaps (\texttt{Button\allowbreak Unmask\allowbreak Swap} $20.00\%$, \texttt{Video\allowbreak Unmask\allowbreak Swap} $29.33\%$) and long-horizon spatial reference (\texttt{Video\allowbreak Place\allowbreak Order} $30.00\%$).
+\end{enumerate}
+
+This report chronicles an end-to-end research cycle testing how compact $O(1)$ linear-recurrent associative state (\texttt{Gated DeltaNet} \cite{yang2025gdn,grazzi2025unlocking}), non-privileged surprise landmarks \cite{behrouz2025titans}, shared-VLM spatial pointer grounding, and residual multi-hop refinement perform under strict single-node interactive compute constraints (Miyabi GH200 \texttt{interact-g} + single RTX 5080 evaluation) and rigorous multiplicity-corrected statistical testing.
+
+% =============================================================================
+\section{Phase 1: Mechanistic Dissociation of Writing and Multi-Hop Readout}
+% =============================================================================
+Before scaling to $3.44\text{B}$ $\pi_{0.5}$, Phase 1 (\texttt{DeltaLoop-VLA}) isolated when expressive state writing versus iterative multi-hop readout is mathematically necessary across $87$ shortcut-audited synthetic runs ($3$ seeds) and $10{,}720$ closed-loop \texttt{RoboMME} rollouts on scratch ($28\text{M}$--$40\text{M}$) and cached $450\text{M}$ \texttt{lerobot/smolvla\_base} \cite{smolvla2025} backbones.
+
+\subsection{Negative-Eigenvalue Associative Writing vs.\ Weight-Tied Multi-Hop Readout}
+Our recurrent memory core updates a fixed-size matrix state $\mathbf{S}_u^{(h)} \in \mathbb{R}^{d_v \times d_k}$ via a motion-gated Gated DeltaNet transition with expanded step size $\beta_u^{(h)} \in (0, 2)$ \cite{grazzi2025unlocking}:
+\begin{equation}
+  \mathbf{S}_u^{(h)} = \exp\!\big(g_u^{(h)}\big)\!\left(\mathbf{I} - \beta_u^{(h)}\mathbf{k}_u^{(h)}{\mathbf{k}_u^{(h)}}^\top\right)\mathbf{S}_{u-1}^{(h)} + \beta_u^{(h)}\mathbf{v}_u^{(h)}{\mathbf{k}_u^{(h)}}^\top, \qquad \beta_u^{(h)} \in (0, 2), \; g_u^{(h)} \le 0.
+  \label{eq:gdn}
+\end{equation}
+When $\beta_u^{(h)} \to 2$, the Householder factor $(\mathbf{I} - 2\mathbf{k}\mathbf{k}^\top)$ exhibits eigenvalue $-1$ along $\mathbf{k}$, enabling exact sign-inversion and one-step state permutation tracking across $S_n$ swaps that contraction-only $\beta \in (0, 1)$ updates cannot represent in a single layer. Conversely, when causal chains are presented before the disambiguating target cue (\texttt{Task 1A-Retro}), single-pass readout ($L=1$) fails regardless of write rule; a weight-tied \texttt{Prelude--Core--Coda} loop issuing $L_t$ sequential queries $\mathbf{q}_t^{(\ell)}$ over frozen past state resolves multi-hop transitive bindings:
+\begin{itemize}[leftmargin=1.6em,nosep]
+  \item \textbf{Write dissociation (\texttt{Task 1A-Online}, $S_8$ swaps):} Expanding $\beta_t \in (0, 1) \to (0, 2)$ lifts 1-layer GDN accuracy from $25.1\%$ to \textbf{$100.0 \pm 0.0\%$} both in-distribution ($k \le 4$) and zero-shot OOD ($k=5, 6$).
+  \item \textbf{Read dissociation (\texttt{Task 1A-Retro}):} Single-pass, write-loop, parallel-query, and untied 6-layer baselines remain near chance ($17.1\%$--$21.4\%$ on forward causal chains), whereas weight-tied \texttt{DeltaLoop} reaches \textbf{$94.8\%$--$97.1\%$ ID} and extrapolates zero-shot to \textbf{$76.4\%$--$80.4\%$ at OOD $k=5$}, while Common-Random-Number (\texttt{CRN}) quantile halting cuts ID recurrent FLOPs by $56\%$.
+\end{itemize}
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../results/synthetic/figures/fig1_mechanistic_dissociation.pdf}
+    \caption{Phase 1 synthetic write ($\beta \in (0,2)$) vs.\ multi-hop read dissociation.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../results/robomme/figures/cycle3b_smolvla/fig8_mechanistic_probes_and_signflip.pdf}
+    \caption{Frozen $520\text{ KB}$ GDN state probes ($93.5\%$ count, $4.36\text{ px}$ localization).}
+  \end{subfigure}
+  \caption{\textbf{Phase 1 Mechanistic Verification.} Compact $520\text{ KB}$ 2-layer GDN states accurately encode task history, motivating Phase 2 scaling beyond cached $450\text{M}$ \texttt{SmolVLA}'s $<10\%$ motor bottleneck.}
+  \label{fig:phase1}
+\end{figure}
+
+\subsection{Why Phase 1 Motivated Scaling to $3.44\text{B}$ $\pi_{0.5}$}
+On closed-loop \texttt{RoboMME}, single-pass 2-layer GDN (\texttt{M5}, $520\text{ KB}$ state) achieved Holm-significant gains over memoryless policies on both scratch ($12.50\%$ vs.\ $3.12\%$, $p_{\mathrm{Holm}} = 0.0038$) and cached $450\text{M}$ \texttt{SmolVLA} ($5.25\%$ vs.\ $1.50\%$, $p_{\mathrm{Holm}} = 0.0420$). Crucially, frozen-state probes (Figure~\ref{fig:phase1}b) proved that the $520\text{ KB}$ recurrent state already stored \textbf{$93.52\%$ of repetition counts} and \textbf{$4.36\text{ px}$ target coordinates}: the $<10\%$ closed-loop ceiling arose from freezing \texttt{SmolVLM2} over $8 \times 8$-pooled tokens rather than from associative memory capacity.
+
+% =============================================================================
+\section{Phase 2 Architecture: \texttt{DeltaMem-$\pi_{0.5}$} and \texttt{DeltaGround-VLM}}
+% =============================================================================
+To remove the Phase-1 visuomotor ceiling, Phase 2 ported all three upstream $3.44\text{B}$ \texttt{MME-VLA} $\pi_{0.5}$ Orbax checkpoints (\texttt{pi05\_baseline}, \texttt{perceptual\_\allowbreak framesamp\_\allowbreak modul}, and \texttt{symbolic\_\allowbreak grounded\_\allowbreak subgoal}) to native PyTorch with verified $\le 10^{-5}$ \texttt{fp32} velocity parity and extracted $1{,}600$ memory-mapped \texttt{RoboMME} episodes ($768{,}897$ frames + $121{,}013$ unpooled $16 \times 16 = 256$-token dual-view execution steps, $0.56\text{ s}$ \texttt{mmap} startup). Our Phase-2 architecture combines four modular components without privileged test-time inputs:
+
+\paragraph{1. Multi-Timescale 2-Layer \texttt{fp32} GDN and \texttt{EpisodeBoundaryForgetGate}.}
+A \texttt{DualView\allowbreak Event\allowbreak PerceiverWriter} compresses strided front ($8\times 8$) and wrist ($4\times 4$) tokens together with 8-DoF joint/gripper-edge kinematics into $8$ write slots per step, driving a 2-layer \texttt{fp32} GDN ($520.0\text{ KB}$ state) partitioned into \texttt{Short} ($[4,32]$), \texttt{Mid} ($[32,256]$), and \texttt{Long} ($[256,2048]$) half-life heads. To prevent cross-episode state pollution in un-reset deployments, \texttt{Episode\allowbreak Boundary\allowbreak ForgetGate} monitors prompt-embedding cosine jumps, $\text{exec} \to \text{demo}$ transitions, and coupled visual-kinematic cuts, flushing recurrent state and keyframe indices when $b_u > 0.5$ without any external \texttt{reset()} oracle.
+
+\paragraph{2. \texttt{HybridSurpriseGDNBridge} with RoPE-Span Alignment and RMSNorm Scale Matching.}
+Rather than discarding high-resolution visual patches, we pair $28$ physical-timestamp-uniform visual anchors ($\text{excl}=0$, spanning \texttt{RoPE} positions $0\ldots 511$) with $4$--$8$ \texttt{GDN-Surprise} event keyframes to form a $512$-token perceptual canvas $\mathbf{C}_{\mathrm{perc}} \in \mathbb{R}^{512 \times 1024}$, modulated residually by 2L-GDN state readouts:
+\begin{equation}
+  \mathbf{M}^{(1)} = \mathbf{C}_{\mathrm{perc}} + \tanh(\gamma_{\mathrm{hyb}})\cdot \operatorname{RMSNorm}\!\Big(\operatorname{FFN}\big(\operatorname{XAttn}(\mathbf{C}_{\mathrm{perc}}, [\mathbf{G}_{\mathrm{gdn}} \,\|\, \mathbf{L}_{\mathrm{surp}}])\big)\Big)\cdot \operatorname{rms}(\mathbf{C}_{\mathrm{perc}}),
+\end{equation}
+eliminating a $41\times$ un-normalized \texttt{SwiGLU} norm shock discovered during Stage-A forensics.
+
+\paragraph{3. Zero-Copy Shared-VLM \texttt{DeltaGround-VLM} (\texttt{Hybrid-Pyramid} Pointer).}
+For occlusion-permanence and visual-reference tasks, \texttt{DualSwitchableLoRALinear} wraps all $252$ linear projections (attention + MLP) of the shared $2.6\text{B}$ \texttt{PaliGemma-2B} VLM, toggling in $<0.01\text{ ms}$ with $0\text{ MiB}$ extra base VLM memory between motor inference and a shortcut-free ($w_{\text{non-entry}} = 0$) $\langle \text{row\_y}, \text{col\_x}\rangle$ pointer head. Our Wave-15 \texttt{Hybrid-Pyramid} selector combines $4 \times 256$-token ($16\times 16$, $14\times 14\text{ px}$) container-lift apex frames with $12 \times 64$-token ($8\times 8$) dense swap-motion frames ($1{,}792$ tokens total), achieving $75.0\%$--$76.7\%$ unseen neutral-arm \texttt{STEP0} accuracy ($12.82$--$15.76\text{ px}$ mean error).
+
+\paragraph{4. \texttt{Stage-C Hop-2} Zero-Init Residual Multi-Hop Refinement.}
+Realizing Phase 1's iterative readout principle on $3.44\text{B}$ $\pi_{0.5}$, a zero-initialized second-hop refiner $\mathbf{M}^{(2)} = \mathbf{M}^{(1)} + \tanh(\gamma_{\mathrm{hop2}})\operatorname{Refiner}(\mathbf{M}^{(1)}, \mathbf{G}_{\mathrm{gdn}}^{(2)})$ activates selectively from the public user instruction on continuous trajectory-imitation tasks (\texttt{MoveCube}, \texttt{PatternLock}, \texttt{InsertPeg}) while preserving exact $L=1$ parity on demo-free counting tasks.
+
+% =============================================================================
+\section{Experimental Results on \texttt{RoboMME}}
+% =============================================================================
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.96\linewidth,height=0.83\textheight,keepaspectratio]{../docs/figures_phase2/fig_p2_1_leaderboard_and_suites.pdf}
+  \caption{\textbf{Phase 2 Leaderboard and Suite Breakdown} across held-out \texttt{test240} ($N=240$), model-selection \texttt{val80} ($N=80$), and published \texttt{RoboMME} baselines ($m=146$ Holm--Bonferroni family).}
+  \label{fig:p2_main}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{\textbf{Summary of Key Phase-2 Closed-Loop Evaluations on 16-Task \texttt{RoboMME}} ($0$ privileged test-time inputs). Published rows use $N=800\times 3$; our held-out \texttt{test240} uses $N=240$ ($16\times 15$, seed $7$) and \texttt{val80} uses $N=80$ ($16\times 5$). Family-wise $p_{\mathrm{Holm}}$ is step-down Holm--Bonferroni adjusted over all $m=146$ tests.}
+  \label{tab:main}
+  \setlength{\tabcolsep}{4.2pt}
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lccccccc}
+    \toprule
+    \textbf{Method / Split} & \textbf{State} & \textbf{Count.} & \textbf{Perm.} & \textbf{Ref.} & \textbf{Imit.} & \textbf{16-Task AVG} & \textbf{Key Paired Test ($m=146$)} \\
+    \midrule
+    \multicolumn{8}{l}{\emph{Published Official \texttt{test} Leaderboard ($N=800 \times 3$ seeds; for reference)}} \\
+    $\pi_{0.5}$ Baseline \cite{mmevla2026} & $0\text{ B}$ & $28.78$ & $17.00$ & $17.17$ & $8.78$ & $17.93\%$ & Memoryless reference \\
+    \texttt{MemER} (\texttt{Qwen3-VL-4B}) \cite{mmevla2026} & $16$ imgs & $48.83$ & $\mathbf{53.17}$ & $38.00$ & $29.50$ & $42.38\%$ & $10{,}135\text{ ms/chunk}$ \\
+    \texttt{FrameSamp+Modulator} \cite{mmevla2026} & $4.00\text{ MiB}$ & $65.22$ & $25.11$ & $36.33$ & $51.39$ & $44.51\%$ & $440.0\text{ ms}$ (A5000) \\
+    \texttt{T\textsuperscript{2}Mem} ($1{,}536$ H200-h) \cite{t2mem2026} & $36.35\text{ MiB}$ & $\mathbf{78.17}$ & $49.17$ & $38.67$ & $\mathbf{61.34}$ & $\mathbf{56.83\%}$ & Current non-oracle SOTA \\
+    \midrule
+    \multicolumn{8}{l}{\emph{Our Controlled Held-Out \texttt{test240} ($N=240$, single-session $k=1$)}} \\
+    $\pi_{0.5}$ Base (PyTorch) & $0\text{ B}$ & $21.67$ & $30.00$ & $23.33$ & $11.67$ & $21.67\%$ & $223.1\text{ ms/chunk}$ \\
+    \texttt{FrameSamp+Modul} (PyTorch) & $2.00\text{ MiB}$ & $\mathbf{66.67}$ & $28.33$ & $35.00$ & $53.33$ & $45.83\%$ & $+24.17\text{ pp}$ vs Base ($p_{\mathrm{Holm}}\!=\!0.0292$) \\
+    \textbf{Ours: Unified Pyr+Hop-2 (1-Ckpt)} & $2.84\text{ MiB}$ & $65.00$ & $28.33$ & $43.33$ & $\mathbf{53.33}$ & $47.50\%$ & $+25.83\text{ pp}$ vs Base ($p_{\mathrm{Holm}}\!=\!0.0292$) \\
+    \textbf{Ours: Hybrid Stage-C Hop-2} & $2.39\text{ MiB}$ & $65.00$ & $\mathbf{31.67}$ & $\mathbf{45.00}$ & $\mathbf{53.33}$ & $\mathbf{48.75\%}$ & $+27.08\text{ pp}$ vs Base ($p_{\mathrm{Holm}}\!=\!0.0292$); vs FS $p\!=\!0.349$ \\
+    \midrule
+    \multicolumn{8}{l}{\emph{Our Controlled Held-Out \texttt{test240} Under Un-Reset Cross-Session Interference ($k=3$, $720$ rollouts)}} \\
+    \texttt{FrameSamp+Modul} ($k=3$) & $2.00\text{ MiB}$ & $21.67$ & $15.00$ & $20.00$ & $5.00$ & $15.42\%$ & $-30.42\text{ pp}$ collapse ($p_{\mathrm{Holm}}\!=\!0.0292$) \\
+    \textbf{Ours: Hybrid Stage-C Hop-2 ($k=3$)} & $2.39\text{ MiB}$ & $\mathbf{43.33}$ & $\mathbf{25.00}$ & $\mathbf{45.00}$ & $\mathbf{53.33}$ & $\mathbf{41.67\%}$ & \textbf{$+26.25\text{ pp}$ vs FS $k=3$ ($p_{\mathrm{McN}}\!=\!1.16\text{e-}14$, $p_{\mathrm{Holm}}\!=\!0.0292$)} \\
+    \midrule
+    \multicolumn{8}{l}{\emph{Model-Selection \texttt{val80} ($N=80$, $k=1$; best-of-$63$ configurations---upward selection bias applies)}} \\
+    \texttt{FrameSamp+Modul} (\texttt{val80}) & $2.00\text{ MiB}$ & $65.00$ & $20.00$ & $25.00$ & $65.00$ & $43.75\%$ & $+25.00\text{ pp}$ vs Base ($p_{\mathrm{Holm}}\!=\!0.0356$) \\
+    \textbf{Ours: Unified Pyr/HR16/Adv+Hop-2} & $2.84\text{ MiB}$ & $80.00$ & $40.00$ & $45.00$ & $65.00$ & $57.50\%$ & $8.19\text{ GiB}$ 1-ckpt ($p_{\mathrm{McN}}\!=\!0.0127$, $p_{\mathrm{Holm}}\!=\!0.294$) \\
+    \textbf{Ours: Specialist M10+Hop-2} & $2.94\text{ MiB}$ & $\mathbf{80.00}$ & $\mathbf{40.00}$ & $\mathbf{55.00}$ & $\mathbf{65.00}$ & $\mathbf{60.00\%}$ & $16/16 \ge 20\%$ ($p_{\mathrm{McN}}\!=\!0.0044$, $p_{\mathrm{Holm}}\!=\!0.152$) \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+Table~\ref{tab:main} and Figures~\ref{fig:p2_main}--\ref{fig:p2_interf} summarize our $77$ Phase-2 evaluations:
+\begin{enumerate}[leftmargin=1.6em,nosep]
+  \item \textbf{Strongest Held-Out Result---Un-Reset $k=3$ Cross-Session Interference (\texttt{test240}):} When $2$ prior cross-task distractor episodes precede each target episode without oracle memory resets, \texttt{FrameSamp+Modulator} collapses by $-30.42\text{ pp}$ ($45.83\% \to 15.42\%$, $p_{\mathrm{McN}} = 2.44 \times 10^{-17}$, falling below memoryless $\pi_{0.5}$'s $21.67\%$). On the exact same paired distractor streams, \texttt{Hybrid Stage-C Hop-2} retains \textbf{$41.67\%$ ($100/240$)}, outperforming \texttt{FrameSamp+Modulator} by \textbf{$+26.25\text{ pp}$ ($2.70\times$, $69:6$ discordant wins, $p_{\mathrm{McN}} = 1.16 \times 10^{-14}$, $p_{\mathrm{Holm}} = 0.0292$)}, with $0.00\text{ pp}$ degradation on \texttt{Reference} ($45.00\%$) and \texttt{Imitation} ($53.33\%$).
+  \item \textbf{Single-Session Held-Out \texttt{test240} ($k=1$):} \texttt{Hybrid Stage-C Hop-2} achieves \textbf{$48.75\%$ ($117/240$)} at $387.8\text{ ms/chunk}$ ($7.04\text{ GiB}$ VRAM), and single-checkpoint \texttt{Unified M7D-v2 + Pyramid + Hop-2} achieves \textbf{$47.50\%$ ($114/240$, $8.82\text{ GiB}$)}. Both outperform $\pi_{0.5}$ Base with family-wise significance ($p_{\mathrm{Holm}} = 0.0292$) and exceed \texttt{FrameSamp+\allowbreak Modulator} ($45.83\%$) in point estimate, though the $+2.92\text{ pp}$ single-session margin over \texttt{FrameSamp} is not statistically significant ($24:17$, $p_{\mathrm{McN}} = 0.349$).
+  \item \textbf{Per-Task Comparison Against \texttt{T\textsuperscript{2}Mem} ($56.83\%$):} On \texttt{test240}, our models match or exceed published \texttt{T\textsuperscript{2}Mem} on $8$ of $16$ tasks---\texttt{BinFill} ($66.7\%$ vs.\ $60.7\%$), \texttt{VideoUnmaskSwap} ($33.3\%$ vs.\ $29.3\%$), \texttt{ButtonUnmaskSwap} ($26.7\%$--$33.3\%$ vs.\ $20.0\%$), \texttt{VideoRepick} ($40.0\%$ vs.\ $38.7\%$), \texttt{VideoPlaceButton} ($60.0\%$ vs.\ $35.3\%$), \texttt{VideoPlaceOrder} ($60.0\%$ vs.\ $30.0\%$), \texttt{MoveCube} ($86.7\%$ vs.\ $80.7\%$), and \texttt{PatternLock} ($66.7\%$ vs.\ $50.0\%$)---while $98\%$ of our $-8.08\text{ pp}$ overall deficit concentrates in four tasks: \texttt{VideoUnmask} ($26.7\%$ vs.\ $88.0\%$), \texttt{StopCube} ($26.7\%$ vs.\ $70.0\%$), \texttt{InsertPeg} ($0.0\%$ vs.\ $36.0\%$), and \texttt{PickHighlight} ($20.0\%$ vs.\ $50.7\%$; $60.0\%$ in an exploratory 15-episode \texttt{Symbolic-VLM} test).
+\end{enumerate}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.96\linewidth,height=0.83\textheight,keepaspectratio]{../docs/figures_phase2/fig_p2_2_per_task_heatmap.pdf}
+  \caption{\textbf{Per-Task Success Rate Matrix Across All 16 \texttt{RoboMME} Tasks} comparing baselines, pure hybrid memory, unified single-checkpoint VLM-grounded models, and specialist routing.}
+  \label{fig:p2_heatmap}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.95\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.35\textheight,keepaspectratio]{../docs/figures_phase2/fig_p2_3_efficiency_pareto_and_state.pdf}
+    \caption{Inference latency per chunk and fast-state memory footprint Pareto frontier.}
+  \end{subfigure}\\[0.6em]
+  \begin{subfigure}[t]{0.95\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.35\textheight,keepaspectratio]{../docs/figures_phase2/fig_p2_4_interference_and_parity.pdf}
+    \caption{Un-reset $k=3$ cross-session interference robustness and Orbax$\to$PyTorch bridge parity.}
+  \end{subfigure}
+  \caption{\textbf{Systems Efficiency and Un-Reset Multi-Session Robustness.} \texttt{DeltaMem-$\pi_{0.5}$} operates at $387.8\text{ ms/chunk}$ ($26\times$ faster than \texttt{MemER}) and $0.51$--$2.94\text{ MiB}$ state ($12.4\times$--$71\times$ smaller than \texttt{T\textsuperscript{2}Mem}).}
+  \label{fig:p2_interf}
+\end{figure}
+
+% =============================================================================
+\section{Engineering Diagnostics, Caveats, and Negative Results}
+% =============================================================================
+\paragraph{Critical Implementation Pitfalls Resolved.}
+(1)~Post-\texttt{SigLIP} affine cropping warped baked-in vision positional embeddings relative to 3D robot actions; removing it restored \texttt{PickHighlight} from $0\% \to 60\%$.
+(2)~Updating \texttt{bfloat16} parameters directly at $\text{lr}=4\times 10^{-5} < 0.5\,\text{ulp}_{\mathrm{bf16}}(0.05)$ truncated motor updates; \texttt{FP32MasterAdamW} ($\text{wd}=10^{-10}$) restored smooth co-adaptation.
+(3)~Supervised $\langle y, x\rangle$ training on interior execution steps leaked the hovering expert Panda arm ($\sim 50\text{ px}$ unseen error); masking coordinate loss strictly to unoccluded stage-entry frames ($w_{\text{non-entry}}=0$) cut unseen \texttt{STEP0} error to $12.82$--$15.87\text{ px}$.
+(4)~Wrapping MLP layers alongside attention projections in \texttt{DualSwitchableLoRALinear} ($252/252$ tensors) yielded a $+12.50\text{ pp}$ zero-retraining jump ($42.50\% \to 55.00\%$).
+
+\paragraph{Transparent Statistical Disclosures and Negative Results.}
+(1)~\emph{Best-of-$63$ selection on \texttt{val80}:} Our $60.00\%$ and $57.50\%$ \texttt{val80} scores reflect iterative selection over $63$ configurations ($p_{\mathrm{Holm}} \ge 0.152$ vs.\ \texttt{FrameSamp}); generalisation claims rest strictly on \texttt{test240}.
+(2)~\emph{Mechanism of $k=3$ robustness:} \texttt{Hybrid Stage-C Hop-2} exhibits robustness, not total immunity ($48.75\% \to 41.67\%$, $-7.08\text{ pp}$ vs.\ \texttt{FrameSamp}'s $-30.42\text{ pp}$), driven primarily by \texttt{EpisodeBoundaryForgetGate} (which upstream \texttt{FrameSamp} lacks): on the $9$ video-demo tasks ($135$ eps), ours goes $64 \to 65$ ($+0.7\text{ pp}$) vs.\ \texttt{FrameSamp}'s $60 \to 20$ ($-29.6\text{ pp}$), while on the $7$ demo-free tasks ($105$ eps), ours goes $53 \to 35$ ($-17.1\text{ pp}$) vs.\ $50 \to 17$ ($-31.4\text{ pp}$).
+(3)~\emph{Track-1 vs.\ Track-2 initialization:} All models above $25\%$ warm-start from public non-privileged \texttt{MME-VLA} checkpoints; in a step-matched $350$-step cold \texttt{pi05\_baseline} comparison, 2L-GDN ($17.50\%$) outperformed 1L-\texttt{T\textsuperscript{2}Mem} ($15.00\%$) and cold joint PEFT ($13.75\%$).
+(4)~\emph{Negative results:} Implicit continuous VLM KV bridging without $\langle y, x\rangle$ text (\texttt{P2-M11}, $45.00\%$, gate amplitude $1.56\%$), reactive 4-step replanning (\texttt{P2-M12}, $53.75\%$, where Flow-Matching re-noising disrupted \texttt{InsertPeg} $20\% \to 0\%$), memoryless \texttt{Symbolic-VLM} permanence routing (\texttt{m10v4}, $50.00\%$, \texttt{Permanence} $5\%$), and two-sided prominence + patch-flow advection (\texttt{m9v5adv}, $57.50\%$ \texttt{val80}, withheld from \texttt{test240} under our pre-registered $>60\%$ gate) are preserved in full in the repository.
+
+% =============================================================================
+\section{Conclusion}
+% =============================================================================
+Across synthetic benchmarks, cached $450\text{M}$ \texttt{SmolVLA}, and $3.44\text{B}$ $\pi_{0.5}$, combining $520\text{ KB}$ multi-timescale Gated DeltaNet state, non-privileged surprise landmarks, boundary-reset gating, and selective multi-hop refinement yields real-time ($387.8\text{ ms/chunk}$), memory-compact ($2.39\text{ MiB}$) visuomotor policies that surpass memoryless $\pi_{0.5}$ by $+27.08\text{ pp}$ on \texttt{RoboMME} \texttt{test240} and outperform explicit frame-sampling memory by $+26.25\text{ pp}$ ($p_{\mathrm{Holm}} = 0.0292$) under realistic un-reset multi-episode streaming. Closing the remaining $-8.08\text{ pp}$ single-session gap to $1{,}536$-H200-hour \texttt{T\textsuperscript{2}Mem} centers on four sharply localized tasks: \texttt{VideoUnmask}, \texttt{StopCube}, \texttt{InsertPeg}, and \texttt{PickHighlight}.
+
+\FloatBarrier
+\bibliographystyle{plain}
+\bibliography{references}
+
+\vspace{1.5em}
+\noindent\rule{\linewidth}{0.8pt}
+\begin{center}
+\small
+\textbf{AI Authorship \& Creation Disclosure}\\[0.3em]
+本研究・コード実装・実験評価・本技術レポートおよびプロジェクトページは、主に \textbf{Gemini 4 Carbon} を使用して書かれ・作られました。\\
+\emph{This research, codebase, experimental evaluation, technical report, and project website were primarily written and created using \textbf{Gemini 4 Carbon}.}
+\end{center}
+\noindent\rule{\linewidth}{0.8pt}
+
+\end{document}

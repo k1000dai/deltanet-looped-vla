@@ -1,0 +1,118 @@
+{
+  "config": {
+    "tasks": [
+      "PickXtimes",
+      "StopCube",
+      "VideoUnmaskSwap",
+      "ButtonUnmaskSwap",
+      "VideoRepick",
+      "VideoPlaceOrder",
+      "InsertPeg",
+      "RouteStick"
+    ],
+    "dataset": "val",
+    "model_seeds": [
+      7
+    ],
+    "exec_horizon": 16,
+    "max_steps": 1300
+  },
+  "summary": {
+    "overall": {
+      "name": "overall",
+      "num_episodes": 1,
+      "success_rate": 0.0,
+      "success_ci95_low": 0.0,
+      "success_ci95_high": 0.0,
+      "mean_steps": 401.0,
+      "mean_demo_frames": 0.0,
+      "mean_loop_depth": 3.0,
+      "p50_loop_depth": 3.0,
+      "p95_loop_depth": 3.0,
+      "mean_ms_per_chunk": 615.8701541829103,
+      "p95_ms_per_chunk": 615.8701541829103
+    },
+    "suites": {
+      "Counting": {
+        "name": "Counting",
+        "num_episodes": 1,
+        "success_rate": 0.0,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.0,
+        "mean_steps": 401.0,
+        "mean_demo_frames": 0.0,
+        "mean_loop_depth": 3.0,
+        "p50_loop_depth": 3.0,
+        "p95_loop_depth": 3.0,
+        "mean_ms_per_chunk": 615.8701541829103,
+        "p95_ms_per_chunk": 615.8701541829103
+      }
+    },
+    "tasks": {
+      "PickXtimes": {
+        "name": "PickXtimes",
+        "num_episodes": 1,
+        "success_rate": 0.0,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.0,
+        "mean_steps": 401.0,
+        "mean_demo_frames": 0.0,
+        "mean_loop_depth": 3.0,
+        "p50_loop_depth": 3.0,
+        "p95_loop_depth": 3.0,
+        "mean_ms_per_chunk": 615.8701541829103,
+        "p95_ms_per_chunk": 615.8701541829103
+      }
+    }
+  },
+  "episodes": [
+    {
+      "task": "PickXtimes",
+      "suite": "Counting",
+      "dataset": "val",
+      "episode_id": 0,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 401,
+      "demo_frames": 0,
+      "num_chunks": 26,
+      "mean_loop_depth": 3.0,
+      "p95_loop_depth": 3.0,
+      "loop_depths": [
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0
+      ],
+      "mean_ms_per_chunk": 615.8701541829103,
+      "total_infer_ms": 16012.624008755665,
+      "episode_wall_s": 23.09268698398955,
+      "task_goal": "pick up the blue cube and place it on the target, repeating this action three times, then press the button to stop",
+      "difficulty": "easy",
+      "error_message": null
+    }
+  ]
+}

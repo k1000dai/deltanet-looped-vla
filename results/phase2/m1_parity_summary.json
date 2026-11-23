@@ -1,0 +1,90 @@
+{
+  "milestone": "M1_pi05_bridge_parity_and_eval",
+  "hardware": "Local x86_64 NVIDIA GeForce RTX 5080 Laptop GPU (16,303 MiB VRAM), headless SAPIEN 3.0.2 (DISPLAY='')",
+  "protocol": {
+    "split": "val",
+    "num_tasks": 16,
+    "episodes_per_task": 5,
+    "total_episodes": 80,
+    "seed": 7,
+    "exec_horizon": 16,
+    "action_horizon": 20,
+    "max_steps": 1300
+  },
+  "pi05_baseline_pt": {
+    "official_hf_repo": "Yinpei/pi05_baseline",
+    "official_test_sr": 0.1793,
+    "val80_sr": 0.1875,
+    "val80_ci95": [
+      0.1,
+      0.275
+    ],
+    "suites": {
+      "Counting": 0.3,
+      "Permanence": 0.15,
+      "Reference": 0.2,
+      "Imitation": 0.1
+    },
+    "mean_ms_per_chunk": 184.44564142791634,
+    "p95_ms_per_chunk": 189.55838156742726,
+    "model_only_vram_mib": 6575.93,
+    "peak_eval_with_sapien_vram_mib": 6674.57,
+    "parity_metrics": {
+      "bfloat16_vs_flax_bfloat16_siglip_max_diff": 3.5,
+      "bfloat16_vs_flax_bfloat16_vt_max_diff": 0.029721736907958984,
+      "bfloat16_vs_flax_bfloat16_vt_mean_diff": 0.005796985235065222,
+      "bfloat16_vs_flax_bfloat16_sdpa_vt_max_diff": 0.025909423828125,
+      "bf16_step0_modul_residual_diff": 0.0,
+      "float32_vs_flax_float32_siglip_max_diff": 0.00012969970703125,
+      "float32_vs_flax_float32_vt_max_diff": 1.6689300537109375e-06,
+      "float32_vs_flax_float32_vt_mean_diff": 3.5457779290481994e-07,
+      "float32_vs_flax_float32_sdpa_vt_max_diff": 1.6689300537109375e-06
+    }
+  },
+  "perceptual_framesamp_modul_pt": {
+    "official_hf_repo": "Yinpei/perceptual-framesamp-modul",
+    "official_test_sr": 0.4451,
+    "val80_sr": 0.4375,
+    "val80_ci95": [
+      0.325,
+      0.55
+    ],
+    "suites": {
+      "Counting": 0.65,
+      "Permanence": 0.2,
+      "Reference": 0.25,
+      "Imitation": 0.65
+    },
+    "mean_ms_per_chunk": 414.9576928572709,
+    "p95_ms_per_chunk": 458.8669976973446,
+    "model_only_vram_mib": 6582.94,
+    "peak_eval_with_sapien_vram_mib": 6851.3,
+    "parity_metrics": {
+      "bfloat16_vs_flax_bfloat16_siglip_max_diff": 3.5,
+      "bfloat16_vs_flax_bfloat16_vt_max_diff": 0.2976078987121582,
+      "bfloat16_vs_flax_bfloat16_vt_mean_diff": 0.019473392516374588,
+      "bfloat16_vs_flax_bfloat16_sdpa_vt_max_diff": 0.12834858894348145,
+      "float32_vs_flax_float32_siglip_max_diff": 0.00012969970703125,
+      "float32_vs_flax_float32_vt_max_diff": 1.0013580322265625e-05,
+      "float32_vs_flax_float32_vt_mean_diff": 1.0801217058542534e-06,
+      "float32_vs_flax_float32_sdpa_vt_max_diff": 1.0013580322265625e-05
+    }
+  },
+  "paired_comparison_framesamp_vs_baseline": {
+    "n_pairs": 80,
+    "mean_a": 0.4375,
+    "mean_b": 0.1875,
+    "mean_diff": 0.25,
+    "ci_low": 0.125,
+    "ci_high": 0.375,
+    "p_value_two_sided": 0.0001,
+    "p_bootstrap_phipson_smyth_2tail": 0.0002,
+    "p_value_one_sided_gt0": 0.0001,
+    "p_value_one_sided_lt0": 1.0,
+    "discordant_a_only": 25,
+    "discordant_b_only": 5,
+    "p_bootstrap_two_sided": 0.0001,
+    "p_mcnemar_two_sided": 0.000324914,
+    "p_mcnemar_two_sided_4dp": 0.0003
+  }
+}

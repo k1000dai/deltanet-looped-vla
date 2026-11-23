@@ -1,0 +1,225 @@
+{
+  "config": {
+    "tasks": [
+      "StopCube"
+    ],
+    "dataset": "test",
+    "model_seeds": [
+      7
+    ],
+    "exec_horizon": 16,
+    "max_steps": 1300
+  },
+  "summary": {
+    "overall": {
+      "name": "overall",
+      "num_episodes": 5,
+      "success_rate": 0.2,
+      "success_ci95_low": 0.0,
+      "success_ci95_high": 0.6,
+      "mean_steps": 140.8,
+      "mean_demo_frames": 0.0,
+      "mean_loop_depth": 1.0,
+      "p50_loop_depth": 1.0,
+      "p95_loop_depth": 1.0,
+      "mean_ms_per_chunk": 227.53948507480217,
+      "p95_ms_per_chunk": 279.51296027392215
+    },
+    "suites": {
+      "Counting": {
+        "name": "Counting",
+        "num_episodes": 5,
+        "success_rate": 0.2,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.6,
+        "mean_steps": 140.8,
+        "mean_demo_frames": 0.0,
+        "mean_loop_depth": 1.0,
+        "p50_loop_depth": 1.0,
+        "p95_loop_depth": 1.0,
+        "mean_ms_per_chunk": 227.53948507480217,
+        "p95_ms_per_chunk": 279.51296027392215
+      }
+    },
+    "tasks": {
+      "StopCube": {
+        "name": "StopCube",
+        "num_episodes": 5,
+        "success_rate": 0.2,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.6,
+        "mean_steps": 140.8,
+        "mean_demo_frames": 0.0,
+        "mean_loop_depth": 1.0,
+        "p50_loop_depth": 1.0,
+        "p95_loop_depth": 1.0,
+        "mean_ms_per_chunk": 227.53948507480217,
+        "p95_ms_per_chunk": 279.51296027392215
+      }
+    }
+  },
+  "episodes": [
+    {
+      "task": "StopCube",
+      "suite": "Counting",
+      "dataset": "test",
+      "episode_id": 0,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 320,
+      "demo_frames": 0,
+      "num_chunks": 20,
+      "mean_loop_depth": 1.0,
+      "p95_loop_depth": 1.0,
+      "loop_depths": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_ms_per_chunk": 290.596564450243,
+      "total_infer_ms": 5811.93128900486,
+      "episode_wall_s": 17.730877135007177,
+      "task_goal": "press the button to stop the cube just as it reaches the target for the fourth time",
+      "difficulty": "easy",
+      "error_message": null
+    },
+    {
+      "task": "StopCube",
+      "suite": "Counting",
+      "dataset": "test",
+      "episode_id": 1,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 97,
+      "demo_frames": 0,
+      "num_chunks": 7,
+      "mean_loop_depth": 1.0,
+      "p95_loop_depth": 1.0,
+      "loop_depths": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_ms_per_chunk": 235.17854356863867,
+      "total_infer_ms": 1646.2498049804708,
+      "episode_wall_s": 6.034916948003229,
+      "task_goal": "press the button to stop the cube just as it reaches the target for the fourth time",
+      "difficulty": "easy",
+      "error_message": null
+    },
+    {
+      "task": "StopCube",
+      "suite": "Counting",
+      "dataset": "test",
+      "episode_id": 2,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 80,
+      "demo_frames": 0,
+      "num_chunks": 5,
+      "mean_loop_depth": 1.0,
+      "p95_loop_depth": 1.0,
+      "loop_depths": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_ms_per_chunk": 219.48482260049786,
+      "total_infer_ms": 1097.4241130024893,
+      "episode_wall_s": 4.932463557997835,
+      "task_goal": "press the button to stop the cube just as it reaches the target for the second time",
+      "difficulty": "medium",
+      "error_message": null
+    },
+    {
+      "task": "StopCube",
+      "suite": "Counting",
+      "dataset": "test",
+      "episode_id": 3,
+      "model_seed": 7,
+      "success": true,
+      "outcome": "success",
+      "steps": 87,
+      "demo_frames": 0,
+      "num_chunks": 6,
+      "mean_loop_depth": 1.0,
+      "p95_loop_depth": 1.0,
+      "loop_depths": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_ms_per_chunk": 191.6607085004216,
+      "total_infer_ms": 1149.9642510025296,
+      "episode_wall_s": 4.860319548999541,
+      "task_goal": "press the button to stop the cube just as it reaches the target for the second time",
+      "difficulty": "hard",
+      "error_message": null
+    },
+    {
+      "task": "StopCube",
+      "suite": "Counting",
+      "dataset": "test",
+      "episode_id": 4,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 120,
+      "demo_frames": 0,
+      "num_chunks": 8,
+      "mean_loop_depth": 1.0,
+      "p95_loop_depth": 1.0,
+      "loop_depths": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_ms_per_chunk": 200.77678625420958,
+      "total_infer_ms": 1606.2142900336767,
+      "episode_wall_s": 5.735275140992599,
+      "task_goal": "press the button to stop the cube just as it reaches the target for the second time",
+      "difficulty": "easy",
+      "error_message": null
+    }
+  ],
+  "worker_telemetry": {
+    "arch": "smolvla_m2_framesamp",
+    "state_size_bytes": 24576,
+    "peak_vram_mb": 1018.11,
+    "distractor_sessions": 0
+  }
+}

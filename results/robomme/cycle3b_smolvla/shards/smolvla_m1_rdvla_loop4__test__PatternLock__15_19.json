@@ -1,0 +1,222 @@
+{
+  "config": {
+    "tasks": [
+      "PatternLock"
+    ],
+    "dataset": "test",
+    "model_seeds": [
+      7
+    ],
+    "exec_horizon": 16,
+    "max_steps": 1300
+  },
+  "summary": {
+    "overall": {
+      "name": "overall",
+      "num_episodes": 5,
+      "success_rate": 0.0,
+      "success_ci95_low": 0.0,
+      "success_ci95_high": 0.0,
+      "mean_steps": 130.6,
+      "mean_demo_frames": 135.6,
+      "mean_loop_depth": 4.0,
+      "p50_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "mean_ms_per_chunk": 175.26544430163995,
+      "p95_ms_per_chunk": 208.6605262433477
+    },
+    "suites": {
+      "Imitation": {
+        "name": "Imitation",
+        "num_episodes": 5,
+        "success_rate": 0.0,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.0,
+        "mean_steps": 130.6,
+        "mean_demo_frames": 135.6,
+        "mean_loop_depth": 4.0,
+        "p50_loop_depth": 4.0,
+        "p95_loop_depth": 4.0,
+        "mean_ms_per_chunk": 175.26544430163995,
+        "p95_ms_per_chunk": 208.6605262433477
+      }
+    },
+    "tasks": {
+      "PatternLock": {
+        "name": "PatternLock",
+        "num_episodes": 5,
+        "success_rate": 0.0,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.0,
+        "mean_steps": 130.6,
+        "mean_demo_frames": 135.6,
+        "mean_loop_depth": 4.0,
+        "p50_loop_depth": 4.0,
+        "p95_loop_depth": 4.0,
+        "mean_ms_per_chunk": 175.26544430163995,
+        "p95_ms_per_chunk": 208.6605262433477
+      }
+    }
+  },
+  "episodes": [
+    {
+      "task": "PatternLock",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 15,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 157,
+      "demo_frames": 258,
+      "num_chunks": 10,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 215.01853610097896,
+      "total_infer_ms": 2150.218181006494,
+      "episode_wall_s": 16.307603912006016,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to retrace the same pattern",
+      "difficulty": "hard",
+      "error_message": null
+    },
+    {
+      "task": "PatternLock",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 16,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 156,
+      "demo_frames": 105,
+      "num_chunks": 10,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 146.29949139780365,
+      "total_infer_ms": 1463.0258169781882,
+      "episode_wall_s": 12.564488459000131,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to retrace the same pattern",
+      "difficulty": "easy",
+      "error_message": null
+    },
+    {
+      "task": "PatternLock",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 17,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 253,
+      "demo_frames": 69,
+      "num_chunks": 16,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 183.22848681282267,
+      "total_infer_ms": 2931.6841550098616,
+      "episode_wall_s": 15.272011116998328,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to retrace the same pattern",
+      "difficulty": "easy",
+      "error_message": null
+    },
+    {
+      "task": "PatternLock",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 18,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 67,
+      "demo_frames": 64,
+      "num_chunks": 5,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 182.44272220035782,
+      "total_infer_ms": 912.2407569957431,
+      "episode_wall_s": 10.871688254002947,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to retrace the same pattern",
+      "difficulty": "medium",
+      "error_message": null
+    },
+    {
+      "task": "PatternLock",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 19,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 20,
+      "demo_frames": 182,
+      "num_chunks": 2,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 149.33798499623663,
+      "total_infer_ms": 298.70770999696106,
+      "episode_wall_s": 11.926100746000884,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to retrace the same pattern",
+      "difficulty": "hard",
+      "error_message": null
+    }
+  ],
+  "worker_telemetry": {
+    "arch": "smolvla_m1_rdvla_loop4",
+    "state_size_bytes": 0,
+    "peak_vram_mb": 891.56,
+    "distractor_sessions": 0
+  }
+}

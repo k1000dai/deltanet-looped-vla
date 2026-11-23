@@ -1,0 +1,34 @@
+# Virtual environments
+.venv/
+
+# External repositories
+external/
+
+# Experiment outputs, datasets, checkpoints, and artifacts
+outputs/
+data/
+checkpoints/
+*.pt
+*.pth
+*.safetensors
+*.mp4
+
+# LaTeX build intermediates
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.xdv
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Experiment tracking
+.wandb/
+wandb/

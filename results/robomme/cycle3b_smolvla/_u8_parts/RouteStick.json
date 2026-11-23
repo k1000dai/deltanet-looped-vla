@@ -1,0 +1,141 @@
+{
+  "mode": "smolvla_cached_shards",
+  "shard_dir": "/work/gj26/b20098/datasets/robomme_smolvla_v1",
+  "device": "cuda",
+  "train_frac": 0.8,
+  "distractor_ks": [
+    0,
+    1,
+    3
+  ],
+  "models": {
+    "smolvla_m7_deltaloop_anchor": {
+      "meta": {
+        "ckpt_path": "/work/gj26/b20098/projects/deltanet-looped-vla/checkpoints/robomme/cycle3b_smolvla/smolvla_m7_deltaloop_anchor.pt",
+        "arch": "smolvla_m7_deltaloop",
+        "step": 10000,
+        "state_bytes": 532480,
+        "max_loops": 4,
+        "missing_keys": [],
+        "unexpected_keys": [],
+        "probe_wall_sec": 44.95
+      },
+      "tasks": {
+        "RouteStick": {
+          "n_episodes_used": 100,
+          "n_train_episodes": 80,
+          "n_eval_episodes": 20,
+          "L_eval": 4,
+          "probe1_xy_localization": {
+            "n_train_xy_chunks": 0,
+            "n_eval_xy_chunks": 0,
+            "ctx_only_ridge": {},
+            "coda_only_by_depth": {},
+            "fused_ctx_coda_by_depth": {}
+          },
+          "probe2_state_retention": {
+            "state_feature_dim": 133120,
+            "count_target_name": "completed_transitions",
+            "count_from_S_past": {
+              "n_samples": 233,
+              "acc_pct": 71.6738224029541,
+              "macro_f1_pct": 44.596140093097496,
+              "mae": 0.3776824176311493
+            },
+            "count_from_coda_L": {
+              "n_samples": 233,
+              "acc_pct": 67.81116127967834,
+              "macro_f1_pct": 42.28979063559989,
+              "mae": 0.42489269375801086
+            },
+            "count_from_S_past_by_horizon": {
+              "early_lt32": {
+                "n_samples": 40,
+                "acc_pct": 94.9999988079071,
+                "macro_f1_pct": 97.43589743589743,
+                "mae": 0.05000000074505806
+              },
+              "mid_32_95": {
+                "n_samples": 80,
+                "acc_pct": 81.25,
+                "macro_f1_pct": 82.28201991962258,
+                "mae": 0.21250000596046448
+              },
+              "late_ge96": {
+                "n_samples": 113,
+                "acc_pct": 56.63716793060303,
+                "macro_f1_pct": 37.9028379028379,
+                "mae": 0.6106194853782654
+              }
+            }
+          },
+          "probe3_cross_session_and_halting": {
+            "event_loop_profile": {
+              "overall": {
+                "n_chunks": 233,
+                "mean_expected_L": 1.4869556427001953,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "mean_coda_drift": 0.07691589742898941
+              },
+              "post_demo_onset": {
+                "n_chunks": 40,
+                "mean_expected_L": 1.5427194833755493,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "mean_coda_drift": 0.0775243490934372
+              },
+              "subgoal_transition": {
+                "n_chunks": 37,
+                "mean_expected_L": 1.5313012599945068,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "mean_coda_drift": 0.07675357162952423
+              },
+              "steady_execution": {
+                "n_chunks": 156,
+                "mean_expected_L": 1.462139368057251,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "mean_coda_drift": 0.07679837942123413
+              }
+            },
+            "by_distractor_k": {
+              "k=0": {
+                "k_distractor_episodes": 0,
+                "coda_cos_sim_vs_k0": 1.0000007152557373,
+                "mean_expected_L": 1.4869556427001953,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "probe2_count_acc_pct": 71.6738224029541
+              },
+              "k=1": {
+                "k_distractor_episodes": 1,
+                "coda_cos_sim_vs_k0": 0.9907318353652954,
+                "mean_expected_L": 1.4838758707046509,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "probe2_count_acc_pct": 11.58798262476921
+              },
+              "k=3": {
+                "k_distractor_episodes": 3,
+                "coda_cos_sim_vs_k0": 0.9907361268997192,
+                "mean_expected_L": 1.4892723560333252,
+                "mean_gate_L": 1.0,
+                "mean_coda_conv_L": 2.0,
+                "probe2_count_acc_pct": 5.5793993175029755
+              }
+            },
+            "summary": {
+              "coda_cos_sim_at_k3": 0.9907361268997192,
+              "px_err_increase_k0_to_k3": NaN,
+              "zero_shot_px_err_increase_k0_to_k3": NaN,
+              "count_acc_drop_k0_to_k3": 66.09442308545113,
+              "expected_L_shift_k0_to_k3": 0.002316713333129883
+            }
+          }
+        }
+      }
+    }
+  }
+}

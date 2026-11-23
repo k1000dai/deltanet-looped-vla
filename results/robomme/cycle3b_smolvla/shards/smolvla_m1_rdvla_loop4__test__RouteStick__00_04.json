@@ -1,0 +1,225 @@
+{
+  "config": {
+    "tasks": [
+      "RouteStick"
+    ],
+    "dataset": "test",
+    "model_seeds": [
+      7
+    ],
+    "exec_horizon": 16,
+    "max_steps": 1300
+  },
+  "summary": {
+    "overall": {
+      "name": "overall",
+      "num_episodes": 5,
+      "success_rate": 0.0,
+      "success_ci95_low": 0.0,
+      "success_ci95_high": 0.0,
+      "mean_steps": 139.8,
+      "mean_demo_frames": 160.0,
+      "mean_loop_depth": 4.0,
+      "p50_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "mean_ms_per_chunk": 163.04123428668132,
+      "p95_ms_per_chunk": 179.95055462836586
+    },
+    "suites": {
+      "Imitation": {
+        "name": "Imitation",
+        "num_episodes": 5,
+        "success_rate": 0.0,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.0,
+        "mean_steps": 139.8,
+        "mean_demo_frames": 160.0,
+        "mean_loop_depth": 4.0,
+        "p50_loop_depth": 4.0,
+        "p95_loop_depth": 4.0,
+        "mean_ms_per_chunk": 163.04123428668132,
+        "p95_ms_per_chunk": 179.95055462836586
+      }
+    },
+    "tasks": {
+      "RouteStick": {
+        "name": "RouteStick",
+        "num_episodes": 5,
+        "success_rate": 0.0,
+        "success_ci95_low": 0.0,
+        "success_ci95_high": 0.0,
+        "mean_steps": 139.8,
+        "mean_demo_frames": 160.0,
+        "mean_loop_depth": 4.0,
+        "p50_loop_depth": 4.0,
+        "p95_loop_depth": 4.0,
+        "mean_ms_per_chunk": 163.04123428668132,
+        "p95_ms_per_chunk": 179.95055462836586
+      }
+    }
+  },
+  "episodes": [
+    {
+      "task": "RouteStick",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 0,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 214,
+      "demo_frames": 150,
+      "num_chunks": 14,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 181.27839457104398,
+      "total_infer_ms": 2537.929666999844,
+      "episode_wall_s": 19.594734904996585,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to navigate around the sticks on the table, following the same path",
+      "difficulty": "easy",
+      "error_message": null
+    },
+    {
+      "task": "RouteStick",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 1,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 98,
+      "demo_frames": 100,
+      "num_chunks": 7,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 174.63919485765342,
+      "total_infer_ms": 1222.5072630026261,
+      "episode_wall_s": 15.232211684000504,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to navigate around the sticks on the table, following the same path",
+      "difficulty": "easy",
+      "error_message": null
+    },
+    {
+      "task": "RouteStick",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 2,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 100,
+      "demo_frames": 200,
+      "num_chunks": 7,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 160.50982399922628,
+      "total_infer_ms": 1123.598542995751,
+      "episode_wall_s": 18.132456102001015,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to navigate around the sticks on the table, following the same path",
+      "difficulty": "medium",
+      "error_message": null
+    },
+    {
+      "task": "RouteStick",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 3,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 32,
+      "demo_frames": 200,
+      "num_chunks": 2,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 129.3842740051332,
+      "total_infer_ms": 258.79833500948735,
+      "episode_wall_s": 14.686424995001289,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to navigate around the sticks on the table, following the same path",
+      "difficulty": "hard",
+      "error_message": null
+    },
+    {
+      "task": "RouteStick",
+      "suite": "Imitation",
+      "dataset": "test",
+      "episode_id": 4,
+      "model_seed": 7,
+      "success": false,
+      "outcome": "fail",
+      "steps": 255,
+      "demo_frames": 150,
+      "num_chunks": 16,
+      "mean_loop_depth": 4.0,
+      "p95_loop_depth": 4.0,
+      "loop_depths": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      "mean_ms_per_chunk": 169.39448400034962,
+      "total_infer_ms": 2710.357975003717,
+      "episode_wall_s": 21.579856649994326,
+      "task_goal": "watch the video carefully, then use the stick attached to the robot to navigate around the sticks on the table, following the same path",
+      "difficulty": "easy",
+      "error_message": null
+    }
+  ],
+  "worker_telemetry": {
+    "arch": "smolvla_m1_rdvla_loop4",
+    "state_size_bytes": 0,
+    "peak_vram_mb": 891.56,
+    "distractor_sessions": 0
+  }
+}

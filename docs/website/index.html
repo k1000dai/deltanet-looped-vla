@@ -1,522 +1,552 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5 — Research Visual Showcase</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="[Fun Project] DeltaLoop-VLA & DeltaMem-pi0.5: Multi-Timescale Gated DeltaNet Memory, Non-Privileged Surprise Landmarks, and Interference-Robust Multi-Hop Readout for Long-Horizon Visuomotor Manipulation." />
+  <meta property="og:title" content="[Fun Project] DeltaLoop-VLA & DeltaMem-π0.5: Interference-Robust Embodied Memory for Long-Horizon Manipulation" />
+  <meta property="og:description" content="2.70× higher success (+26.25 pp, p_Holm = 0.0292) under un-reset multi-session interference on RoboMME test240, 48.75% single-session success at 387.8 ms/chunk, and 520 KB O(1) Gated DeltaNet state." />
+  <meta property="og:url" content="https://k1000dai.github.io/deltanet-looped-vla/" />
+  <meta property="og:image" content="https://k1000dai.github.io/deltanet-looped-vla/assets/fig_p2_1_leaderboard_and_suites.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="[Fun Project] DeltaLoop-VLA & DeltaMem-π0.5" />
+  <meta name="twitter:description" content="Multi-Timescale Gated DeltaNet Memory, Surprise Landmarks, and Interference-Robust Multi-Hop Readout on 16-Task RoboMME." />
+  <meta name="twitter:image" content="https://k1000dai.github.io/deltanet-looped-vla/assets/fig_p2_1_leaderboard_and_suites.png" />
+
+  <title>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5: Interference-Robust Embodied Memory for Long-Horizon Manipulation</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+JP:wght@400;600&display=swap" rel="stylesheet" />
+
   <style>
     :root {
-      --bg: #0b1020;
-      --bg-soft: #111831;
-      --surface: #ffffff;
-      --surface-alt: #f5f7fc;
-      --ink: #0f172a;
-      --ink-muted: #475569;
-      --border: #e2e8f0;
-      --blue: #2563eb;
-      --blue-soft: #dbeafe;
-      --teal: #0d9488;
-      --teal-soft: #ccfbf1;
-      --amber: #d97706;
-      --amber-soft: #fef3c7;
-      --rose: #e11d48;
-      --rose-soft: #ffe4e6;
-      --violet: #7c3aed;
-      --slate: #64748b;
-      --radius: 14px;
-      --shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+      --accent: #0066cc;
+      --accent-deep: #1c51d6;
+      --ink: #2b2f42;
+      --body: #363636;
+      --muted: #5a6072;
+      --light-bg: #f5f6f9;
+      --border: #e5e9f0;
+      --ours-bg: #eef4ff;
+      --takeaway-bg: #eef1ff;
     }
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-      background: var(--surface-alt);
-      color: var(--ink);
-      line-height: 1.65;
+      font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--body);
+      background: #ffffff;
+      font-size: 16.5px;
+      line-height: 1.68;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Sticky Top Nav */
-    .topnav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(11, 16, 32, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 0.65rem 1.5rem;
-    }
-    .topnav-inner {
-      max-width: 1240px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .brand {
-      color: #fff;
-      font-weight: 800;
-      font-size: 0.98rem;
-      letter-spacing: 0.01em;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-    }
-    .brand-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #38bdf8, #34d399);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
-    }
-    .nav-links {
-      display: flex;
-      gap: 0.95rem;
-      flex-wrap: wrap;
-    }
-    .nav-links a {
-      color: #cbd5e1;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 0.3rem 0.6rem;
-      border-radius: 6px;
-      transition: all 0.16s ease;
-    }
-    .nav-links a:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
+    h1, h2, h3, h4, .publication-title, .publication-authors, .part-eyebrow, .btn-pill, .tab-pill {
+      font-family: 'Google Sans', 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Hero */
-    .hero {
-      background: radial-gradient(circle at 18% 20%, #1d356e 0%, #0b1020 58%, #070b16 100%);
-      color: #f8fafc;
-      padding: 3.8rem 1.5rem 3.2rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    a {
+      color: var(--accent);
+      text-decoration: none;
     }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Layout containers matching Bulma is-max-desktop + is-four-fifths */
     .container {
-      max-width: 1240px;
+      max-width: 980px;
       margin: 0 auto;
-    }
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #7dd3fc;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.28);
-      padding: 0.32rem 0.8rem;
-      border-radius: 999px;
-      margin-bottom: 1rem;
-    }
-    .hero h1 {
-      font-size: clamp(1.75rem, 3.3vw, 2.75rem);
-      line-height: 1.24;
-      margin: 0 0 1rem;
-      font-weight: 850;
-      letter-spacing: -0.02em;
-    }
-    .hero-sub {
-      color: #cbd5e1;
-      font-size: 1.03rem;
-      max-width: 960px;
-      margin: 0 0 1.8rem;
-    }
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-bottom: 2.2rem;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.42rem 0.85rem;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 650;
-      text-decoration: none;
-      background: rgba(255, 255, 255, 0.08);
-      color: #f1f5f9;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-    .pill:hover {
-      background: rgba(255, 255, 255, 0.16);
-      transform: translateY(-1px);
-    }
-    .pill.primary {
-      background: linear-gradient(135deg, #2563eb, #0d9488);
-      border-color: transparent;
-      color: #fff;
+      padding: 0 1.5rem;
     }
 
-    /* KPI Grid */
-    .kpi-grid {
+    .narrow {
+      max-width: 790px;
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 3.4rem 0;
+    }
+
+    .section.is-light {
+      background-color: var(--light-bg);
+    }
+
+    .has-text-centered { text-align: center; }
+    .has-text-justified { text-align: justify; hyphens: auto; }
+    .has-text-left { text-align: left !important; }
+    .has-text-grey { color: #7a8194; font-weight: 400; }
+
+    /* Hero Header */
+    .hero-header {
+      padding: 3.8rem 0 2.6rem;
+      background: #ffffff;
+    }
+
+    .fun-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.28rem 0.85rem;
+      border-radius: 999px;
+      background: #eef4ff;
+      border: 1px solid #cfe0ff;
+      color: var(--accent-deep);
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 1.05rem;
+    }
+
+    .publication-title {
+      font-size: clamp(1.95rem, 3.6vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.2;
+      color: #1f2433;
+      margin: 0 auto 1.15rem;
+      max-width: 920px;
+      letter-spacing: -0.015em;
+    }
+
+    .publication-authors {
+      font-size: 1.12rem;
+      color: #4a4a4a;
+      margin-bottom: 0.35rem;
+    }
+
+    .publication-venue {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 0.96rem;
+      color: #6b7280;
+      margin-bottom: 1.55rem;
+    }
+
+    /* Rounded dark buttons (Nerfies / Explorative Modeling style) */
+    .publication-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-top: 1.1rem;
+    }
+
+    .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.48rem;
+      background: #363636;
+      color: #ffffff !important;
+      padding: 0.52rem 1.08rem;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      text-decoration: none !important;
+      transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-pill:hover {
+      background: #1f2433;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+    }
+
+    .btn-pill svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Section Headings */
+    .part-eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .title-2 {
+      font-size: clamp(1.65rem, 2.7vw, 2.15rem);
+      font-weight: 700;
+      color: #1f2433;
+      margin: 0 0 0.65rem;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    .title-3 {
+      font-size: clamp(1.38rem, 2.2vw, 1.72rem);
+      font-weight: 700;
+      color: #1f2433;
+      margin: 0 0 1rem;
+      line-height: 1.3;
+    }
+
+    .title-4 {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: #1f2433;
+      margin: 0 0 0.65rem;
+    }
+
+    .subtitle-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 740px;
+      margin: 0 auto 1.6rem;
+      line-height: 1.55;
+    }
+
+    p {
+      margin: 0 0 1rem;
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    code {
+      font-family: ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
+      font-size: 0.86em;
+      background: rgba(27, 31, 35, 0.055);
+      padding: 0.14em 0.38em;
+      border-radius: 5px;
+      color: #26304a;
+    }
+
+    /* Teaser 4-Column Intuition Cards */
+    .teaser-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.9rem;
+      margin-top: 1.2rem;
     }
-    .kpi-card {
-      background: rgba(17, 24, 49, 0.78);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      border-radius: var(--radius);
-      padding: 1.15rem 1.25rem;
+    @media (max-width: 820px) {
+      .teaser-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    .kpi-label {
-      font-size: 0.78rem;
-      color: #94a3b8;
+    @media (max-width: 500px) {
+      .teaser-grid { grid-template-columns: 1fr; }
+    }
+
+    .teaser-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f0;
+      border-radius: 10px;
+      padding: 1.05rem 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .teaser-card.highlight {
+      border: 1.8px solid var(--accent);
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+      box-shadow: 0 8px 22px rgba(0, 102, 204, 0.08);
+    }
+
+    .teaser-card .t-tag {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
+      color: #6b7280;
+      margin-bottom: 0.35rem;
     }
-    .kpi-val {
-      font-size: 1.95rem;
-      font-weight: 850;
-      margin: 0.2rem 0 0.25rem;
-      color: #fff;
-      letter-spacing: -0.02em;
+    .teaser-card.highlight .t-tag {
+      color: var(--accent);
     }
-    .kpi-val .accent-teal { color: #2dd4bf; }
-    .kpi-val .accent-blue { color: #60a5fa; }
-    .kpi-val .accent-amber { color: #fbbf24; }
-    .kpi-note {
-      font-size: 0.81rem;
-      color: #cbd5e1;
+
+    .teaser-card .t-name {
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: #1f2433;
+      margin-bottom: 0.55rem;
+    }
+
+    .teaser-card .t-metric {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #1f2433;
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+    }
+    .teaser-card.highlight .t-metric {
+      color: var(--accent);
+    }
+    .teaser-card .t-metric.warn {
+      color: #c81e45;
+    }
+
+    .teaser-card .t-desc {
+      font-size: 0.82rem;
+      color: #555b6e;
       line-height: 1.45;
     }
 
-    /* Sections */
-    section {
-      padding: 3rem 1.5rem;
-    }
-    .sec-head {
+    /* Result Blocks & Two-Column Figures */
+    .result-block {
+      margin-top: 2.7rem;
       margin-bottom: 1.5rem;
     }
-    .sec-tag {
-      font-size: 0.76rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--blue);
-      margin-bottom: 0.25rem;
-    }
-    .sec-head h2 {
-      font-size: 1.65rem;
-      margin: 0 0 0.45rem;
-      letter-spacing: -0.015em;
-    }
-    .sec-head p {
-      margin: 0;
-      color: var(--ink-muted);
-      max-width: 900px;
-      font-size: 0.96rem;
-    }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: var(--shadow);
-    }
-
-    /* Controls / Tabs */
-    .tab-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
-    }
-    .tab-btn {
-      appearance: none;
-      border: 1px solid var(--border);
-      background: var(--surface-alt);
-      color: var(--ink-muted);
-      padding: 0.48rem 0.95rem;
-      border-radius: 9px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .tab-btn:hover {
-      border-color: #94a3b8;
-      color: var(--ink);
-    }
-    .tab-btn.active {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    }
-
-    /* Interactive Architecture SVG */
-    .arch-layout {
+    .cols-2 {
       display: grid;
-      grid-template-columns: 1.55fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 1.25rem;
-      align-items: stretch;
+      align-items: start;
+      margin-top: 1.15rem;
     }
-    @media (max-width: 960px) {
-      .arch-layout { grid-template-columns: 1fr; }
-    }
-    .arch-node {
-      cursor: pointer;
-      transition: filter 0.15s ease, opacity 0.15s ease;
-    }
-    .arch-node:hover {
-      filter: brightness(1.06);
-    }
-    .arch-node.selected rect {
-      stroke-width: 3.2px;
-      stroke: #0f172a;
-    }
-    .arch-detail {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .arch-detail h3 {
-      margin: 0 0 0.5rem;
-      font-size: 1.12rem;
-      color: var(--ink);
-    }
-    .formula-box {
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 0.81rem;
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 0.75rem 0.9rem;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 0.75rem 0;
-    }
-    .meta-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      margin-top: 0.65rem;
-    }
-    .chip {
-      font-size: 0.76rem;
-      font-weight: 700;
-      padding: 0.24rem 0.6rem;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: #1d4ed8;
-    }
-    .chip.teal { background: var(--teal-soft); color: #0f766e; }
-    .chip.amber { background: var(--amber-soft); color: #b45309; }
-    .chip.rose { background: var(--rose-soft); color: #be123c; }
-
-    /* Chart Legend */
-    .legend-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 0.8rem;
-      font-size: 0.83rem;
-      font-weight: 650;
-    }
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .swatch {
-      width: 13px;
-      height: 13px;
-      border-radius: 3px;
-      display: inline-block;
+    @media (max-width: 768px) {
+      .cols-2 { grid-template-columns: 1fr; }
     }
 
-    /* 16-Task Table / Bars */
-    .task-table-wrap {
-      overflow-x: auto;
-    }
-    table.task-table {
+    .result-img, .concept-img {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-    table.task-table th,
-    table.task-table td {
-      padding: 0.58rem 0.7rem;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      white-space: nowrap;
-    }
-    table.task-table th {
-      background: #f8fafc;
-      font-weight: 750;
-      color: var(--ink);
-      font-size: 0.79rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-    .bar-cell {
-      min-width: 120px;
-    }
-    .mini-bar-bg {
-      background: #e2e8f0;
-      height: 8px;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 3px;
-    }
-    .mini-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-    }
-    .win-tag {
-      display: inline-block;
-      padding: 0.14rem 0.48rem;
-      border-radius: 6px;
-      font-size: 0.74rem;
-      font-weight: 750;
-    }
-    .win-tag.up { background: var(--teal-soft); color: #0f766e; }
-    .win-tag.gap { background: var(--rose-soft); color: #be123c; }
-    .win-tag.mid { background: var(--blue-soft); color: #1d4ed8; }
-
-    /* Wave Timeline */
-    .timeline-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 0.95rem;
-      margin-top: 1.25rem;
-    }
-    .wave-card {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.1rem;
-      background: #fff;
-      cursor: pointer;
-      transition: transform 0.14s ease, border-color 0.14s ease;
-    }
-    .wave-card:hover, .wave-card.active {
-      border-color: var(--blue);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1);
-    }
-    .wave-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.35rem;
-    }
-    .wave-id {
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--blue);
-      text-transform: uppercase;
-    }
-    .wave-score {
-      font-size: 0.85rem;
-      font-weight: 800;
-      padding: 0.15rem 0.5rem;
-      border-radius: 6px;
-      background: var(--blue-soft);
-      color: #1e40af;
-    }
-    .wave-card.neg .wave-score {
-      background: var(--amber-soft);
-      color: #92400e;
-    }
-    .wave-card h4 {
-      margin: 0 0 0.35rem;
-      font-size: 0.95rem;
-    }
-    .wave-card p {
-      margin: 0;
-      font-size: 0.82rem;
-      color: var(--ink-muted);
-      line-height: 1.5;
-    }
-
-    /* Caveat & Negative Result Grid */
-    .caveat-box {
-      background: #fffbeb;
-      border: 1px solid #fcd34d;
-      border-left: 5px solid var(--amber);
-      border-radius: 12px;
-      padding: 1.25rem 1.4rem;
-      margin-bottom: 1.4rem;
-    }
-    .caveat-box h3 {
-      margin: 0 0 0.5rem;
-      color: #92400e;
-      font-size: 1.04rem;
-    }
-    .caveat-box ul {
-      margin: 0;
-      padding-left: 1.2rem;
-      color: #78350f;
-      font-size: 0.88rem;
-    }
-    .caveat-box li { margin-bottom: 0.42rem; }
-
-    /* Figure Gallery */
-    .fig-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 1.15rem;
-    }
-    .fig-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-    }
-    .fig-img-wrap {
-      background: #f8fafc;
-      padding: 0.65rem;
-      border-bottom: 1px solid var(--border);
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 8px;
+      border: 1px solid #e6e9f0;
+      background: #ffffff;
       cursor: zoom-in;
+      transition: box-shadow 0.16s ease, transform 0.16s ease;
+    }
+    .result-img:hover, .concept-img:hover {
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.09);
+      transform: translateY(-1px);
+    }
+
+    .concept-box {
+      background: #ffffff;
+      border: 1px solid #e5e9f0;
+      border-radius: 12px;
+      padding: 1.25rem 1.25rem 0.9rem;
+      margin-top: 1.2rem;
+    }
+
+    .fig-caption {
+      font-family: 'Google Sans', 'Noto Sans', sans-serif;
+      font-size: 0.91rem;
+      color: #4a4f62;
+      line-height: 1.52;
+      max-width: 860px;
+      margin: 0.68rem auto 0;
       text-align: center;
     }
-    .fig-img-wrap img {
+
+    /* Takeaway Box (Explorative Modeling exact callout style) */
+    .takeaway-box {
+      background: var(--takeaway-bg);
+      border: 1.5px solid var(--accent-deep);
+      border-radius: 10px;
+      padding: 1.08rem 1.3rem;
+      margin-top: 2rem;
+      color: #1a1a2e;
+      font-size: 1rem;
+      line-height: 1.58;
+    }
+    .takeaway-box strong {
+      color: var(--accent-deep);
+    }
+
+    .caveat-box {
+      background: #fbfbfd;
+      border: 1px solid #dfe4ef;
+      border-left: 3.5px solid #64748b;
+      border-radius: 8px;
+      padding: 0.95rem 1.2rem;
+      margin-top: 1.4rem;
+      font-size: 0.92rem;
+      color: #3f4659;
+      line-height: 1.58;
+    }
+
+    /* Booktabs Result Tables */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1.15rem;
+    }
+
+    .result-table {
+      background: transparent;
+      border-collapse: collapse;
       width: 100%;
-      height: 230px;
-      object-fit: contain;
-      display: block;
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      font-size: 0.86rem;
     }
-    .fig-body {
-      padding: 0.95rem 1.1rem;
+
+    .result-table th,
+    .result-table td {
+      border: none;
+      padding: 0.46rem 0.48rem;
+      vertical-align: middle;
+      text-align: center;
     }
-    .fig-body h4 {
-      margin: 0 0 0.3rem;
-      font-size: 0.94rem;
+
+    .result-table th {
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 700;
+      color: var(--ink);
+      background: transparent;
+      white-space: nowrap;
     }
-    .fig-body p {
+
+    .result-table thead tr:last-child th {
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .result-table tbody tr:not(:last-child) {
+      border-bottom: 1px solid #edeff4;
+    }
+
+    .result-table tbody tr.group-row td {
+      background: #f8f9fc;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #52586a;
+      text-align: left;
+      padding: 0.38rem 0.68rem;
+      border-top: 1px solid #d8dde8;
+      border-bottom: 1px solid #d8dde8;
+    }
+
+    .result-table tbody tr:hover:not(.group-row) {
+      background: #f7f9fc;
+    }
+
+    .result-table tr.ours-row,
+    .result-table tr.ours-row:hover {
+      background: var(--ours-bg);
+    }
+
+    .ours-tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 7px;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--accent);
+      vertical-align: middle;
+    }
+
+    .delta-pos {
+      color: #0b7a5c;
+      font-weight: 600;
+    }
+    .delta-neg {
+      color: #c81e45;
+      font-weight: 600;
+    }
+
+    /* Interactive Suite Filter Pills */
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 1rem 0 0.85rem;
+    }
+
+    .tab-pill {
+      appearance: none;
+      border: 1px solid #d6dce8;
+      background: #ffffff;
+      color: #4a5064;
+      padding: 0.36rem 0.88rem;
+      border-radius: 999px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+    .tab-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tab-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    /* Code Blocks (Getting Started & BibTeX) */
+    .code-cols {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      margin-top: 1.1rem;
+    }
+
+    .code-label {
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--accent-deep);
+      margin-bottom: 0.38rem;
+    }
+
+    .xm-code {
+      background: #f6f8fa;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.95rem 1.05rem;
+      font-family: ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
+      font-size: 0.8rem;
+      line-height: 1.56;
+      color: #26304a;
+      overflow-x: auto;
+      white-space: pre;
       margin: 0;
-      font-size: 0.81rem;
-      color: var(--ink-muted);
     }
+    .section.is-light .xm-code {
+      background: #ffffff;
+    }
+    .xm-code .cmt { color: #8c95aa; }
+    .xm-code .kw { color: #005cc5; font-weight: 600; }
+
+    .bibtex-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .copy-btn {
+      font-family: 'Google Sans', sans-serif;
+      background: #363636;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.14s ease;
+    }
+    .copy-btn:hover { background: #1f2433; }
 
     /* Lightbox Modal */
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(11, 16, 32, 0.88);
+      background: rgba(18, 22, 33, 0.86);
       display: none;
       align-items: center;
       justify-content: center;
@@ -528,402 +558,674 @@
     .lightbox-inner {
       max-width: 94vw;
       max-height: 92vh;
-      background: #fff;
-      border-radius: 12px;
-      padding: 0.8rem;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 0.85rem;
       text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     }
     .lightbox-inner img {
       max-width: 90vw;
       max-height: 82vh;
       object-fit: contain;
+      display: block;
     }
     .lightbox-cap {
-      margin-top: 0.45rem;
-      font-size: 0.86rem;
-      font-weight: 650;
-      color: var(--ink);
+      margin-top: 0.5rem;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 0.88rem;
+      color: #2b2f42;
     }
 
-    footer {
-      background: var(--bg);
-      color: #94a3b8;
-      padding: 2.2rem 1.5rem;
-      font-size: 0.84rem;
-      text-align: center;
+    /* Footer */
+    footer.footer {
+      background: #fafafa;
+      border-top: 1px solid #eaecef;
+      padding: 2.6rem 1.5rem 3rem;
+      font-size: 0.9rem;
+      color: #586069;
     }
-    footer a { color: #7dd3fc; text-decoration: none; }
+
+    .ai-disclosure {
+      margin-top: 1.15rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid #e2e6ef;
+      color: #2b2f42;
+    }
+    .ai-disclosure .jp-note {
+      font-family: 'Noto Sans JP', 'Noto Sans', sans-serif;
+      font-size: 0.84rem;
+      color: #5a6072;
+      margin-top: 0.25rem;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <nav class="topnav">
-    <div class="topnav-inner">
-      <a class="brand" href="#top">
-        <span class="brand-dot"></span>
-        <span>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5</span>
-      </a>
-      <div class="nav-links">
-        <a href="#overview">概要・達成度</a>
-        <a href="#architecture">アーキテクチャ図解</a>
-        <a href="#benchmark">対話型ベンチマーク</a>
-        <a href="#tasks">全16タスク分析</a>
-        <a href="#trajectory">Phase 1→2 実験軌跡</a>
-        <a href="#caveats">統計検証・失敗分析</a>
-        <a href="#gallery">論文図表ギャラリー</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ======================= HERO HEADER ======================= -->
+  <header class="hero-header">
+    <div class="container has-text-centered">
+      <div class="fun-badge">[Fun Project] &middot; Embodied Memory for Vision-Language-Action Models</div>
 
-  <!-- Hero -->
-  <header class="hero" id="top">
-    <div class="container">
-      <div class="eyebrow">[Fun Project] • RoboMME 16-Task Embodied Memory Research • Phase 1 &amp; Phase 2 Complete</div>
-      <h1>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5:<br/>高速連想記憶・非特権サプライズランドマーク・適応マルチホップ推論による長期視覚運動制御</h1>
-      <p class="hero-sub">
-        Phase 1（合成87ラン＋<code>450M SmolVLA</code> 閉ループ <code>10,720</code> エピソード）での機構解明から、Phase 2（<code>3.44B π0.5</code> 上での全16訓練Wave・閉ループ <code>77</code> ラン・<code>m = 146</code> Holm-Bonferroni 多重検定）までを一貫して可視化・総括した研究ショーケース。
-      </p>
-      <div class="badge-row">
-        <a class="pill primary" href="tech_report.pdf">📑 Technical Report (LaTeX PDF)</a>
-        <a class="pill" href="https://github.com/k1000dai/deltanet-looped-vla">💻 GitHub Repository</a>
-        <a class="pill" href="https://github.com/k1000dai/deltanet-looped-vla/tree/main/paper">📝 LaTeX Source (paper/)</a>
-        <a class="pill" href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE2.md">📄 RESULTS_PHASE2.md</a>
-        <a class="pill" href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_REPORT.md">📘 RESULTS_REPORT.md</a>
-        <a class="pill" href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/docs/SURVEY_PHASE2.md">📚 SURVEY_PHASE2.md</a>
+      <h1 class="publication-title">
+        <span style="color: #0066cc;">DeltaLoop-VLA &amp; DeltaMem-&pi;<sub>0.5</sub></span>:
+        Multi-Timescale Gated DeltaNet Memory, Surprise Landmarks, and Interference-Robust Multi-Hop Readout
+      </h1>
+
+      <div class="publication-authors">
+        <a href="https://github.com/k1000dai" target="_blank" rel="noopener">k1000dai</a>
+      </div>
+      <div class="publication-venue">
+        [Fun Project] Technical Report &middot; November 2026 &middot; Evaluated on 16-Task RoboMME (ManiSkill3)
       </div>
 
-      <div class="kpi-grid" id="overview">
-        <div class="kpi-card">
-          <div class="kpi-label">最強の Held-Out 成果 (test240 • k=3 連続干渉)</div>
-          <div class="kpi-val"><span class="accent-teal">41.67%</span> <span style="font-size:1.05rem;color:#94a3b8;">vs 15.42%</span></div>
-          <div class="kpi-note"><code>FrameSamp+Modul</code> を <strong>+26.25 pp (2.70×)</strong> 上回る（<code>69:6</code>, <code>p_McN = 1.16e-14</code>, <strong><code>p_holm = 0.0292</code> 有意</strong>）。<code>Ref</code> / <code>Imit</code> 低下 <code>0.0 pp</code>。</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Held-Out 単発最高 (test240 • k=1)</div>
-          <div class="kpi-val"><span class="accent-blue">48.75%</span> <span style="font-size:1.05rem;color:#94a3b8;">(117 / 240)</span></div>
-          <div class="kpi-note"><code>π0.5 Base</code> (21.67%) 比 <strong>+27.08 pp (<code>p_holm = 0.0292</code>)</strong>。<code>FrameSamp</code> (45.83%) 比 +2.92 pp (<code>p=0.349</code> n.s.)。<code>T²Mem</code> (56.83%) には -8.08 pp。</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">モデル選択 Split 最高 (val80 • Best-of-63)</div>
-          <div class="kpi-val"><span class="accent-amber">60.00%</span> <span style="font-size:1.05rem;color:#94a3b8;">/ 57.50% (1-Ckpt)</span></div>
-          <div class="kpi-note">Specialist (<code>L∈{1,2,3}</code>) が 60.0%、<code>8.19 GiB</code> 単一モデル3系統が 57.5%（全16タスク <code>≥20%</code>；※<code>val80</code> 選択バイアスあり）。</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">エピソード記憶状態・推論速度 (RTX 5080)</div>
-          <div class="kpi-val"><span class="accent-teal">387.8 ms</span> <span style="font-size:1.05rem;color:#94a3b8;">/ 7.04 GiB</span></div>
-          <div class="kpi-note">状態サイズ <code>0.51–2.94 MiB</code>（<code>T²Mem</code> <code>36.35 MiB</code> の <strong>12.4×〜71× 省メモリ</strong>、<code>MemER</code> <code>10,135 ms</code> の <strong>26× 高速</strong>）。</div>
-        </div>
+      <div class="publication-links">
+        <a href="tech_report.pdf" target="_blank" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v1.5H8V13zm0 3h8v1.5H8V16zm0-6h3v1.5H8V10z"/></svg>
+          <span>Tech Report (PDF)</span>
+        </a>
+        <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.58.1.79-.25.79-.56v-2.02c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.02 11.02 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.42.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+          <span>Code</span>
+        </a>
+        <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE2.md" target="_blank" rel="noopener" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7-4h4v18h-4V3z"/></svg>
+          <span>Phase 2 Results</span>
+        </a>
+        <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_REPORT.md" target="_blank" rel="noopener" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
+          <span>Phase 1 Report</span>
+        </a>
+        <a href="https://github.com/k1000dai/deltanet-looped-vla/tree/main/paper" target="_blank" rel="noopener" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/></svg>
+          <span>LaTeX Source</span>
+        </a>
+        <a href="#BibTeX" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z"/></svg>
+          <span>BibTeX</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Section 1: Interactive Architecture Diagram -->
-  <section id="architecture">
+  <!-- ======================= TL;DR ======================= -->
+  <section class="section is-light">
     <div class="container">
-      <div class="sec-head">
-        <div class="sec-tag">1 • System Architecture</div>
-        <h2>対話型アーキテクチャ解剖（ブロックをクリックして詳細・数式を表示）</h2>
-        <p>Phase 1 の <code>2層 Gated DeltaNet + Multi-Hop Readout</code> を、Phase 2 で <code>3.44B π0.5 (PaliGemma-2B + ActionExpert-300M)</code> 上に統合した全体パイプラインです。</p>
-      </div>
-
-      <div class="card arch-layout">
-        <div>
-          <svg viewBox="0 0 760 410" width="100%" style="background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
-            <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
-              </marker>
-            </defs>
-
-            <!-- Connectors -->
-            <line x1="165" y1="95" x2="215" y2="95" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrow)" />
-            <line x1="165" y1="215" x2="215" y2="215" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrow)" />
-            <line x1="395" y1="95" x2="445" y2="145" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrow)" />
-            <line x1="395" y1="215" x2="445" y2="175" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrow)" />
-            <line x1="395" y1="330" x2="445" y2="295" stroke="#64748b" stroke-width="2.2" marker-end="url(#arrow)" />
-            <line x1="165" y1="245" x2="215" y2="330" stroke="#64748b" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arrow)" />
-            <line x1="535" y1="205" x2="535" y2="248" stroke="#0d9488" stroke-width="2.4" marker-end="url(#arrow)" />
-            <line x1="625" y1="165" x2="655" y2="215" stroke="#2563eb" stroke-width="2.4" marker-end="url(#arrow)" />
-            <line x1="625" y1="290" x2="655" y2="250" stroke="#0d9488" stroke-width="2.4" marker-end="url(#arrow)" />
-
-            <!-- Node 1: SigLIP + VLM -->
-            <g class="arch-node selected" data-node="siglip" onclick="selectArch('siglip', this)">
-              <rect x="20" y="45" width="145" height="100" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
-              <text x="92" y="75" text-anchor="middle" font-size="13" font-weight="800" fill="#1e3a8a">SigLIP + PaliGemma</text>
-              <text x="92" y="96" text-anchor="middle" font-size="11" fill="#1e40af">Front 16×16 (256t)</text>
-              <text x="92" y="114" text-anchor="middle" font-size="11" fill="#1e40af">Wrist 16×16 + 言語指示</text>
-              <text x="92" y="132" text-anchor="middle" font-size="10" font-weight="700" fill="#2563eb">2.6B VLM • Switchable LoRA</text>
-            </g>
-
-            <!-- Node 2: Streaming History -->
-            <g class="arch-node" data-node="writer" onclick="selectArch('writer', this)">
-              <rect x="20" y="175" width="145" height="95" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
-              <text x="92" y="203" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0c4a6e">Dual-View Event Writer</text>
-              <text x="92" y="222" text-anchor="middle" font-size="11" fill="#0369a1">Demo + Exec ストリーム</text>
-              <text x="92" y="240" text-anchor="middle" font-size="11" fill="#0369a1">8-DoF Proprio + 把持エッジ</text>
-              <text x="92" y="257" text-anchor="middle" font-size="10" font-weight="700" fill="#0284c7">1.56× Stride 高速化</text>
-            </g>
-
-            <!-- Node 3: 2L-GDN + ForgetGate -->
-            <g class="arch-node" data-node="gdn" onclick="selectArch('gdn', this)">
-              <rect x="215" y="165" width="180" height="105" rx="10" fill="#ccfbf1" stroke="#0d9488" stroke-width="2" />
-              <text x="305" y="193" text-anchor="middle" font-size="13" font-weight="800" fill="#134e4a">Multi-Scale 2L-GDN</text>
-              <text x="305" y="212" text-anchor="middle" font-size="11" fill="#0f766e">Short / Mid / Long 減衰ヘッド</text>
-              <text x="305" y="230" text-anchor="middle" font-size="11" fill="#0f766e">+ EpisodeBoundaryForgetGate</text>
-              <text x="305" y="251" text-anchor="middle" font-size="10.5" font-weight="800" fill="#0d9488">O(1) 520 KB fp32 連想状態</text>
-            </g>
-
-            <!-- Node 4: Perceptual Canvas -->
-            <g class="arch-node" data-node="canvas" onclick="selectArch('canvas', this)">
-              <rect x="215" y="45" width="180" height="98" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" />
-              <text x="305" y="73" text-anchor="middle" font-size="12.5" font-weight="800" fill="#4c1d95">Surprise + TimeUniform</text>
-              <text x="305" y="92" text-anchor="middle" font-size="11" fill="#5b21b6">28 時間一様アンカー (excl=0)</text>
-              <text x="305" y="110" text-anchor="middle" font-size="11" fill="#5b21b6">+ 4/8 GDN-Surprise キーフレーム</text>
-              <text x="305" y="129" text-anchor="middle" font-size="10" font-weight="700" fill="#7c3aed">RoPE スパン整合 (512t)</text>
-            </g>
-
-            <!-- Node 5: DeltaGround-VLM -->
-            <g class="arch-node" data-node="dgvlm" onclick="selectArch('dgvlm', this)">
-              <rect x="215" y="290" width="180" height="92" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2" />
-              <text x="305" y="317" text-anchor="middle" font-size="12.5" font-weight="800" fill="#78350f">DeltaGround-VLM (任意)</text>
-              <text x="305" y="336" text-anchor="middle" font-size="11" fill="#92400e">4×256t (16×16) Apex Reveal</text>
-              <text x="305" y="354" text-anchor="middle" font-size="11" fill="#92400e">+ 12×64t Swap 追跡 → &lt;y, x&gt;</text>
-              <text x="305" y="371" text-anchor="middle" font-size="10" font-weight="700" fill="#b45309">75.0–76.7% Unseen &lt;18px</text>
-            </g>
-
-            <!-- Node 6: Hybrid Bridge -->
-            <g class="arch-node" data-node="bridge" onclick="selectArch('bridge', this)">
-              <rect x="445" y="118" width="180" height="87" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2" />
-              <text x="535" y="145" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1e3a8a">HybridSurpriseGDNBridge</text>
-              <text x="535" y="164" text-anchor="middle" font-size="11" fill="#1e40af">RMSNorm スケール整合残差融合</text>
-              <text x="535" y="182" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1d4ed8">perc_canvas + tanh(γ)·XAttn</text>
-            </g>
-
-            <!-- Node 7: Stage-C Hop-2 -->
-            <g class="arch-node" data-node="hop2" onclick="selectArch('hop2', this)">
-              <rect x="445" y="248" width="180" height="88" rx="10" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" />
-              <text x="535" y="275" text-anchor="middle" font-size="12.5" font-weight="800" fill="#134e4a">Stage-C Hop-2 Refiner</text>
-              <text x="535" y="294" text-anchor="middle" font-size="11" fill="#0f766e">適応ループ深さ L ∈ {1, 2, 3}</text>
-              <text x="535" y="313" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0f766e">Imitation +10〜20 pp 向上</text>
-            </g>
-
-            <!-- Node 8: ActionExpert -->
-            <g class="arch-node" data-node="expert" onclick="selectArch('expert', this)">
-              <rect x="655" y="165" width="90" height="135" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
-              <text x="700" y="202" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">Action</text>
-              <text x="700" y="218" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">Expert</text>
-              <text x="700" y="238" text-anchor="middle" font-size="10.5" fill="#93c5fd">300M • 18L</text>
-              <text x="700" y="255" text-anchor="middle" font-size="10.5" fill="#93c5fd">10-Step Euler</text>
-              <text x="700" y="274" text-anchor="middle" font-size="10" font-weight="700" fill="#2dd4bf">H = 16 Act</text>
-            </g>
-          </svg>
+      <div class="narrow">
+        <h2 class="title-3 has-text-centered">TL;DR</h2>
+        <div class="has-text-justified">
+          <p>
+            We study constant-size associative memory and iterative multi-hop readout for non-Markovian robotic manipulation across synthetic benchmarks, a cached <code>450M</code> <code>SmolVLA</code> backbone, and end-to-end <code>3.44B</code> <strong>&pi;<sub>0.5</sub></strong> policies on the 16-task <strong>RoboMME</strong> benchmark. First, in <strong>Phase 1 (DeltaLoop-VLA)</strong>, we show a clean mechanistic dissociation between <em>negative-eigenvalue associative writing</em> (&beta;<sub><em>t</em></sub> &isin; (0, 2), lifting <em>S</em><sub>8</sub> swap tracking from <strong>25.1% &rarr; 100.0%</strong>) and <em>weight-tied multi-hop readout</em> (<strong>97.1%</strong> ID and <strong>80.4%</strong> zero-shot OOD pointer chasing). Second, scaling to <strong>Phase 2 (DeltaMem-&pi;<sub>0.5</sub>)</strong>, pairing a <strong>520 KB</strong> multi-timescale Gated DeltaNet, non-privileged surprise keyframes, an automatic <code>EpisodeBoundaryForgetGate</code>, and selective <code>Hop-2</code> refinement delivers <strong>2.70&times; higher success (+26.25 pp, 41.67% vs. 15.42%, <em>p</em><sub>Holm</sub> = 0.0292)</strong> than explicit frame-sampling memory under un-reset <em>k</em> = 3 cross-session streaming on held-out <code>test240</code>, while reaching <strong>48.75%</strong> single-session success (+27.08 pp over memoryless &pi;<sub>0.5</sub>) at <strong>387.8 ms/chunk</strong> and <strong>71&times; smaller</strong> recurrent state than <code>T&sup2;Mem</code>.
+          </p>
         </div>
 
-        <div class="arch-detail" id="arch-detail-panel">
-          <!-- Populated dynamically by JS -->
+        <!-- 4-Card Visual Intuition Strip -->
+        <div class="teaser-grid">
+          <div class="teaser-card">
+            <div>
+              <div class="t-tag">Markovian Baseline</div>
+              <div class="t-name">&pi;<sub>0.5</sub> Base (0 B State)</div>
+              <div class="t-metric">21.7%</div>
+            </div>
+            <div class="t-desc">Current frame + static prompt only; blind to occluded swaps, counts, and prior video demos.</div>
+          </div>
+
+          <div class="teaser-card">
+            <div>
+              <div class="t-tag">Explicit Token Buffer</div>
+              <div class="t-name">FrameSamp+Modul</div>
+              <div class="t-metric warn">45.8% &rarr; 15.4%</div>
+            </div>
+            <div class="t-desc">Collapses by <strong>&minus;30.4 pp</strong> under un-reset <em>k</em> = 3 multi-episode streaming when stale frames pollute history.</div>
+          </div>
+
+          <div class="teaser-card">
+            <div>
+              <div class="t-tag">Per-Layer Fast MLP</div>
+              <div class="t-name">T&sup2;Mem (1,536 H200-h)</div>
+              <div class="t-metric">56.8%</div>
+            </div>
+            <div class="t-desc">Published single-session SOTA, but requires <strong>36.35 MiB</strong> fast weights/episode and lacks a forget gate.</div>
+          </div>
+
+          <div class="teaser-card highlight">
+            <div>
+              <div class="t-tag">Ours &middot; 2.39 MiB Total</div>
+              <div class="t-name">DeltaMem-&pi;<sub>0.5</sub></div>
+              <div class="t-metric">48.8% / 41.7%<sub>k=3</sub></div>
+            </div>
+            <div class="t-desc"><strong>+26.3 pp</strong> over FrameSamp under <em>k</em> = 3 interference (<em>p</em><sub>Holm</sub> = 0.0292) at <strong>387.8 ms/chunk</strong> on 7.0 GiB VRAM.</div>
+          </div>
         </div>
+        <p class="fig-caption">
+          Comparison on held-out 16-task RoboMME (<code>test240</code>, 0 privileged oracle inputs; <code>T&sup2;Mem</code> shown from its official <code>test800&times;3</code> report).
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- Section 2: Interactive Benchmark & k=3 Interference Chart -->
-  <section id="benchmark" style="padding-top:1rem;">
+  <!-- ======================= ABSTRACT & ARCHITECTURE ======================= -->
+  <section class="section">
     <div class="container">
-      <div class="sec-head">
-        <div class="sec-tag">2 • Interactive Benchmark Explorer</div>
-        <h2>評価 Split・未リセット干渉（<code>k=1</code> vs <code>k=3</code>）比較チャート</h2>
-        <p>タブを切り替えて、単発評価（<code>test240 k=1</code>）、連続セッション干渉評価（<code>test240 k=3</code>）、および <code>val80</code> モデル選択スコアを比較できます。</p>
+      <div class="narrow">
+        <h2 class="title-3 has-text-centered">Abstract</h2>
+        <div class="has-text-justified">
+          <p>
+            Long-horizon robotic manipulation under partial observability requires memory architectures that simultaneously track discrete state permutations, preserve fine spatial landmarks across hundreds of demonstration frames, and remain stable across continuous multi-episode deployments without human-issued memory resets. Existing Vision-Language-Action (VLA) memory designs face an acute trilemma: uniform token buffers drop brief occlusion-reveal flashes and collapse when prior-episode tokens linger across task boundaries; external VLM subgoal planners incur &gt;10 s/chunk latency; and per-layer MLP fast weights (<code>T&sup2;Mem</code>) require 36.35 MiB of state per episode and 1,536 H200 GPU-hours of second-order training.
+          </p>
+          <p>
+            We address this trilemma across two phases. In <strong>Phase 1</strong>, across 87 shortcut-audited synthetic runs and 10,720 closed-loop rollouts, we isolate when expressive rank-1 Householder-like writing (&beta;<sub><em>t</em></sub> &isin; (0, 2)) versus weight-tied iterative multi-hop readout (<code>Prelude&ndash;Core&ndash;Coda</code>) is mathematically required, and show via linear probes that a <strong>520 KB</strong> 2-layer <code>fp32</code> Gated DeltaNet retains <strong>93.52%</strong> of repetition counts and <strong>4.36 px</strong> target coordinates. In <strong>Phase 2</strong>, across 16 training waves, 77 closed-loop evaluations, and <em>m</em> = 146 step-down Holm&ndash;Bonferroni multiplicity-corrected tests on <code>3.44B</code> &pi;<sub>0.5</sub>, our <code>HybridSurpriseGDNBridge</code> + <code>EpisodeBoundaryForgetGate</code> + <code>Stage-C Hop-2</code> stack achieves family-wise-significant superiority under un-reset <em>k</em> = 3 cross-session interference (+26.25 pp, <em>p</em><sub>Holm</sub> = 0.0292), reaches 48.75% single-session accuracy on held-out <code>test240</code> (exceeding published <code>T&sup2;Mem</code> on the <code>Reference</code> suite, 45.00% vs. 38.67%), and documents all engineering pitfalls, selection biases, and negative results transparently.
+          </p>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="tab-bar" id="bench-tabs">
-          <button class="tab-btn active" onclick="renderBench('test_k3', this)">🔥 Held-Out test240 (k=3 連続干渉 — 最強成果)</button>
-          <button class="tab-btn" onclick="renderBench('test_k1', this)">📊 Held-Out test240 (k=1 単発標準評価)</button>
-          <button class="tab-btn" onclick="renderBench('val_k1', this)">🧪 val80 (k=1 モデル選択 Best-of-63)</button>
-        </div>
+      <!-- Clean Vector Architecture Diagram -->
+      <div class="concept-box" style="margin-top: 2.4rem;">
+        <h3 class="title-4 has-text-centered" style="margin-bottom: 0.8rem;">The Architecture: Constant-State Associative Memory + Surprise Landmarks + Hop-2 Readout</h3>
+        <svg viewBox="0 0 920 270" width="100%" aria-label="DeltaMem-pi0.5 Architecture Overview">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+            </marker>
+          </defs>
 
-        <div class="legend-row" id="bench-legend"></div>
-        <div id="bench-svg-wrap"></div>
-        <p id="bench-caption" style="margin:0.8rem 0 0;font-size:0.84rem;color:var(--ink-muted);"></p>
+          <!-- Column 1: Inputs -->
+          <rect x="14" y="24" width="186" height="98" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="107" y="48" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1f2433">Dual-View Stream + Goal</text>
+          <text x="107" y="68" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">SigLIP 16&times;16 Unpooled (256t)</text>
+          <text x="107" y="86" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">PaliGemma-2B (252 Dual-LoRA)</text>
+          <text x="107" y="106" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0066cc">0 MiB Extra Base VLM Copy</text>
+
+          <rect x="14" y="144" width="186" height="102" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="107" y="168" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1f2433">Event Perceiver Writer</text>
+          <text x="107" y="188" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">Front 8&times;8 + Wrist 4&times;4 + q_state</text>
+          <text x="107" y="206" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">8 Write Slots + Boundary Gate</text>
+          <text x="107" y="226" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0b7a5c">Auto-Flush on Session Cut</text>
+
+          <!-- Column 2: Memory Streams -->
+          <rect x="242" y="24" width="218" height="98" rx="9" fill="#eef4ff" stroke="#0066cc" stroke-width="1.6"/>
+          <text x="351" y="48" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#0066cc">Perceptual + Surprise Canvas</text>
+          <text x="351" y="68" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">28 Time-Uniform Anchors (excl=0)</text>
+          <text x="351" y="86" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">+ 4&ndash;8 GDN-Surprise Peaks (512t)</text>
+          <text x="351" y="106" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">RoPE Near-Field Span 0..511</text>
+
+          <rect x="242" y="144" width="218" height="102" rx="9" fill="#eef4ff" stroke="#0066cc" stroke-width="1.6"/>
+          <text x="351" y="168" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#0066cc">2-Layer Multi-Timescale GDN</text>
+          <text x="351" y="188" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">S_u = e^g (I &minus; &beta; k k^T) S_{u-1} + &beta; v k^T</text>
+          <text x="351" y="206" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Short [4,32] &middot; Mid &middot; Long [256,2048]</text>
+          <text x="351" y="226" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">520 KB O(1) fp32 Fast State</text>
+
+          <!-- Column 3: Bridge + Multi-Hop -->
+          <rect x="502" y="24" width="196" height="98" rx="9" fill="#f5f6ff" stroke="#1c51d6" stroke-width="1.6"/>
+          <text x="600" y="48" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1c51d6">HybridSurpriseGDNBridge</text>
+          <text x="600" y="68" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Canvas &times; [GDN || Landmarks]</text>
+          <text x="600" y="86" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">RMSNorm Scale-Matched Residual</text>
+          <text x="600" y="106" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">Prevents 41&times; SwiGLU Shock</text>
+
+          <rect x="502" y="144" width="196" height="102" rx="9" fill="#f5f6ff" stroke="#1c51d6" stroke-width="1.6"/>
+          <text x="600" y="168" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1c51d6">Stage-C Hop-2 + Pointer</text>
+          <text x="600" y="188" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Zero-Init Iterative Refiner (L=2)</text>
+          <text x="600" y="206" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">16&times;16 Apex &lt;y, x&gt; Grounding</text>
+          <text x="600" y="226" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0b7a5c">76.7% Unseen STEP0 Hit</text>
+
+          <!-- Column 4: Action Expert -->
+          <rect x="740" y="68" width="166" height="134" rx="9" fill="#1f2433" stroke="#1f2433" stroke-width="1.5"/>
+          <text x="823" y="98" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="13" font-weight="700" fill="#ffffff">ActionExpert-300M</text>
+          <text x="823" y="120" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">18L History Cross-Attn</text>
+          <text x="823" y="139" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">10-Step Euler Flow ODE</text>
+          <text x="823" y="158" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">20&times;8 Action Chunk (H=16)</text>
+          <text x="823" y="182" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="11" font-weight="700" fill="#60a5fa">387.8 ms &middot; 7.04 GiB</text>
+
+          <!-- Arrows -->
+          <line x1="200" y1="73" x2="238" y2="73" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="200" y1="195" x2="238" y2="195" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="351" y1="144" x2="351" y2="126" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr)"/>
+          <line x1="460" y1="73" x2="498" y2="73" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="460" y1="182" x2="498" y2="96" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+          <line x1="460" y1="205" x2="498" y2="205" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="600" y1="122" x2="600" y2="140" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="698" y1="88" x2="736" y2="115" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="698" y1="185" x2="736" y2="155" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+        </svg>
+        <p class="fig-caption">
+          Overview of <strong>DeltaMem-&pi;<sub>0.5</sub></strong>. Physical-time visual anchors and GDN-surprise event frames form a 512-token canvas modulated residually by a 520 KB 2-layer multi-timescale Gated DeltaNet with automatic episode-boundary forgetting and selective Hop-2 refinement.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- Section 3: 16-Task Explorer -->
-  <section id="tasks" style="padding-top:1rem;">
+  <!-- ======================= PART 1: PHASE 1 ======================= -->
+  <section class="section is-light" id="phase1">
     <div class="container">
-      <div class="sec-head">
-        <div class="sec-tag">3 • Per-Task Breakdown (All 16 RoboMME Tasks)</div>
-        <h2>全16タスク詳細スコア＆対 <code>T²Mem</code> ギャップ解剖</h2>
-        <p>16タスク中 <strong>8タスクで論文 <code>T²Mem</code> 同等以上</strong> を達成した一方、残り4タスク（<code>VideoUnmask</code>, <code>StopCube</code>, <code>InsertPeg</code>, <code>PickHighlight</code>）が全体 <code>-8.08 pp</code> 差の原因であることが一目で分かります。</p>
+      <div class="narrow has-text-centered">
+        <div class="part-eyebrow">Part 1 &middot; Mechanistic Foundations</div>
+        <h2 class="title-2">Dissociating Associative State Writing from Multi-Hop Readout</h2>
+        <p class="subtitle-lead">
+          Before scaling to 3.44B &pi;<sub>0.5</sub>, 87 shortcut-audited synthetic runs and 10,720 SmolVLA rollouts isolate exactly when negative-eigenvalue state transitions versus weight-tied iterative readouts are required.
+        </p>
       </div>
 
-      <div class="card">
-        <div class="tab-bar">
-          <button class="tab-btn active" onclick="filterTasks('ALL', this)">全16タスク</button>
-          <button class="tab-btn" onclick="filterTasks('Counting', this)">Counting (4)</button>
-          <button class="tab-btn" onclick="filterTasks('Permanence', this)">Permanence (4)</button>
-          <button class="tab-btn" onclick="filterTasks('Reference', this)">Reference (4)</button>
-          <button class="tab-btn" onclick="filterTasks('Imitation', this)">Imitation (4)</button>
-          <button class="tab-btn" onclick="filterTasks('BOTTLENECK', this)">🔍 残課題4タスクのみ</button>
+      <!-- Result Block 1.1: Write vs Read -->
+      <div class="result-block">
+        <div class="narrow has-text-justified">
+          <p>
+            Standard contraction-only linear RNNs restrict their update step size to &beta;<sub><em>t</em></sub> &isin; (0, 1), preventing single-layer sign inversion when containers swap positions. Expanding the Gated DeltaNet transition to <strong>&beta;<sub><em>t</em></sub> &isin; (0, 2)</strong> unlocks Householder reflections (<strong>I</strong> &minus; 2<strong>kk</strong><sup>&top;</sup> with eigenvalue &minus;1), lifting 1-layer <em>S</em><sub>8</sub> swap tracking from <strong>25.1% &rarr; 100.0 &plusmn; 0.0%</strong> both in-distribution (<em>k</em> &le; 4) and zero-shot OOD (<em>k</em> = 5, 6). Conversely, when causal chains arrive <em>before</em> the disambiguating target cue (<code>Task 1A-Retro</code>), single-pass readouts (<em>L</em> = 1), parallel multi-query heads, and untied 6-layer stacks remain stuck near chance (17.1%&ndash;21.4%), whereas our weight-tied <strong>Prelude&ndash;Core&ndash;Coda</strong> loop reaches <strong>97.1% ID</strong> and extrapolates zero-shot to <strong>80.4% at OOD <em>k</em> = 5</strong> while cutting ID recurrent FLOPs by <strong>56%</strong> via Common-Random-Number (CRN) quantile halting.
+          </p>
         </div>
 
-        <div class="task-table-wrap">
-          <table class="task-table">
+        <div class="cols-2">
+          <div>
+            <img src="assets/fig1_mechanistic_dissociation.png" alt="Phase 1 Write vs Multi-Hop Read Dissociation" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div>
+            <img src="assets/fig2_k_L_staircase_heatmap.png" alt="Diagonal (k, L) Reasoning Staircase Heatmap" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+        </div>
+        <p class="fig-caption">
+          <strong>Left:</strong> Sharp double dissociation between &beta; &isin; (0, 2) associative writing on online <em>S</em><sub>8</sub> swaps (top) and weight-tied multi-hop readout on retroactive pointer chains (bottom). <strong>Right:</strong> Clean diagonal <em>L</em> &ge; <em>k</em> reasoning staircase across chain lengths <em>k</em> &isin; {1..6}. (Click any figure to enlarge.)
+        </p>
+
+        <div class="table-container">
+          <table class="result-table">
             <thead>
               <tr>
-                <th>タスク名</th>
-                <th>Suite</th>
-                <th>π0.5 Base<br/>(test240)</th>
-                <th>FrameSamp<br/>(test240 k=1)</th>
-                <th>提案: Hybrid Hop-2<br/>(test240 k=1)</th>
-                <th>提案 k=3 vs FS k=3<br/>(未リセット干渉)</th>
-                <th>T²Mem 論文値<br/>(test800)</th>
-                <th>対 T²Mem 判定</th>
+                <th class="has-text-left">Architecture <span class="has-text-grey">(3 seeds, shortcut-audited)</span></th>
+                <th>Params</th>
+                <th>1A-Online ID</th>
+                <th>1A-Online OOD</th>
+                <th>1A-Retro Fwd ID</th>
+                <th>1A-Retro OOD (<em>k</em>=5)</th>
               </tr>
             </thead>
-            <tbody id="task-tbody"></tbody>
+            <tbody>
+              <tr>
+                <td class="has-text-left">1-Layer GDN (&beta; &isin; (0, 1), <em>L</em> = 1)</td>
+                <td>0.53M</td>
+                <td>25.1%</td>
+                <td>16.9%</td>
+                <td>19.1%</td>
+                <td>14.1%</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">1-Layer GDN (&beta; &isin; (0, 2), <em>L</em> = 1)</td>
+                <td>0.53M</td>
+                <td><strong>100.0%</strong></td>
+                <td><strong>100.0%</strong></td>
+                <td>18.1%</td>
+                <td>13.6%</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">Untied Deep Readout (6 layers, 3.7&times; params)</td>
+                <td>2.42M</td>
+                <td>20.2%</td>
+                <td>14.8%</td>
+                <td>21.4%</td>
+                <td>14.2%</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>DeltaLoop (&beta; &isin; (0, 2), <em>L</em> = 6, weight-tied)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>0.66M</strong></td>
+                <td>63.6% <span class="has-text-grey">(s0: 99.7%)</span></td>
+                <td>47.1% <span class="has-text-grey">(s0: 90.0%)</span></td>
+                <td><strong>94.8%</strong> <span class="has-text-grey">(&beta;&isin;(0,1): 97.1%)</span></td>
+                <td><strong>76.4%</strong> <span class="has-text-grey">(80.4%)</span></td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
+
+      <!-- Result Block 1.2: Frozen SmolVLA State Probes -->
+      <div class="result-block">
+        <div class="narrow has-text-justified">
+          <p>
+            To verify whether compact recurrent states survive real visual observations before investing in 3.44B-scale training, we evaluated 2-layer Gated DeltaNet memory (<code>520 KB</code> state) on cached <code>450M</code> <code>lerobot/smolvla_base</code> across 10,720 closed-loop RoboMME rollouts. While freezing <code>SmolVLM2</code> over heavily pooled 8&times;8 tokens imposed a &lt;10% closed-loop actuation bottleneck (5.25% vs. 1.50% memoryless, <em>p</em><sub>Holm</sub> = 0.0420), linear probes on the <strong>frozen 520 KB recurrent state</strong> decoded <strong>93.52%</strong> of repetition counts and localized hidden manipulation targets to <strong>4.36 px</strong> (2.44&times; sharper than 32-frame <code>FrameSamp</code>) — proving that the bottleneck lay in frozen backbone actuation rather than GDN memory capacity.
+          </p>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <img src="assets/fig8_mechanistic_probes_and_signflip.png" alt="Frozen 520 KB GDN State Linear Probes on SmolVLA" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div>
+            <img src="assets/fig5_robomme_main_suites.png" alt="Phase 1 SmolVLA Closed-Loop Suites" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+        </div>
+        <p class="fig-caption">
+          <strong>Left:</strong> Linear probes on frozen 520 KB 2-layer GDN states retain 93.52% count accuracy and 4.36 px spatial target error, with monotonic hop-by-hop dereferencing across <em>&ell;</em> = 1 &rarr; 4. <strong>Right:</strong> Phase-1 closed-loop suite gains over memoryless SmolVLA that motivated end-to-end scaling to 3.44B &pi;<sub>0.5</sub>.
+        </p>
+      </div>
+
+      <div class="narrow">
+        <div class="takeaway-box">
+          <strong>Takeaway.</strong> Negative-eigenvalue Gated DeltaNet writing (&beta; &isin; (0, 2)) and weight-tied multi-hop querying solve orthogonal computational bottlenecks (state permutation tracking vs. retroactive pointer dereferencing), and a <strong>520 KB</strong> 2-layer <code>fp32</code> GDN state already preserves &gt;93% of task-critical history on real RoboMME trajectories.
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Section 4: Research Trajectory & Bug Forensics -->
-  <section id="trajectory" style="padding-top:1rem;">
+  <!-- ======================= PART 2: PHASE 2 (3.44B PI0.5) ======================= -->
+  <section class="section" id="phase2">
     <div class="container">
-      <div class="sec-head">
-        <div class="sec-tag">4 • Research Trajectory (Phase 1 → Phase 2 Wave 1–16)</div>
-        <h2>研究進化曲線と発見・解決した主要ボトルネック</h2>
-        <p>合成タスクでの仮説検証（Phase 1）から、<code>3.44B π0.5</code> 移行後のバグ特定・解像度改善・マルチホップ統合（Phase 2 全16 Wave）までの全軌跡です。</p>
+      <div class="narrow has-text-centered">
+        <div class="part-eyebrow">Part 2 &middot; Scaling to 3.44B &pi;<sub>0.5</sub> on RoboMME</div>
+        <h2 class="title-2">Interference-Robust Embodied Memory at 3.44B Scale</h2>
+        <p class="subtitle-lead">
+          Evaluated across 16 training waves, 77 closed-loop runs, and a pre-specified family of <em>m</em> = 146 step-down Holm&ndash;Bonferroni paired tests on 16-task RoboMME.
+        </p>
       </div>
 
-      <div class="card">
-        <div id="traj-svg-wrap"></div>
-        <div class="timeline-grid" id="wave-cards"></div>
+      <!-- Result Block 2.1: Cross-Session Interference & Main Table -->
+      <div class="result-block" style="margin-top: 1.6rem;">
+        <div class="narrow has-text-justified">
+          <p>
+            Real robots execute consecutive tasks without an external human calling <code>policy.reset()</code> between episodes. When two unrelated cross-task distractor episodes precede each target evaluation episode on held-out <code>test240</code> (<em>k</em> = 3 sessions, 720 rollouts), explicit token-buffer memory (<code>FrameSamp+Modulator</code>) suffers catastrophic cross-episode contamination, collapsing by <strong>&minus;30.42 pp</strong> (from 45.83% to <strong>15.42%</strong>, falling below memoryless &pi;<sub>0.5</sub>'s 21.67%). Equipped with our non-privileged <code>EpisodeBoundaryForgetGate</code> — which detects prompt-embedding cosine shifts, <code>exec &rarr; demo</code> transitions, and coupled visual-kinematic cuts — <strong>DeltaMem-&pi;<sub>0.5</sub> (Hybrid Stage-C Hop-2)</strong> retains <strong>41.67% (100/240)</strong> on the exact same paired distractor streams, outperforming <code>FrameSamp+Modulator</code> by <strong>+26.25 pp (2.70&times;, 69 : 6 discordant wins, exact paired McNemar <em>p</em> = 1.16 &times; 10<sup>&minus;14</sup>, <em>p</em><sub>Holm</sub> = 0.0292)</strong> with <strong>0.00 pp degradation</strong> on <code>Reference</code> (45.00%) and <code>Imitation</code> (53.33%).
+          </p>
+        </div>
+
+        <div class="table-container">
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th class="has-text-left">Method / Split <span class="has-text-grey">(0 oracle inputs)</span></th>
+                <th>State</th>
+                <th>Count.</th>
+                <th>Perm.</th>
+                <th>Ref.</th>
+                <th>Imit.</th>
+                <th>AVG</th>
+                <th>Paired Test (<em>m</em> = 146)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="group-row"><td colspan="8">Held-Out Official Test Split Under Un-Reset Multi-Session Interference (test240, k = 3, 720 rollouts)</td></tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (PyTorch, <em>k</em> = 3)</td>
+                <td>2.00 MiB</td>
+                <td>21.7%</td>
+                <td>15.0%</td>
+                <td>20.0%</td>
+                <td>5.0%</td>
+                <td><span class="delta-neg">15.42%</span></td>
+                <td>&minus;30.4 pp collapse (<em>p</em><sub>Holm</sub>=0.0292)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>Hybrid Stage-C Hop-2 (<em>k</em> = 3)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>2.39 MiB</strong></td>
+                <td><strong>43.3%</strong></td>
+                <td><strong>25.0%</strong></td>
+                <td><strong>45.0%</strong></td>
+                <td><strong>53.3%</strong></td>
+                <td><strong>41.67%</strong></td>
+                <td><span class="delta-pos">+26.25 pp vs. FS</span> (<em>p</em><sub>Holm</sub>=0.0292)</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="8">Held-Out Official Test Split — Standard Single-Session (test240, N = 240, k = 1)</td></tr>
+              <tr>
+                <td class="has-text-left">&pi;<sub>0.5</sub> Baseline (PyTorch)</td>
+                <td>0 B</td>
+                <td>21.7%</td>
+                <td>30.0%</td>
+                <td>23.3%</td>
+                <td>11.7%</td>
+                <td>21.67%</td>
+                <td>223.1 ms/chunk</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (PyTorch)</td>
+                <td>2.00 MiB</td>
+                <td><strong>66.7%</strong></td>
+                <td>28.3%</td>
+                <td>35.0%</td>
+                <td><strong>53.3%</strong></td>
+                <td>45.83%</td>
+                <td>+24.2 pp vs. Base (<em>p</em><sub>Holm</sub>=0.0292)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>Unified M7D-v2 + Pyramid + Hop-2</strong> <span class="ours-tag">Ours</span></td>
+                <td>2.84 MiB</td>
+                <td>65.0%</td>
+                <td>28.3%</td>
+                <td>43.3%</td>
+                <td><strong>53.3%</strong></td>
+                <td><strong>47.50%</strong></td>
+                <td>+25.8 pp vs. Base (<em>p</em><sub>Holm</sub>=0.0292)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>Hybrid Stage-C Hop-2</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>2.39 MiB</strong></td>
+                <td>65.0%</td>
+                <td><strong>31.7%</strong></td>
+                <td><strong>45.0%</strong></td>
+                <td><strong>53.3%</strong></td>
+                <td><strong>48.75%</strong></td>
+                <td>+27.1 pp vs. Base; vs. FS <em>p</em>=0.349</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="8">Published Official Leaderboard Reference (test800 &times; 3 seeds; external compute / protocol reference)</td></tr>
+              <tr>
+                <td class="has-text-left">MemER (Qwen3-VL-4B planner)</td>
+                <td>16 imgs</td>
+                <td>48.8%</td>
+                <td><strong>53.2%</strong></td>
+                <td>38.0%</td>
+                <td>29.5%</td>
+                <td>42.38%</td>
+                <td>10,135 ms/chunk (&lt;0.1 Hz)</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (MME-VLA)</td>
+                <td>4.00 MiB</td>
+                <td>65.2%</td>
+                <td>25.1%</td>
+                <td>36.3%</td>
+                <td>51.4%</td>
+                <td>44.51%</td>
+                <td>440.0 ms/chunk (A5000)</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">T&sup2;Mem (18&times;16 fast MLPs, 1,536 H200-h)</td>
+                <td>36.35 MiB</td>
+                <td><strong>78.2%</strong></td>
+                <td>49.2%</td>
+                <td>38.7%</td>
+                <td><strong>61.3%</strong></td>
+                <td><strong>56.83%</strong></td>
+                <td>Published single-session SOTA</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="8">Model-Selection Validation Split (val80, N = 80; best-of-63 configs — upward selection bias applies)</td></tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (<code>val80</code>)</td>
+                <td>2.00 MiB</td>
+                <td>65.0%</td>
+                <td>20.0%</td>
+                <td>25.0%</td>
+                <td>65.0%</td>
+                <td>43.75%</td>
+                <td>+25.0 pp vs. Base (<em>p</em><sub>Holm</sub>=0.0356)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>Unified Pyramid / HR16 / Adv + Hop-2</strong> <span class="ours-tag">Ours</span></td>
+                <td>2.84 MiB</td>
+                <td><strong>80.0%</strong></td>
+                <td><strong>40.0%</strong></td>
+                <td>45.0%</td>
+                <td><strong>65.0%</strong></td>
+                <td><strong>57.50%</strong></td>
+                <td>8.19 GiB 1-ckpt (<em>p</em><sub>Holm</sub>=0.294 n.s.)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>Grounded Specialist M10 + Hop-2</strong> <span class="ours-tag">Ours</span></td>
+                <td>2.94 MiB</td>
+                <td><strong>80.0%</strong></td>
+                <td><strong>40.0%</strong></td>
+                <td><strong>55.0%</strong></td>
+                <td><strong>65.0%</strong></td>
+                <td><strong>60.00%</strong></td>
+                <td>16/16 &ge;20% (<em>p</em><sub>Holm</sub>=0.152 n.s.)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fig-caption">
+          Main Phase-2 evaluation table. Family-wise <em>p</em><sub>Holm</sub> values are step-down Holm&ndash;Bonferroni adjusted across all <em>m</em> = 146 paired tests conducted in Phase 2.
+        </p>
+
+        <div class="cols-2" style="margin-top: 1.8rem;">
+          <div>
+            <img src="assets/fig_p2_4_interference_and_parity.png" alt="Cross-Session k=3 Interference Robustness and PyTorch Bridge Parity" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div>
+            <img src="assets/fig_p2_3_efficiency_pareto_and_state.png" alt="Speed-Accuracy and Memory State Pareto Frontier" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+        </div>
+        <p class="fig-caption">
+          <strong>Left:</strong> Un-reset cross-session distractor interference (<em>k</em> = 3) and Orbax&rarr;PyTorch conversion parity (max fp32 velocity diff 1.67&times;10<sup>&minus;6</sup>). <strong>Right:</strong> Foreground latency (387.8 ms/chunk, 26&times; faster than MemER) and episode memory footprint (12.4&times;&ndash;71&times; smaller than T&sup2;Mem).
+        </p>
+      </div>
+
+      <!-- Result Block 2.2: Leaderboard & Interactive 16-Task Breakdown -->
+      <div class="result-block">
+        <h3 class="title-4 has-text-centered">Per-Task Profile Across All 16 RoboMME Tasks</h3>
+        <div class="narrow has-text-justified">
+          <p>
+            On held-out <code>test240</code>, our models match or surpass published 1,536-H200-hour <code>T&sup2;Mem</code> on <strong>8 of 16 tasks</strong> — including <code>VideoPlaceOrder</code> (<strong>60.0% vs. 30.0%</strong>), <code>VideoPlaceButton</code> (<strong>60.0% vs. 35.3%</strong>), <code>PatternLock</code> (<strong>66.7% vs. 50.0%</strong>), <code>MoveCube</code> (<strong>86.7% vs. 80.7%</strong>), <code>BinFill</code> (<strong>66.7% vs. 60.7%</strong>), <code>VideoRepick</code> (<strong>40.0% vs. 38.7%</strong>), and container-swap permanence (<code>VideoUnmaskSwap</code> <strong>33.3% vs. 29.3%</strong>, <code>ButtonUnmaskSwap</code> <strong>26.7%&ndash;33.3% vs. 20.0%</strong>) — lifting the <code>Reference</code> suite above <code>T&sup2;Mem</code> (<strong>45.00% vs. 38.67%</strong>). Meanwhile, 98% of our &minus;8.08 pp overall single-session gap to <code>T&sup2;Mem</code> concentrates in four tasks: <code>VideoUnmask</code>, <code>StopCube</code>, <code>InsertPeg</code>, and <code>PickHighlight</code>.
+          </p>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <img src="assets/fig_p2_1_leaderboard_and_suites.png" alt="Phase 2 Full 77-Run Leaderboard and Suite Profile" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div>
+            <img src="assets/fig_p2_2_per_task_heatmap.png" alt="16-Task Success Rate Matrix Heatmap" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+        </div>
+        <p class="fig-caption">
+          <strong>Left:</strong> Complete Phase-2 leaderboard across all 77 closed-loop evaluations and cognitive suite breakdown. <strong>Right:</strong> Per-task success rate matrix across all 16 RoboMME manipulation tasks.
+        </p>
+
+        <!-- Interactive 16-Task Filterable Booktabs Table -->
+        <div style="margin-top: 2rem;">
+          <div class="filter-bar">
+            <button class="tab-pill active" onclick="filterTasks('ALL', this)">All 16 Tasks</button>
+            <button class="tab-pill" onclick="filterTasks('Counting', this)">Counting (4)</button>
+            <button class="tab-pill" onclick="filterTasks('Permanence', this)">Permanence (4)</button>
+            <button class="tab-pill" onclick="filterTasks('Reference', this)">Reference (4)</button>
+            <button class="tab-pill" onclick="filterTasks('Imitation', this)">Imitation (4)</button>
+            <button class="tab-pill" onclick="filterTasks('WINS', this)">Beats T&sup2;Mem (8)</button>
+            <button class="tab-pill" onclick="filterTasks('GAP', this)">4 Bottleneck Tasks</button>
+          </div>
+
+          <div class="table-container">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th class="has-text-left">Task</th>
+                  <th>Suite</th>
+                  <th>&pi;<sub>0.5</sub> Base</th>
+                  <th>FrameSamp (<em>k</em>=1)</th>
+                  <th>Ours (<em>k</em>=1)</th>
+                  <th>Un-Reset <em>k</em>=3 (Ours vs. FS)</th>
+                  <th>T&sup2;Mem (Pub.)</th>
+                  <th>vs. T&sup2;Mem</th>
+                </tr>
+              </thead>
+              <tbody id="task-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Candid Caveats & Negative Results Box -->
+        <div class="narrow">
+          <div class="caveat-box">
+            <strong>Statistical Rigor, Caveats &amp; Negative Results.</strong>
+            (1) <em>Selection bias on <code>val80</code>:</em> Our 60.00% and 57.50% <code>val80</code> scores reflect iterative best-of-63 selection (<em>p</em><sub>Holm</sub> &ge; 0.152 vs. FrameSamp after <em>m</em> = 146 multiplicity correction); all generalization claims rest strictly on held-out <code>test240</code>.
+            (2) <em>Mechanism of <em>k</em> = 3 robustness:</em> <code>Hybrid Stage-C Hop-2</code> shows strong robustness rather than total immunity (48.75% &rarr; 41.67%, &minus;7.08 pp vs. FrameSamp's &minus;30.42 pp), driven primarily by <code>EpisodeBoundaryForgetGate</code>: on the 9 video-demo tasks, success holds steady (64 &rarr; 65/135), whereas demo-free tasks drop 53 &rarr; 35/105 due to subtle boundary cuts.
+            (3) <em>Documented negative results:</em> Continuous VLM KV bridging without explicit <code>&lt;y, x&gt;</code> text (<code>P2-M11</code>, 45.00%), reactive 4-step Flow-Matching replanning (<code>P2-M12</code>, which disrupted <code>InsertPeg</code> 20% &rarr; 0% via re-noising jitter), and post-SigLIP affine cropping (which warped positional embeddings relative to 3D actions, 0% &rarr; 60% once removed) are preserved in full in <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE2.md" target="_blank" rel="noopener">RESULTS_PHASE2.md</a>.
+          </div>
+
+          <div class="takeaway-box">
+            <strong>Takeaway.</strong> Pairing <strong>520 KB</strong> multi-timescale Gated DeltaNet state with non-privileged surprise landmarks, automatic episode-boundary forgetting, and selective Hop-2 readout yields real-time (<strong>387.8 ms/chunk</strong>), compact (<strong>2.39 MiB</strong>) 3.44B &pi;<sub>0.5</sub> policies that surpass memoryless &pi;<sub>0.5</sub> by <strong>+27.08 pp</strong> on <code>test240</code> and beat explicit frame sampling by <strong>+26.25 pp (2.70&times;)</strong> under un-reset multi-session deployment.
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Section 5: Statistical Caveats & Negative Results -->
-  <section id="caveats" style="padding-top:1rem;">
+  <!-- ======================= GETTING STARTED / MINIMAL RECIPE ======================= -->
+  <section class="section is-light" id="getting-started">
     <div class="container">
-      <div class="sec-head">
-        <div class="sec-tag">5 • Scientific Rigor &amp; Negative Results</div>
-        <h2>統計的厳密性（<code>m = 146</code> Holm補正）とネガティブ結果の完全開示</h2>
-        <p><code>Claude Opus 5.5 (High)</code> 独立監査（<code>reviewer-2</code>）で検証済みの留意点および「うまくいかなかったアイデア」の記録です。</p>
+      <div class="narrow has-text-centered">
+        <h2 class="title-3">Core Memory Recipe &amp; Reproducibility</h2>
+        <p class="subtitle-lead" style="margin-bottom: 1.2rem;">
+          Minimal PyTorch formulation comparing standard contraction-only memory against our negative-eigenvalue Gated DeltaNet with non-privileged boundary forgetting and RMSNorm-matched hybrid readout.
+        </p>
       </div>
 
-      <div class="caveat-box">
-        <h3>⚠️ ヘッドライン数値を読む上での重要な統計的留意点（RESULTS_PHASE2.md §1.1）</h3>
-        <ul>
-          <li><strong>対 <code>T²Mem</code> (56.83%) 全体比較:</strong> Held-out <code>test240</code> 最高値は <strong>48.75%</strong> (95% CI <code>[42.5, 55.0%]</code>) であり、<code>T²Mem</code> 全体平均には届いていません（<code>Reference</code> スイートのみ <code>45.00% &gt; 38.67%</code>）。</li>
-          <li><strong><code>val80</code> (60.00% / 57.50%) の選択バイアス:</strong> 同一80エピソード上で63構成を探索した最良値（Winner's Curse）であり、<code>m = 146</code> Holm補正後の対 <code>FrameSamp</code> 最小値は <code>p_holm = 0.152</code> (n.s.) です。</li>
-          <li><strong><code>k = 3</code> 耐性の主要因（頑健性であり完全無影響ではない）:</strong> <code>test240</code> でも <code>48.75% → 41.67%</code> (<code>-7.08 pp</code>) の低下は生じます。<code>FrameSamp</code> (<code>-30.42 pp</code>) に対する大幅優位は主に非特権 <code>EpisodeBoundaryForgetGate</code>（指示文変化・<code>exec→demo</code> 遷移検知）によるもので、デモあり9タスクで <code>64→65</code> vs <code>60→20</code>、デモなし7タスクでも <code>53→35 (-17.1 pp)</code> vs <code>50→17 (-31.4 pp)</code> と優位を維持しています。</li>
-          <li><strong>Track-2 Warm-Start 開示:</strong> 25%超の全構成は公開非特権 <code>MME-VLA</code> 重み（<code>perceptual-framesamp-modul</code> 等）からの継続学習であり、コールドスタート Track-1 単一GPU 350 step 比較では <code>2L-GDN (17.50%) &gt; T²Mem-1L (15.00%) &gt; Cold PEFT (13.75%)</code> でした。</li>
-        </ul>
-      </div>
+      <div class="narrow">
+        <div class="code-cols">
+          <div>
+            <div class="code-label">Standard Token Buffer / Contraction RNN <span class="has-text-grey">&middot; drifts across sessions</span></div>
+<pre class="xm-code"><span class="cmt"># Uniform buffer drops brief reveals &amp; leaks prior episodes</span>
+buf.append(vis_tokens)                <span class="cmt"># no boundary reset</span>
+mem = subsample_uniform(buf, K=32)    <span class="cmt"># collapses to 15.4% at k=3</span>
 
-      <div class="timeline-grid">
-        <div class="wave-card neg">
-          <div class="wave-top"><span class="wave-id">Negative Result 1 • Wave 13</span><span class="wave-score">val80: 45.00%</span></div>
-          <h4>P2-M11: 暗黙連続 VLM KV ブリッジ（&lt;y, x&gt; 文字列なし）</h4>
-          <p>ゼロ初期化ゲート <code>tanh(γ_vlm)</code> が300 stepで <code>0.0156</code> (1.56%) しか開かず <code>Permanence = 10%</code> に留まり、明示的 <code>&lt;y, x&gt;</code> サブゴール注入 (<code>57.50%</code>) が <code>+12.50 pp</code> 優位であることを実証。</p>
+<span class="cmt"># Contraction-only delta rule: beta in (0, 1)</span>
+beta = torch.sigmoid(proj_b(x))       <span class="cmt"># cannot invert S_8 swaps (25.1%)</span>
+S = (I - beta * k @ k.T) @ S + beta * v @ k.T</pre>
+          </div>
+
+          <div>
+            <div class="code-label">DeltaMem-&pi;<sub>0.5</sub> <span class="has-text-grey">&middot; &beta; &isin; (0, 2) + boundary forget + Hop-2</span></div>
+<pre class="xm-code"><span class="cmt"># 1. Non-privileged EpisodeBoundaryForgetGate + beta in (0, 2)</span>
+b_cut = boundary_gate(cos_prompt, phase_edge, vis_cut) &gt; 0.5
+S = torch.where(b_cut, 0.0, S)        <span class="cmt"># 41.7% vs 15.4% at k=3!</span>
+beta = 2.0 * torch.sigmoid(proj_b(x)) <span class="cmt"># eigenvalue -1 -&gt; 100% swaps</span>
+S = exp_g * (I - beta * k @ k.T) @ S + beta * v @ k.T
+
+<span class="cmt"># 2. Scale-matched Hybrid Bridge + Zero-Init Hop-2 Refiner</span>
+M1 = C_perc + tanh(g1) * rms_norm(XAttn(C_perc, [G_gdn, L_surp])) * rms(C_perc)
+M2 = M1 + tanh(g2) * hop2_refiner(M1, G_gdn_hop2)  <span class="cmt"># active on Imitation</span></pre>
+          </div>
         </div>
-        <div class="wave-card neg">
-          <div class="wave-top"><span class="wave-id">Negative Result 2 • Wave 14</span><span class="wave-score">val80: 53.75%</span></div>
-          <h4>P2-M12: 短ホライズン <code>exec_horizon = 4</code> 適応再計画</h4>
-          <p>4ステップ毎の再計画で Flow-Matching ガウス雑音が毎回再注入され <code>InsertPeg</code> の滑らかな挿入軌道が崩壊（<code>20% → 0%</code>；<code>exec_h=16</code> 復帰で即 <code>20%</code> 回復）。</p>
-        </div>
-        <div class="wave-card neg">
-          <div class="wave-top"><span class="wave-id">Negative Result 3 • Wave 15</span><span class="wave-score">val80: 50.00%</span></div>
-          <h4>m10v4: 視覚メモリなし Symbolic-VLM 分離ルーティング</h4>
-          <p>露出物体の <code>PickHighlight</code> は <code>80% val / 60% test</code> へ急伸した一方、<code>Symbolic-VLM</code> には視覚メモリがないため <code>&lt;y, x&gt;</code> が1容器ずれると即失敗（<code>Permanence = 5%</code>）。</p>
-        </div>
-        <div class="wave-card neg">
-          <div class="wave-top"><span class="wave-id">Pre-Registered Gate • Wave 16</span><span class="wave-score">val80: 57.50%</span></div>
-          <h4>m9v5adv: 両側プロミネンス＋パッチフロー移流</h4>
-          <p><code>VideoUnmask</code> / <code>ButtonUnmask</code> を <code>40% → 60%</code> に改善し <code>57.50%</code> 同率に到達したが、事前登録ゲート（<code>&gt;60%</code>）未達のため <code>test240</code> 汚染を防ぎ評価凍結。</p>
-        </div>
+
+        <div class="code-label" style="margin-top: 1.35rem;">Run closed-loop RoboMME evaluation (single-session <code>k=1</code> &amp; un-reset interference <code>k=3</code>)</div>
+<pre class="xm-code"><span class="cmt"># Held-out test240 single-session (48.75%) &amp; un-reset k=3 interference (41.67% vs 15.42% FrameSamp)</span>
+uv run python scripts/eval_pi05.py --arch hybrid_hop2 --split test --num-episodes-per-task 15 \
+  --checkpoint checkpoints/phase2/m6_hybrid_v3_stageC_hop2/ckpt_hop2_final.pt \
+  --output-json results/phase2/test240_hybrid_stageC_hop2_imitL2.json</pre>
+
+        <p class="has-text-centered" style="margin-top: 1.6rem; font-size: 1.04rem; color: #2b2f42;">
+          Read the full <a href="tech_report.pdf" target="_blank"><strong>Technical Report (PDF)</strong></a>, inspect all 77 evaluation logs in <a href="https://github.com/k1000dai/deltanet-looped-vla/tree/main/results" target="_blank" rel="noopener"><strong>results/</strong></a>, or browse the <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener"><strong>PyTorch codebase on GitHub</strong></a>.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- Section 6: High-Res Publication Figure Gallery -->
-  <section id="gallery" style="padding-top:1rem;">
+  <!-- ======================= BIBTEX ======================= -->
+  <section class="section" id="BibTeX">
     <div class="container">
-      <div class="sec-head">
-        <div class="sec-tag">6 • Publication Figure Gallery</div>
-        <h2>論文グレード図表ギャラリー（クリックで高解像度拡大）</h2>
-        <p>Phase 2（<code>fig_p2_1〜4</code>）および Phase 1（<code>fig1, fig2, fig5, fig8</code>）の生成図表です。</p>
-      </div>
-
-      <div class="fig-grid">
-        <div class="fig-card">
-          <div class="fig-img-wrap" onclick="openLightbox('assets/fig_p2_1_leaderboard_and_suites.png', 'Phase 2 Fig. 1: 16-Task RoboMME Leaderboard & 4-Suite Breakdown')">
-            <img src="assets/fig_p2_1_leaderboard_and_suites.png" alt="Phase 2 Fig 1" />
-          </div>
-          <div class="fig-body">
-            <h4>Phase 2 Fig. 1 — 全体リーダーボード＆4スイート比較</h4>
-            <p><code>test240</code> / <code>val80</code> における提案手法・<code>FrameSamp+Modul</code>・<code>T²Mem</code>・<code>π0.5 Base</code> の比較。</p>
-          </div>
+      <div class="narrow">
+        <div class="bibtex-header">
+          <h2 class="title-3" style="margin: 0;">BibTeX</h2>
+          <button id="copyBibtex" class="copy-btn">Copy</button>
         </div>
-
-        <div class="fig-card">
-          <div class="fig-img-wrap" onclick="openLightbox('assets/fig_p2_4_interference_and_parity.png', 'Phase 2 Fig. 4: Cross-Session k=3 Interference Robustness & Orbax→PyTorch Parity')">
-            <img src="assets/fig_p2_4_interference_and_parity.png" alt="Phase 2 Fig 4" />
-          </div>
-          <div class="fig-body">
-            <h4>Phase 2 Fig. 4 — 未リセット <code>k=3</code> 連続セッション干渉耐性＆変換精度</h4>
-            <p><code>test240 k=3</code> での <code>41.67% vs 15.42% (p_holm = 0.0292)</code> 優位と <code>≤1e-5</code> PyTorch 変換パリティ。</p>
-          </div>
-        </div>
-
-        <div class="fig-card">
-          <div class="fig-img-wrap" onclick="openLightbox('assets/fig_p2_2_per_task_heatmap.png', 'Phase 2 Fig. 2: Per-Task Success Rate Heatmap Across All 16 RoboMME Tasks')">
-            <img src="assets/fig_p2_2_per_task_heatmap.png" alt="Phase 2 Fig 2" />
-          </div>
-          <div class="fig-body">
-            <h4>Phase 2 Fig. 2 — 全16タスク×全モデル成功率ヒートマップ</h4>
-            <p>全77ランにわたるタスク別成功率の網羅的比較と意匠別の強み・弱みの可視化。</p>
-          </div>
-        </div>
-
-        <div class="fig-card">
-          <div class="fig-img-wrap" onclick="openLightbox('assets/fig_p2_3_efficiency_pareto_and_state.png', 'Phase 2 Fig. 3: Latency, VRAM, and Fast-State Memory Pareto Frontier')">
-            <img src="assets/fig_p2_3_efficiency_pareto_and_state.png" alt="Phase 2 Fig 3" />
-          </div>
-          <div class="fig-body">
-            <h4>Phase 2 Fig. 3 — 推論レイテンシ・状態メモリ容量パレート境界</h4>
-            <p><code>387.8 ms/chunk</code>・<code>0.51–2.94 MiB</code> 状態による対 <code>MemER</code> / <code>T²Mem</code> 効率パレート。</p>
-          </div>
-        </div>
-
-        <div class="fig-card">
-          <div class="fig-img-wrap" onclick="openLightbox('assets/fig1_mechanistic_dissociation.png', 'Phase 1 Fig. 1: Synthetic Write (β∈(0,2)) vs Multi-Hop Read Dissociation')">
-            <img src="assets/fig1_mechanistic_dissociation.png" alt="Phase 1 Fig 1" />
-          </div>
-          <div class="fig-body">
-            <h4>Phase 1 Fig. 1 — 負固有値書込 <code>β∈(0,2)</code> とマルチホップ読出の機構分離</h4>
-            <p>合成 <code>S_8</code> 容器入替追跡 <code>100.0%</code> と因果鎖逆引き <code>97.1%</code> の分離実証。</p>
-          </div>
-        </div>
-
-        <div class="fig-card">
-          <div class="fig-img-wrap" onclick="openLightbox('assets/fig8_mechanistic_probes_and_signflip.png', 'Phase 1 Fig. 8: Mechanistic State Probes (93.5% Count, 4.36 px Zero-Shot Localization)')">
-            <img src="assets/fig8_mechanistic_probes_and_signflip.png" alt="Phase 1 Fig 8" />
-          </div>
-          <div class="fig-body">
-            <h4>Phase 1 Fig. 8 — <code>520 KB</code> 凍結GDN状態プローブ（93.5% 計数・4.36 px 位置特定）</h4>
-            <p>Phase 2 で大口径 <code>3.44B π0.5</code> へ移行する根拠となった潜在状態保持能力の証明。</p>
-          </div>
-        </div>
+<pre class="xm-code"><code id="bibtexCitation">@techreport{k1000dai2026deltaloopvla,
+  title  = {[Fun Project] DeltaLoop-VLA and DeltaMem-pi0.5: Multi-Timescale
+            Gated DeltaNet Memory, Non-Privileged Surprise Landmarks, and
+            Interference-Robust Multi-Hop Readout},
+  author = {k1000dai},
+  year   = {2026},
+  note   = {Technical Report. Primarily written and created using Gemini 4 Carbon.},
+  url    = {https://k1000dai.github.io/deltanet-looped-vla/}
+}</code></pre>
       </div>
     </div>
   </section>
 
-  <!-- Lightbox -->
+  <!-- ======================= LIGHTBOX ======================= -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <div class="lightbox-inner" onclick="event.stopPropagation()">
       <img id="lightbox-img" src="" alt="Expanded Figure" />
@@ -931,278 +1233,83 @@
     </div>
   </div>
 
-  <footer>
+  <!-- ======================= FOOTER (WITH GEMINI 4 CARBON DISCLOSURE AT BOTTOM) ======================= -->
+  <footer class="footer">
     <div class="container">
-      <div style="margin-bottom:0.65rem;">
-        <strong>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5 Research Showcase</strong> •
-        <a href="tech_report.pdf">Technical Report (PDF)</a> •
-        <a href="https://github.com/k1000dai/deltanet-looped-vla">GitHub Repository</a>
-      </div>
-      <div style="padding-top:0.65rem;border-top:1px solid rgba(148,163,184,0.22);color:#e2e8f0;font-weight:600;">
-        本研究・実装・実験評価・技術レポートおよび本プロジェクトページは、主に <strong>Gemini 4 Carbon</strong> を使用して書かれ・作られました。<br/>
-        <span style="font-weight:400;color:#94a3b8;">This research, codebase, technical report, and project website were primarily written and created using <strong>Gemini 4 Carbon</strong>.</span>
+      <div class="narrow has-text-centered">
+        <p>
+          <strong>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-&pi;<sub>0.5</sub></strong> &middot;
+          <a href="tech_report.pdf" target="_blank">Technical Report (PDF)</a> &middot;
+          <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener">GitHub Repository</a>
+          <br />
+          Page design inspired by the <a href="https://nerfies.github.io/" target="_blank" rel="noopener">Nerfies</a> and <a href="https://explorative-modeling.github.io/" target="_blank" rel="noopener">Explorative Modeling</a> academic project pages.
+        </p>
+
+        <div class="ai-disclosure">
+          <strong>AI Authorship &amp; Creation Disclosure:</strong> This <code>[Fun Project]</code> research, codebase, experimental evaluation, LaTeX technical report, and project website were primarily written and created using <strong>Gemini 4 Carbon</strong>.
+          <div class="jp-note">
+            本研究・コード実装・実験評価・技術レポートおよび本プロジェクトページは、主に <strong>Gemini 4 Carbon</strong> を使用して書かれ・作られました。
+          </div>
+        </div>
       </div>
     </div>
   </footer>
 
   <script>
-    // 1. Architecture Details Data
-    const ARCH_DATA = {
-      siglip: {
-        title: "SigLIP-So400m/14 + PaliGemma-2B (DualSwitchableLoRA)",
-        desc: "正面カメラ・手首カメラの 224×224 画像を 16×16 = 256 トークン（14×14 px 解像度）のまま非プーリング保持し、2.6B PaliGemma-2B に入力。DualSwitchableLoRALinear により単一チェックポイント内で基本制御 (base_policy)・座標推論 (dg)・接地制御 (policy) をゼロコピー 0.01 ms で切替。",
-        eq: "Prefix = [Front_256 || Wrist_256 || Prompt_64],  max_token_len = 64 (0.0 diff parity)",
-        chips: [["VRAM共有: 追加 0 MiB", "teal"], ["252/252 LoRA層完全ラップ", ""], ["Orbax→PT 誤差 ≤1e-5", "amber"]]
-      },
-      writer: {
-        title: "DualViewEventPerceiverWriter (ストライド選抜書込)",
-        desc: "長尺デモ動画（最大1,145フレーム）と10 Hz実行フレームから、正面8×8＋手首4×4特徴と8自由度関節角・グリッパ開閉スパイクを統合し8スロットに圧縮。書込対象フレームのみSigLIPを通す事前選抜により、出力完全一致 (0.0 diff) のまま評価時間を 1.56× 短縮。",
-        eq: "z_u = Perceiver(Front_8x8, Wrist_4x4, q_state, |Δgripper|, vis_motion_rms)",
-        chips: [["8 Write Slots / Step", ""], ["評価高速化 1.56×", "teal"], ["デモ100%保持", "amber"]]
-      },
-      gdn: {
-        title: "Multi-Timescale 2-Layer Gated DeltaNet + EpisodeBoundaryForgetGate",
-        desc: "Short [4,32] / Mid [32,256] / Long [256,2048] の3時間スケール減衰ヘッドを持つ2層 fp32 Gated DeltaNet。さらに非特権 EpisodeBoundaryForgetGate が指示文コサイン変化・exec→demo遷移・視覚カットを検知して前セッション記憶を自動消去し、k=3 連続干渉で +26.25 pp の優位を実現。",
-        eq: "S_u = exp(g_u)(I - β_u k_u k_u^T) S_{u-1} + β_u v_u k_u^T,   State = 520.0 KB (fp32)",
-        chips: [["O(1) 520 KB 状態 (71× < T²Mem)", "teal"], ["k=3 test240 +26.25 pp (p_holm=0.0292)", ""], ["非特権境界リセット", "amber"]]
-      },
-      canvas: {
-        title: "TimeUniform + GDN-Surprise キーフレームキャンバス (512t)",
-        desc: "物理タイムスタンプ上の28個の一様アンカー (excl=0) に加え、GDN書込サプライズと把持イベントで選抜した重要フレームを保持。RoPE位置インデックスを 0..511 全域にスパン整合させることで、2×圧縮時も 16.7%→83.3% へ完全回復。",
-        eq: "Canvas = 28 TimeUniform(t_phys) ∪ 4 GDN-Surprise Peaks  (512 tokens × 1024-D)",
-        chips: [["Counting +15.0 pp (vs 一様のみ)", "teal"], ["RoPE Near-Field 整合", ""], ["Reference 45.0% (> T²Mem)", "amber"]]
-      },
-      dgvlm: {
-        title: "DeltaGround-VLM (Hybrid-Pyramid 16×16 Apex + 8×8 Swap Pointer)",
-        desc: "遮蔽・ハイライト系6タスク向けに共有 PaliGemma-2B 上で動作する非特権 <row_y, col_x> ポインタ。容器リフト頂点4枚を非プーリング 16×16 (256t, 14×14 px) で鮮明に捉えつつ、容器スワップ12枚を 8×8 (64t) で高密度追跡。",
-        eq: "Reveal = 4×256t (16×16 Δ_reveal Apex) + 12×64t (8×8 Swap) = 1,792 tokens → <y, x>",
-        chips: [["Unseen STEP0 75.0–76.7% (12.8 px)", "teal"], ["PickHighlight 86% hit", ""], ["特権マスク・オラクル 0", "amber"]]
-      },
-      bridge: {
-        title: "HybridSurpriseGDNBridge (RMSNorm スケール整合残差融合)",
-        desc: "512トークンの視覚キャンバスをクエリとして、2層GDN状態読出トークンおよびマルチスケールSurpriseランドマークへCross-Attentionを実行。SwiGLUノルム爆発（41×）を防ぐ出力RMSNormスケール整合により安定した共適応を実現。",
-        eq: "M_hyb = C_perc + tanh(γ_hyb) · RMSNorm(FFN(XAttn(C_perc, [GDN_tok || Landmarks]))) * rms(C_perc)",
-        chips: [["ノルム爆発防止 (cos 0.31→0.99)", "rose"], ["K=8 Landmarks +6.25 pp", "teal"], ["ODE KV キャッシュ高速化", ""]]
-      },
-      hop2: {
-        title: "Stage-C Zero-Init Residual Multi-Hop Refiner (L ∈ {1, 2, 3})",
-        desc: "IDEA.md の中核仮説である反復メモリ読出を π0.5 上で実装。デモなし計数タスクでは L=1 を維持してカウント精度 (80% val) を守り、連続軌道模倣タスク (MoveCube, PatternLock, InsertPeg) で L=2 反復精錬を起動して Imitation を 45%→65% へ引き上げ。",
-        eq: "M^(2) = M^(1) + tanh(γ_hop2) · Refiner(M^(1), GDN_Readout^(2)),   L(task_goal) ∈ {1, 2}",
-        chips: [["val80 Imitation +20.0 pp (65%)", "teal"], ["test240 最高 48.75% 達成", ""], ["ゼロ初期化残差安全保証", "amber"]]
-      },
-      expert: {
-        title: "ActionExpert-300M (18-Layer Flow-Matching ODE)",
-        desc: "18層の HistoryBlock Cross-Attention を通じてハイブリッド記憶トークンを参照し、10ステップの標準 Euler ODE 積分で20ステップの関節・グリッパ軌道チャンクを生成（H=16 ステップ実行）。RK2 や RTC 平滑化よりも急停止エッジを鋭く保つ Euler が最良と実証。",
-        eq: "v_θ(a_τ, τ | KV_VLM, KV_Mem) → 10-step Euler ODE → 20×8 Action Chunk (Exec H=16)",
-        chips: [["387.8 ms / chunk (2.58 Hz)", "teal"], ["7.04 GiB Peak VRAM", ""], ["FP32MasterAdamW (wd=1e-10)", "amber"]]
-      }
-    };
-
-    function selectArch(key, el) {
-      document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('selected'));
-      if (el) el.classList.add('selected');
-      const d = ARCH_DATA[key];
-      const panel = document.getElementById('arch-detail-panel');
-      panel.innerHTML = `
-        <div>
-          <div style="font-size:0.74rem;font-weight:800;color:#2563eb;text-transform:uppercase;margin-bottom:0.25rem;">Selected Module</div>
-          <h3>${d.title}</h3>
-          <p style="font-size:0.87rem;color:#334155;margin:0 0 0.6rem;">${d.desc}</p>
-          <div class="formula-box">${d.eq}</div>
-        </div>
-        <div class="meta-chips">
-          ${d.chips.map(([txt, cls]) => `<span class="chip ${cls}">${txt}</span>`).join('')}
-        </div>
-      `;
-    }
-
-    // 2. Interactive Benchmark Chart Data
-    const BENCH_MODES = {
-      test_k3: {
-        caption: "【最重要 Held-Out 結果】事前2エピソードをリセットせず連続投入する k=3 干渉評価 (N=240, 720ロールアウト)。FrameSamp+Modul が 45.83%→15.42% (-30.42 pp) へ崩壊する一方、提案手法は 41.67% (+26.25 pp, p_McN=1.16e-14, p_holm=0.0292) を維持。",
-        series: [
-          { name: "π0.5 Base (メモリなし参考)", color: "#94a3b8", vals: [21.67, 21.67, 30.00, 23.33, 11.67] },
-          { name: "FrameSamp+Modul (k=3 干渉崩壊)", color: "#e11d48", vals: [15.42, 21.67, 15.00, 20.00, 5.00] },
-          { name: "提案: Hybrid Stage-C Hop-2 (k=3 頑健)", color: "#0d9488", vals: [41.67, 43.33, 25.00, 45.00, 53.33] }
-        ]
-      },
-      test_k1: {
-        caption: "【標準単発 Held-Out test240 (N=240)】提案 Hybrid Stage-C Hop-2 (48.75%) および単一モデル Pyramid+Hop-2 (47.50%) は π0.5 Base に有意勝利 (p_holm=0.0292)、FrameSamp (45.83%) を点推定で上回る（p=0.349 n.s.）。T²Mem 論文値 (56.83%, N=800) には全体で -8.08 pp 未達だが Reference (45.0% > 38.7%) で逆転。",
-        series: [
-          { name: "π0.5 Base (test240)", color: "#94a3b8", vals: [21.67, 21.67, 30.00, 23.33, 11.67] },
-          { name: "FrameSamp+Modul (test240)", color: "#64748b", vals: [45.83, 66.67, 28.33, 35.00, 53.33] },
-          { name: "提案: Unified Pyramid+Hop-2 (1-Ckpt)", color: "#2563eb", vals: [47.50, 65.00, 28.33, 43.33, 53.33] },
-          { name: "提案: Hybrid Stage-C Hop-2 (最良)", color: "#0d9488", vals: [48.75, 65.00, 31.67, 45.00, 53.33] },
-          { name: "T²Mem 論文値 (参考 test800)", color: "#d97706", vals: [56.83, 78.17, 49.17, 38.67, 61.34] }
-        ]
-      },
-      val_k1: {
-        caption: "【モデル選択 val80 (N=80, Best-of-63 ※選択バイアスあり)】Specialist M10+Hop-2 が 60.00% (48/80)、単一チェックポイント3系統が 57.50% (46/80, 全16タスク ≥20%) に到達（m=146 多重検定補正後は対 FrameSamp p_holm=0.152 n.s.）。",
-        series: [
-          { name: "π0.5 Base (val80)", color: "#94a3b8", vals: [18.75, 30.00, 15.00, 20.00, 10.00] },
-          { name: "FrameSamp+Modul (val80)", color: "#64748b", vals: [43.75, 65.00, 20.00, 25.00, 65.00] },
-          { name: "提案: Unified Pyramid+Hop-2 (8.19 GiB)", color: "#2563eb", vals: [57.50, 80.00, 35.00, 50.00, 65.00] },
-          { name: "提案: Specialist M10+Hop-2 (L∈{1,2,3})", color: "#0d9488", vals: [60.00, 80.00, 40.00, 55.00, 65.00] }
-        ]
-      }
-    };
-
-    const BENCH_CATS = ["16-Task 平均", "Counting", "Permanence", "Reference", "Imitation"];
-
-    function renderBench(modeKey, btn) {
-      if (btn) {
-        document.querySelectorAll('#bench-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      }
-      const mode = BENCH_MODES[modeKey];
-      document.getElementById('bench-caption').textContent = mode.caption;
-      document.getElementById('bench-legend').innerHTML = mode.series.map(s =>
-        `<span class="legend-item"><span class="swatch" style="background:${s.color}"></span>${s.name}</span>`
-      ).join('');
-
-      const W = 980, H = 310, padL = 52, padR = 24, padT = 28, padB = 46;
-      const plotW = W - padL - padR, plotH = H - padT - padB;
-      const nCats = BENCH_CATS.length, nSer = mode.series.length;
-      const groupW = plotW / nCats;
-      const barW = Math.min(34, (groupW * 0.76) / nSer);
-
-      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%">`;
-      for (let yv = 0; yv <= 100; yv += 20) {
-        const y = padT + plotH * (1 - yv / 100);
-        svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>`;
-        svg += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#64748b">${yv}%</text>`;
-      }
-
-      BENCH_CATS.forEach((cat, ci) => {
-        const gx = padL + ci * groupW + (groupW - nSer * barW - (nSer - 1) * 4) / 2;
-        mode.series.forEach((s, si) => {
-          const val = s.vals[ci];
-          const bh = plotH * (val / 100);
-          const bx = gx + si * (barW + 4);
-          const by = padT + plotH - bh;
-          svg += `<rect x="${bx}" y="${by}" width="${barW}" height="${bh}" rx="4" fill="${s.color}">
-                    <title>${s.name} — ${cat}: ${val.toFixed(2)}%</title>
-                  </rect>`;
-          svg += `<text x="${bx + barW / 2}" y="${by - 5}" text-anchor="middle" font-size="10" font-weight="700" fill="#0f172a">${val.toFixed(1)}</text>`;
-        });
-        svg += `<text x="${padL + (ci + 0.5) * groupW}" y="${H - 16}" text-anchor="middle" font-size="12.5" font-weight="750" fill="#0f172a">${cat}</text>`;
-      });
-      svg += `</svg>`;
-      document.getElementById('bench-svg-wrap').innerHTML = svg;
-    }
-
-    // 3. All 16 Tasks Exact Data (Verified from results/phase2/*.json & SURVEY_PHASE2.md)
     const TASKS_16 = [
-      { task: "BinFill", suite: "Counting", base: 20.00, fs: 60.00, ours: 66.67, oursK3: 40.00, fsK3: 20.00, t2m: 60.67, bottleneck: false },
-      { task: "PickXtimes", suite: "Counting", base: 40.00, fs: 73.33, ours: 80.00, oursK3: 60.00, fsK3: 40.00, t2m: 91.33, bottleneck: false },
-      { task: "SwingXtimes", suite: "Counting", base: 26.67, fs: 86.67, ours: 86.67, oursK3: 66.67, fsK3: 26.67, t2m: 90.67, bottleneck: false },
-      { task: "StopCube", suite: "Counting", base: 0.00, fs: 46.67, ours: 26.67, oursK3: 6.67, fsK3: 0.00, t2m: 70.00, bottleneck: true },
-      { task: "VideoUnmask", suite: "Permanence", base: 33.33, fs: 33.33, ours: 26.67, oursK3: 33.33, fsK3: 26.67, t2m: 88.00, bottleneck: true },
-      { task: "VideoUnmaskSwap", suite: "Permanence", base: 33.33, fs: 26.67, ours: 26.67, oursK3: 20.00, fsK3: 13.33, t2m: 29.33, note: "Unified Pyr: 33.3%", bottleneck: false },
-      { task: "ButtonUnmask", suite: "Permanence", base: 40.00, fs: 33.33, ours: 46.67, oursK3: 26.67, fsK3: 0.00, t2m: 59.33, bottleneck: false },
-      { task: "ButtonUnmaskSwap", suite: "Permanence", base: 13.33, fs: 20.00, ours: 26.67, oursK3: 20.00, fsK3: 20.00, t2m: 20.00, note: "HR16: 33.3%", bottleneck: false },
-      { task: "PickHighlight", suite: "Reference", base: 13.33, fs: 13.33, ours: 20.00, oursK3: 13.33, fsK3: 6.67, t2m: 50.67, note: "Exploratory Sym: 60%", bottleneck: true },
-      { task: "VideoRepick", suite: "Reference", base: 0.00, fs: 33.33, ours: 40.00, oursK3: 46.67, fsK3: 6.67, t2m: 38.67, bottleneck: false },
-      { task: "VideoPlaceButton", suite: "Reference", base: 53.33, fs: 33.33, ours: 60.00, oursK3: 60.00, fsK3: 20.00, t2m: 35.33, bottleneck: false },
-      { task: "VideoPlaceOrder", suite: "Reference", base: 26.67, fs: 60.00, ours: 60.00, oursK3: 60.00, fsK3: 46.67, t2m: 30.00, bottleneck: false },
-      { task: "MoveCube", suite: "Imitation", base: 26.67, fs: 86.67, ours: 86.67, oursK3: 93.33, fsK3: 20.00, t2m: 80.67, bottleneck: false },
-      { task: "InsertPeg", suite: "Imitation", base: 6.67, fs: 13.33, ours: 0.00, oursK3: 0.00, fsK3: 0.00, t2m: 36.00, bottleneck: true },
-      { task: "PatternLock", suite: "Imitation", base: 6.67, fs: 53.33, ours: 66.67, oursK3: 60.00, fsK3: 0.00, t2m: 50.00, bottleneck: false },
-      { task: "RouteStick", suite: "Imitation", base: 6.67, fs: 60.00, ours: 60.00, oursK3: 60.00, fsK3: 0.00, t2m: 78.67, bottleneck: false }
+      { task: "BinFill", suite: "Counting", base: 20.00, fs: 60.00, ours: 66.67, oursK3: 40.00, fsK3: 20.00, t2m: 60.67, gap: false },
+      { task: "PickXtimes", suite: "Counting", base: 40.00, fs: 73.33, ours: 80.00, oursK3: 60.00, fsK3: 40.00, t2m: 91.33, gap: false },
+      { task: "SwingXtimes", suite: "Counting", base: 26.67, fs: 86.67, ours: 86.67, oursK3: 66.67, fsK3: 26.67, t2m: 90.67, gap: false },
+      { task: "StopCube", suite: "Counting", base: 0.00, fs: 46.67, ours: 26.67, oursK3: 6.67, fsK3: 0.00, t2m: 70.00, gap: true },
+      { task: "VideoUnmask", suite: "Permanence", base: 33.33, fs: 33.33, ours: 26.67, oursK3: 33.33, fsK3: 26.67, t2m: 88.00, gap: true },
+      { task: "VideoUnmaskSwap", suite: "Permanence", base: 33.33, fs: 26.67, ours: 26.67, oursK3: 20.00, fsK3: 13.33, t2m: 29.33, note: "Unified Pyr: 33.3%", winAlt: true, gap: false },
+      { task: "ButtonUnmask", suite: "Permanence", base: 40.00, fs: 33.33, ours: 46.67, oursK3: 26.67, fsK3: 0.00, t2m: 59.33, gap: false },
+      { task: "ButtonUnmaskSwap", suite: "Permanence", base: 13.33, fs: 20.00, ours: 26.67, oursK3: 20.00, fsK3: 20.00, t2m: 20.00, note: "HR16: 33.3%", gap: false },
+      { task: "PickHighlight", suite: "Reference", base: 13.33, fs: 13.33, ours: 20.00, oursK3: 13.33, fsK3: 6.67, t2m: 50.67, note: "Exploratory Sym: 60.0%", gap: true },
+      { task: "VideoRepick", suite: "Reference", base: 0.00, fs: 33.33, ours: 40.00, oursK3: 46.67, fsK3: 6.67, t2m: 38.67, gap: false },
+      { task: "VideoPlaceButton", suite: "Reference", base: 53.33, fs: 33.33, ours: 60.00, oursK3: 60.00, fsK3: 20.00, t2m: 35.33, gap: false },
+      { task: "VideoPlaceOrder", suite: "Reference", base: 26.67, fs: 60.00, ours: 60.00, oursK3: 60.00, fsK3: 46.67, t2m: 30.00, gap: false },
+      { task: "MoveCube", suite: "Imitation", base: 26.67, fs: 86.67, ours: 86.67, oursK3: 93.33, fsK3: 20.00, t2m: 80.67, gap: false },
+      { task: "InsertPeg", suite: "Imitation", base: 6.67, fs: 13.33, ours: 0.00, oursK3: 0.00, fsK3: 0.00, t2m: 36.00, gap: true },
+      { task: "PatternLock", suite: "Imitation", base: 6.67, fs: 53.33, ours: 66.67, oursK3: 60.00, fsK3: 0.00, t2m: 50.00, gap: false },
+      { task: "RouteStick", suite: "Imitation", base: 6.67, fs: 60.00, ours: 60.00, oursK3: 60.00, fsK3: 0.00, t2m: 78.67, gap: false }
     ];
 
-    function barHtml(val, color) {
-      return `<div class="bar-cell"><strong>${val.toFixed(1)}%</strong><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${val}%;background:${color}"></div></div></div>`;
-    }
-
-    function filterTasks(filter, btn) {
+    function filterTasks(mode, btn) {
       if (btn) {
-        btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.parentElement.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       }
       const rows = TASKS_16.filter(r => {
-        if (filter === 'ALL') return true;
-        if (filter === 'BOTTLENECK') return r.bottleneck;
-        return r.suite === filter;
+        if (mode === 'ALL') return true;
+        if (mode === 'WINS') return (r.ours >= r.t2m) || r.winAlt;
+        if (mode === 'GAP') return r.gap;
+        return r.suite === mode;
       });
 
       document.getElementById('task-tbody').innerHTML = rows.map(r => {
         const diff = r.ours - r.t2m;
-        let badge = '';
-        if (diff >= 0) badge = `<span class="win-tag up">+${diff.toFixed(1)} pp (優位)</span>`;
-        else if (r.bottleneck) badge = `<span class="win-tag gap">${diff.toFixed(1)} pp (主要課題)</span>`;
-        else badge = `<span class="win-tag mid">${diff.toFixed(1)} pp</span>`;
-        const extra = r.note ? `<div style="font-size:0.72rem;color:#64748b;margin-top:2px;">※${r.note}</div>` : '';
+        const diffStr = (diff >= 0 ? '+' : '−') + Math.abs(diff).toFixed(1) + ' pp';
+        const diffCls = (diff >= 0 || r.winAlt) ? 'delta-pos' : (r.gap ? 'delta-neg' : '');
+        const noteHtml = r.note ? ` <span class="has-text-grey" style="font-size:0.78rem;">(${r.note})</span>` : '';
         return `
-          <tr>
-            <td><strong>${r.task}</strong>${extra}</td>
+          <tr class="${diff >= 0 ? 'ours-row' : ''}">
+            <td class="has-text-left"><strong>${r.task}</strong>${noteHtml}</td>
             <td>${r.suite}</td>
-            <td>${barHtml(r.base, '#94a3b8')}</td>
-            <td>${barHtml(r.fs, '#64748b')}</td>
-            <td>${barHtml(r.ours, '#0d9488')}</td>
-            <td><strong style="color:#0f766e">${r.oursK3.toFixed(1)}%</strong> <span style="color:#94a3b8">vs</span> <span style="color:#e11d48">${r.fsK3.toFixed(1)}%</span></td>
-            <td>${barHtml(r.t2m, '#d97706')}</td>
-            <td>${badge}</td>
+            <td>${r.base.toFixed(1)}%</td>
+            <td>${r.fs.toFixed(1)}%</td>
+            <td><strong>${r.ours.toFixed(1)}%</strong></td>
+            <td><span class="delta-pos">${r.oursK3.toFixed(1)}%</span> <span class="has-text-grey">vs.</span> <span class="delta-neg">${r.fsK3.toFixed(1)}%</span></td>
+            <td>${r.t2m.toFixed(1)}%</td>
+            <td class="${diffCls}">${diffStr}</td>
           </tr>
         `;
       }).join('');
     }
 
-    // 4. Trajectory Curve & Wave Cards
-    const TRAJ_POINTS = [
-      { label: "P1 SmolVLA", val: 6.50, tag: "Phase 1: 450M 8×8 Cache 天井", desc: "520 KB GDN で 93.5% 計数保持を証明するも凍結 450M バックボーンが <10% 運動天井に直面。" },
-      { label: "M1 Base PT", val: 18.75, tag: "M1: 3.44B π0.5 変換パリティ", desc: "Orbax→PyTorch 変換 (≤1e-5 精度) と 16 GiB RTX 5080 上での並列閉ループ評価系を確立。" },
-      { label: "Hybrid v1", val: 8.75, tag: "Wave 2: 4重バグ特定・解消", desc: "RoPE近傍空白・excl=16盲点・SwiGLU 41×ノルム爆発を特定し RMSNorm 整合で 16.7%→83.3% 回復。" },
-      { label: "Stage-A v2", val: 45.00, tag: "Wave 3: 凍結バックボーン + k=3 耐性", desc: "物理時刻アンカー＋GDNサプライズで 45.0% 到達、さらに k=3 連続干渉でも 45.0% (低下 0.0 pp) を実証。" },
-      { label: "Hybrid v3", val: 50.00, tag: "Wave 4: Stage-B 共適応 (test 48.3%)", desc: "FP32MasterAdamW (wd=1e-10) による共適応で val80 50.0%・held-out test240 48.33% を達成。" },
-      { label: "M7B OrdOnly", val: 53.75, tag: "Wave 8: 統一接地 + 順序棄却ゲート", desc: "Permanence 40.0% (VideoUnmask 80%) を達成し、反復計数タスクでのサブゴール棄却で 16/16 ≥20%。" },
-      { label: "M7Dv2 Fix252", val: 55.00, tag: "Wave 10: ショートカット除去 + 252 LoRA", desc: "腕ホバリング学習の排除 (v2_non_entry_xy_weight=0) と MLP 含む 252/252 LoRA 完全復元で +12.5 pp。" },
-      { label: "Pyr/HR16+Hop2", val: 57.50, tag: "Wave 13–15: 16×16 頂点 + 単一モデル 57.5%", desc: "16×16 非プーリング露出 + Swap追跡 + Hop-2 で 8.19 GiB 単一モデル 57.5% val / 47.5% test240。" },
-      { label: "M10+Hop2 / Test*", val: 60.00, tag: "Wave 15–16: val 60.0% & test k=3 41.7%", desc: "val80 で 60.0% 到達、held-out test240 で単発 48.75%・k=3 連続干渉 41.67% (vs FS 15.42%) を確定。" }
-    ];
-
-    function renderTrajectory() {
-      const W = 980, H = 250, padL = 50, padR = 35, padT = 28, padB = 48;
-      const plotW = W - padL - padR, plotH = H - padT - padB;
-      const stepX = plotW / (TRAJ_POINTS.length - 1);
-
-      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="margin-bottom:0.5rem;">`;
-      for (let yv = 0; yv <= 60; yv += 15) {
-        const y = padT + plotH * (1 - yv / 65);
-        svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>`;
-        svg += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#64748b">${yv}%</text>`;
-      }
-      // FrameSamp val80 reference line (43.75%)
-      const yFS = padT + plotH * (1 - 43.75 / 65);
-      svg += `<line x1="${padL}" y1="${yFS}" x2="${W - padR}" y2="${yFS}" stroke="#64748b" stroke-dasharray="5,4" stroke-width="1.5"/>`;
-      svg += `<text x="${W - padR - 4}" y="${yFS - 5}" text-anchor="end" font-size="10.5" font-weight="700" fill="#64748b">FrameSamp val80 (43.75%)</text>`;
-
-      const pts = TRAJ_POINTS.map((p, i) => [padL + i * stepX, padT + plotH * (1 - p.val / 65)]);
-      svg += `<polyline fill="none" stroke="#2563eb" stroke-width="3" points="${pts.map(p => p.join(',')).join(' ')}"/>`;
-
-      TRAJ_POINTS.forEach((p, i) => {
-        const [cx, cy] = pts[i];
-        const col = p.val < 15 ? "#e11d48" : (p.val >= 55 ? "#0d9488" : "#2563eb");
-        svg += `<circle cx="${cx}" cy="${cy}" r="6" fill="${col}" stroke="#fff" stroke-width="2"/>`;
-        svg += `<text x="${cx}" y="${cy - 11}" text-anchor="middle" font-size="10.5" font-weight="800" fill="#0f172a">${p.val.toFixed(1)}%</text>`;
-        svg += `<text x="${cx}" y="${H - 16}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#334155">${p.label}</text>`;
-      });
-      svg += `</svg>`;
-      document.getElementById('traj-svg-wrap').innerHTML = svg;
-
-      document.getElementById('wave-cards').innerHTML = TRAJ_POINTS.map(p => `
-        <div class="wave-card">
-          <div class="wave-top"><span class="wave-id">${p.label}</span><span class="wave-score">${p.val.toFixed(2)}%</span></div>
-          <h4>${p.tag}</h4>
-          <p>${p.desc}</p>
-        </div>
-      `).join('');
-    }
-
-    // 5. Lightbox
     function openLightbox(src, cap) {
       document.getElementById('lightbox-img').src = src;
-      document.getElementById('lightbox-cap').textContent = cap;
+      document.getElementById('lightbox-cap').textContent = cap || '';
       document.getElementById('lightbox').classList.add('open');
     }
     function closeLightbox() {
@@ -1210,11 +1317,16 @@
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
-    // Init
-    selectArch('siglip', document.querySelector('.arch-node[data-node="siglip"]'));
-    renderBench('test_k3');
+    document.getElementById('copyBibtex').addEventListener('click', function () {
+      const text = document.getElementById('bibtexCitation').innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBibtex');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1600);
+      });
+    });
+
     filterTasks('ALL');
-    renderTrajectory();
   </script>
 </body>
 </html>

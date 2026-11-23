@@ -25,8 +25,9 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import gc
 import math
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Literal, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -135,6 +136,9 @@ class DeltaGroundVLMConfig:
     v2_advect_radius: int = 1
     v2_advect_beta: float = 20.0
     v2_advect_id_bias: float = 1.0
+    # Phase-3 (`DeltaGround-VLM v3 + CORM + ReFINE`): session-median reveal selector (`t=0` included) + transition weighting
+    v3_mode: bool = False
+    v3_transition_ce_boost: float = 2.5
 
     def to_pi05_mem_cfg(self) -> Pi05MemConfig:
         return Pi05MemConfig(
@@ -667,6 +671,7 @@ def select_v2_pyramid_reveal_indices(
     front_hist_w: Optional[torch.Tensor] = None,
     is_demo_w: Optional[torch.Tensor] = None,
     prominence_tau: int = 0,
+    v3_median_ref: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, int]:
     """`#410` Hybrid-Pyramid selector: `k_apex` (`4x256t` `16x16` $\\Delta_{\\mathrm{ref}}(t)$) + `k_swap` (`12x64t` `8x8` swap/motion).
 
@@ -697,7 +702,11 @@ def select_v2_pyramid_reveal_indices(
     apex_set: set[int] = set()
     if int(k_apex) > 0 and front_hist_w is not None and int(front_hist_w.shape[0]) >= u_cut:
         with torch.no_grad():
-            if int(prominence_tau) > 0:
+            if bool(v3_median_ref):
+                f_sess = front_hist_w[start_pos:u_cut].float()
+                f_med = f_sess.median(dim=0, keepdim=True).values
+                delta_ref = torch.sqrt((f_sess - f_med).pow(2).mean(dim=-1) + 1e-8).max(dim=-1).values
+            elif int(prominence_tau) > 0:
                 f_sess_n = front_hist_w[start_pos:u_cut]
                 tau = int(prominence_tau)
                 idx_s = torch.arange(n_sess, device=f_sess_n.device)
@@ -710,15 +719,20 @@ def select_v2_pyramid_reveal_indices(
                 f_sess = front_hist_w[start_pos:u_cut].float()
                 delta_ref = torch.sqrt((f_sess - f_sess[0:1]).pow(2).mean(dim=-1) + 1e-8).max(dim=-1).values
         dref_list = delta_ref.detach().cpu().tolist()
+        min_i = 0 if bool(v3_median_ref) else 1
         if is_demo_w is not None and int(is_demo_w.numel()) >= u_cut and bool(is_demo_w[start_pos:u_cut].any().item()):
             d_flags = is_demo_w[start_pos:u_cut].detach().cpu().tolist()
-            apex_pool = [i for i, is_d in enumerate(d_flags) if is_d and i > 0]
+            apex_pool = [i for i, is_d in enumerate(d_flags) if is_d and i >= min_i]
             if not apex_pool:
-                apex_pool = list(range(1, n_sess)) if n_sess > 1 else [0]
+                apex_pool = list(range(min_i, n_sess)) if n_sess > min_i else [0]
         else:
-            apex_pool = list(range(1, n_sess)) if n_sess > 1 else [0]
+            apex_pool = list(range(min_i, n_sess)) if n_sess > min_i else [0]
 
         q_apex = min(int(k_apex), len(apex_pool))
+        if q_apex > 0 and bool(v3_median_ref):
+            # Always anchor `start_pos` (`t=0` lifted container reveal frame!) as slot 0 before ranking median deviations!
+            apex_chosen.append(start_pos)
+            apex_set.add(start_pos)
         if q_apex > 0:
             apex_ranked = sorted(apex_pool, key=lambda i: dref_list[i], reverse=True)
             base_sep = min(8, max(3, len(apex_pool) // max(1, q_apex + 1)))
@@ -1739,6 +1753,7 @@ class DeltaGroundVLMSystem(nn.Module):
                             front_hist_w=f_w[:ue],
                             is_demo_w=d_w[:ue],
                             prominence_tau=self.cfg.v2_reveal_prominence_tau,
+                            v3_median_ref=bool(self.cfg.v3_mode),
                         )
                         if adv_on_ep:
                             p_c = int(f_w.shape[1])
@@ -1923,7 +1938,16 @@ class DeltaGroundVLMSystem(nn.Module):
         tgt_xy2 = targets["xy2_m11"].float()
         is_entry = targets.get("is_stage_entry")
 
-        tmpl_loss = F.cross_entropy(preds["template_logits"], tgt_tmpl, label_smoothing=0.04)
+        if bool(self.cfg.v3_mode) and is_entry is not None and int(is_entry.numel()) == int(tgt_tmpl.numel()):
+            ce_vec = F.cross_entropy(preds["template_logits"], tgt_tmpl, label_smoothing=0.04, reduction="none")
+            w_ce = torch.where(
+                is_entry.bool(),
+                torch.full_like(ce_vec, float(self.cfg.v3_transition_ce_boost)),
+                torch.ones_like(ce_vec),
+            )
+            tmpl_loss = (ce_vec * w_ce).sum() / w_ce.sum().clamp(min=1.0)
+        else:
+            tmpl_loss = F.cross_entropy(preds["template_logits"], tgt_tmpl, label_smoothing=0.04)
         xy_loss = torch.tensor(0.0, device=dev, dtype=torch.float32)
         px_err_1 = torch.zeros_like(tgt_tmpl, dtype=torch.float32)
 
@@ -2237,9 +2261,31 @@ class DeltaGroundVLMEvalAdapter:
         }
         self._stage_latch = StageEntrySubgoalLatch(self._twin_to_grounded)
         self._cont_latch = ContinuousStageEntryLatch(self._twin_to_grounded)
+        from .corm import CausalObjectCentricMemory
+
+        self.enable_corm: bool = os.environ.get("PI05_DISABLE_CORM", "0") != "1"
+        self.corm = CausalObjectCentricMemory(device=self.device)
         init_mode: LoRAMode = self.non_subgoal_lora_mode if self.dynamic_policy_lora_on_subgoal else self.restore_lora_mode
         set_vlm_lora_mode(self.pi05, init_mode)
         self.reset()
+
+    @property
+    def wants_raw_rgb(self) -> bool:
+        return bool(self.enable_corm)
+
+    @torch.no_grad()
+    def ingest_raw_rgb_stream(
+        self,
+        front_rgb_seq: Sequence[np.ndarray] | np.ndarray,
+        raw_states_seq: Sequence[np.ndarray] | np.ndarray,
+        *,
+        task_goal: str,
+        is_demo: bool,
+    ) -> None:
+        if self.enable_corm:
+            self.corm.ingest_raw_stream(
+                front_rgb_seq, raw_states_seq, task_goal=task_goal, is_demo=is_demo
+            )
 
     def reset(self) -> None:
         self.stream_total_frames: int = 0
@@ -2281,6 +2327,8 @@ class DeltaGroundVLMEvalAdapter:
         self._last_b_reset_max: float = 0.0
         self._stage_latch.reset()
         self._cont_latch.reset()
+        if hasattr(self, "corm"):
+            self.corm.reset()
         set_vlm_lora_mode(
             self.pi05, self.non_subgoal_lora_mode if self.dynamic_policy_lora_on_subgoal else self.restore_lora_mode
         )
@@ -2605,6 +2653,7 @@ class DeltaGroundVLMEvalAdapter:
                         front_hist_w=f_all,
                         is_demo_w=d_all,
                         prominence_tau=self.cfg.v2_reveal_prominence_tau,
+                        v3_median_ref=bool(self.cfg.v3_mode),
                     )
                     if self.head.coda.adv_on:
                         nbr_m = self.system._advect_nbr_mask(self.device)
@@ -2877,10 +2926,26 @@ class DeltaGroundVLMEvalAdapter:
 
         tmpl_idx = int(preds["template_logits"][0].argmax(dim=-1).item())
         tmpl_str = self.head.template_vocab[tmpl_idx] if 0 <= tmpl_idx < len(self.head.template_vocab) else ""
-        if self.stage_entry_latch:
-            pred_sg = self._stage_latch.step(tmpl_str, preds["xy_pri"][0], preds["xy_sec"][0])
+        xy1_use, xy2_use = preds["xy_pri"][0], preds["xy_sec"][0]
+        if self.enable_corm and tmpl_str:
+            tmpl_str = self.corm.guard_stage_template(tmpl_str, self._stage_latch.canon_stage, raw_state, task_goal)
+            cand_grounded = self._twin_to_grounded.get(tmpl_str, tmpl_str)
+            corm_yx = self.corm.query_target_yx(cand_grounded, task_goal)
+            if corm_yx is not None:
+                tmpl_str = cand_grounded
+                xy1_use, xy2_use = self.corm.refine_norm_xy(tmpl_str, task_goal, xy1_use, xy2_use)
+                self._stage_latch.canon_stage = cand_grounded
+                self._stage_latch.latched_subgoal = render_grounded_subgoal_from_norm_xy(tmpl_str, xy1_use, xy2_use)
+                self._stage_latch.has_bbox = True
+                pred_sg = self._stage_latch.latched_subgoal
+            elif self.stage_entry_latch:
+                pred_sg = self._stage_latch.step(tmpl_str, xy1_use, xy2_use)
+            else:
+                pred_sg = render_grounded_subgoal_from_norm_xy(tmpl_str, xy1_use, xy2_use)
+        elif self.stage_entry_latch:
+            pred_sg = self._stage_latch.step(tmpl_str, xy1_use, xy2_use)
         else:
-            pred_sg = render_grounded_subgoal_from_norm_xy(tmpl_str, preds["xy_pri"][0], preds["xy_sec"][0])
+            pred_sg = render_grounded_subgoal_from_norm_xy(tmpl_str, xy1_use, xy2_use)
         self._last_pred_subgoal = pred_sg
         out_sg = pred_sg if pred_sg else None
         if self.dynamic_policy_lora_on_subgoal:
@@ -2907,6 +2972,8 @@ class DeltaGroundVLMEvalAdapter:
         self._w_gdn_slots = [t.to(dev) for t in self._w_gdn_slots]
         self._w_state_norm = [t.to(dev) for t in self._w_state_norm]
         self._cont_latch.to_device(dev)
+        if hasattr(self, "corm"):
+            self.corm.to_device(dev)
 
     @torch.no_grad()
     def read_memory(
@@ -2959,6 +3026,24 @@ class DecoupledStagePointerVLMAdapter:
         self._last_pred_subgoal = ""
         self._last_b_reset_max = 0.0
         self._pending_sub_idx = None
+
+    @property
+    def wants_raw_rgb(self) -> bool:
+        return bool(getattr(self.stage_adapter, "wants_raw_rgb", False))
+
+    @torch.no_grad()
+    def ingest_raw_rgb_stream(
+        self,
+        front_rgb_seq: Sequence[np.ndarray] | np.ndarray,
+        raw_states_seq: Sequence[np.ndarray] | np.ndarray,
+        *,
+        task_goal: str,
+        is_demo: bool,
+    ) -> None:
+        if hasattr(self.stage_adapter, "ingest_raw_rgb_stream"):
+            self.stage_adapter.ingest_raw_rgb_stream(
+                front_rgb_seq, raw_states_seq, task_goal=task_goal, is_demo=is_demo
+            )
 
     @torch.no_grad()
     def select_write_indices(
@@ -3091,6 +3176,23 @@ class DecoupledStagePointerVLMAdapter:
             self._stage_latch.reset()
             self._last_pred_subgoal = ""
             return None
+
+        if self.stage_adapter.enable_corm:
+            tmpl_str = self.stage_adapter.corm.guard_stage_template(
+                tmpl_str, self._stage_latch.canon_stage, raw_state, task_goal
+            )
+            cand_grounded = self._twin_to_grounded.get(tmpl_str, tmpl_str)
+            corm_yx = self.stage_adapter.corm.query_target_yx(cand_grounded, task_goal)
+            if corm_yx is not None:
+                tmpl_str = cand_grounded
+                xy1, xy2 = self.stage_adapter.corm.refine_norm_xy(
+                    tmpl_str, task_goal, st_preds["xy_pri"][0], st_preds["xy_sec"][0]
+                )
+                self._stage_latch.canon_stage = cand_grounded
+                self._stage_latch.latched_subgoal = render_grounded_subgoal_from_norm_xy(tmpl_str, xy1, xy2)
+                self._stage_latch.has_bbox = True
+                self._last_pred_subgoal = self._stage_latch.latched_subgoal
+                return self._last_pred_subgoal
 
         canon = self._twin_to_grounded.get(tmpl_str, tmpl_str)
         need_fresh_xy = ("<bbox>" in tmpl_str) and (canon != self._stage_latch.canon_stage or not self._stage_latch.has_bbox)

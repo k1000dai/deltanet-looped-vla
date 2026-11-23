@@ -54,17 +54,42 @@ class ZeroOraclePromptRoutedPolicy(StatefulPolicy):
         primary_policy: Pi05RoboMMEPolicy,
         specialist_policy: Pi05RoboMMEPolicy,
         route_mode: str = "default",
+        *,
+        offload_inactive: bool = False,
     ) -> None:
-        from pi05_mem.deltaground import should_route_to_symbolic_specialist
+        from pi05_mem.deltaground import (
+            should_route_to_symbolic_specialist,
+            should_route_to_symbolic_specialist_8task,
+        )
 
         self.primary = primary_policy
         self.specialist = specialist_policy
+        self._target_device = primary_policy.device
+        self._offload_inactive = bool(offload_inactive) and (self._target_device.type == "cuda")
+        self._active_name: str = "primary"
         if route_mode == "highlight":
             # Public-prompt-only: route ONLY goals mentioning "highlight" (PickHighlight) to the specialist.
             self._route_fn = lambda g: bool(g) and ("highlight" in str(g).lower())
+        elif route_mode == "8task":
+            self._route_fn = should_route_to_symbolic_specialist_8task
         else:
             self._route_fn = should_route_to_symbolic_specialist
         self._suppress_reset = False
+        if self._offload_inactive:
+            self._move_subpolicy(self.specialist, torch.device("cpu"))
+            self._move_subpolicy(self.primary, self._target_device)
+
+    def _move_subpolicy(self, pol: Pi05RoboMMEPolicy, dev: torch.device) -> None:
+        vt = self.primary.model.vision_tower
+        pol.device = dev
+        pol.model.to(dev)
+        # Keep shared SigLIP vision_tower permanently on target GPU!
+        vt.to(self._target_device)
+        pol._generator = torch.Generator(device=dev)
+        pol._generator.manual_seed(pol._seed)
+        ad = getattr(pol, "memory_adapter", None)
+        if ad is not None and hasattr(ad, "to_device"):
+            ad.to_device(dev)
 
     @property
     def suppress_reset(self) -> bool:
@@ -77,7 +102,16 @@ class ZeroOraclePromptRoutedPolicy(StatefulPolicy):
         self.specialist.suppress_reset = bool(val)
 
     def _select(self, task_goal: str) -> tuple[Pi05RoboMMEPolicy, Pi05RoboMMEPolicy]:
-        if self._route_fn(task_goal):
+        want_spec = bool(self._route_fn(task_goal))
+        want_name = "specialist" if want_spec else "primary"
+        if self._offload_inactive and (not self._suppress_reset) and want_name != self._active_name:
+            old_p = self.specialist if self._active_name == "specialist" else self.primary
+            new_p = self.specialist if want_spec else self.primary
+            self._move_subpolicy(old_p, torch.device("cpu"))
+            torch.cuda.empty_cache()
+            self._move_subpolicy(new_p, self._target_device)
+            self._active_name = want_name
+        if want_spec:
             return self.specialist, self.primary
         return self.primary, self.specialist
 
@@ -222,6 +256,8 @@ def load_optional_memory_adapter(
                 )
             if ad.stage_adapter.session_start_frame != prev_sess_s or ad.stage_adapter.session_exec_start_frame != prev_exec_s:
                 ad._stage_latch.reset()
+                if getattr(ad, "corm", None) is not None:
+                    ad.corm.reset()
 
         ad.select_write_indices = _union_select
         ad.ingest_selected_frames = _union_ingest
@@ -526,6 +562,8 @@ def run_parallel_sharded(
         env.setdefault("DISPLAY", "")
         env.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
         env.setdefault("PYTORCH_ALLOC_CONF", "expandable_segments:True")
+        if args.specialist_ckpt_dir is not None and args.interference_k <= 1:
+            env.setdefault("PI05_OFFLOAD_INACTIVE_SPECIALIST", "1")
 
         for i, stasks in enumerate(shard_tasks_list):
             cmd = [
@@ -590,6 +628,8 @@ def run_parallel_sharded(
                 cmd.extend(["--specialist-memory-ckpt", str(args.specialist_memory_ckpt)])
             if args.specialist_hop_mode is not None:
                 cmd.extend(["--specialist-hop-mode", args.specialist_hop_mode])
+            if args.specialist_route != "default":
+                cmd.extend(["--specialist-route", args.specialist_route])
             if args.antithetic:
                 cmd.append("--antithetic")
             if args.save_videos:
@@ -598,7 +638,7 @@ def run_parallel_sharded(
             print(f"[eval_pi05:shard{i}] Launching tasks={list(stasks)} -> {shard_paths[i].name}", flush=True)
             procs.append(subprocess.Popen(cmd, env=env))
             if i < n_workers - 1:
-                time.sleep(2.0)
+                time.sleep(25.0)
 
         while any(p.poll() is None for p in procs):
             time.sleep(4.0)
@@ -693,7 +733,7 @@ def main() -> None:
     parser.add_argument("--specialist-memory-adapter", type=str, default=None, help="Optional module:builder for P2-M10 specialist adapter.")
     parser.add_argument("--specialist-memory-ckpt", type=Path, default=None, help="Optional ckpt for P2-M10 specialist adapter.")
     parser.add_argument("--specialist-hop-mode", choices=("auto", "l1", "l2", "l3"), default=None, help="Optional hop mode override for P2-M10 specialist.")
-    parser.add_argument("--specialist-route", choices=("default", "highlight"), default="default", help="P2-M10 routing rule: default 6-task phrase router, or 'highlight'-only (PickHighlight).")
+    parser.add_argument("--specialist-route", choices=("default", "8task", "highlight"), default="default", help="Specialist routing rule: 'default' (6-task), '8task' (all 8 Permanence+Reference tasks), or 'highlight'-only.")
     parser.add_argument("--interference-k", type=int, default=1, help="Un-reset session length k (1 = standard).")
     parser.add_argument("--parallel-workers", type=int, default=1, help="Number of parallel GPU shard processes.")
     parser.add_argument("--no-resume", action="store_true", help="Overwrite existing output JSON.")
@@ -746,19 +786,24 @@ def main() -> None:
             f"(sharing frozen SigLIP vision_tower, adapter={args.specialist_memory_adapter}) ...",
             flush=True,
         )
+        import weakref
+
+        offload_spec = os.environ.get("PI05_OFFLOAD_INACTIVE_SPECIALIST", "0") == "1" and args.interference_k <= 1
+        spec_init_dev = "cpu" if offload_spec else args.device
         spec_model, spec_stats = load_pi05_checkpoint(
             args.specialist_ckpt_dir,
             device="cpu",
             precision="bfloat16" if args.precision == "bfloat16" else "float32",
         )
         del spec_model.vision_tower
+        policy.model.vision_tower._host_perceptual_pi05 = weakref.ref(policy.model)  # type: ignore[attr-defined]
         spec_model.vision_tower = policy.model.vision_tower
         gc.collect()
         specialist_policy = Pi05RoboMMEPolicy(
             spec_model,
             norm_stats=spec_stats,
             tokenizer_path=args.tokenizer_path or resolve_tokenizer_path(None, args.specialist_ckpt_dir),
-            device=args.device,
+            device=spec_init_dev,
             precision=args.precision,
             num_inference_steps=args.num_steps,
             mem_cfg_scale=args.mem_cfg_scale,
@@ -769,11 +814,13 @@ def main() -> None:
             ode_solver=args.ode_solver,
             seed=args.seed,
         )
+        if offload_spec:
+            policy.model.vision_tower.to(args.device)
         spec_adapter = load_optional_memory_adapter(
             args.specialist_memory_adapter,
             args.specialist_memory_ckpt,
             specialist_policy.model,
-            args.device,
+            spec_init_dev,
             hop_mode=args.specialist_hop_mode or args.hop_mode,
         )
         if spec_adapter is not None:
@@ -782,7 +829,9 @@ def main() -> None:
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-        eval_policy = ZeroOraclePromptRoutedPolicy(policy, specialist_policy, route_mode=args.specialist_route)
+        eval_policy = ZeroOraclePromptRoutedPolicy(
+            policy, specialist_policy, route_mode=args.specialist_route, offload_inactive=offload_spec
+        )
 
     model_vram_mb = (
         torch.cuda.max_memory_allocated() / (1024**2) if torch.cuda.is_available() else 0.0

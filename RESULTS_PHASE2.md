@@ -1,7 +1,10 @@
 # DeltaMem-π0.5 (Phase 2): Multi-Timescale Associative Memory, Non-Privileged Surprise Landmarks, and Self-Grounded Co-Adaptation on 3.44B `π0.5`
 
 **Phase-2 Experimental & Mechanistic Report (Milestones M1–M4 Complete; M5 Official `test240` & `k = 3` Interference Complete — read §1.1 Statistical Caveats before citing any headline number)**  
-**Companion Documents:** [NEXT_GOAL_PLAN.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/NEXT_GOAL_PLAN.md) | [docs/SURVEY_PHASE2.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/docs/SURVEY_PHASE2.md) | [RESULTS_REPORT.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/RESULTS_REPORT.md) | [docs/SURVEY.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/docs/SURVEY.md)
+**Companion Documents:** [RESULTS_PHASE3.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/RESULTS_PHASE3.md) | [NEXT_GOAL_PLAN.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/NEXT_GOAL_PLAN.md) | [docs/SURVEY_PHASE2.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/docs/SURVEY_PHASE2.md) | [RESULTS_REPORT.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/RESULTS_REPORT.md) | [docs/SURVEY.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/docs/SURVEY.md)
+
+> [!IMPORTANT]
+> **Phase-3 Update ([RESULTS_PHASE3.md](file:///home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla/RESULTS_PHASE3.md)):** Building on the Phase-2 diagnostics in this document, **Phase 3 (`DeltaMem-π0.5 v3 + CORM`)** resolves the reveal-inversion and swap-transport bottlenecks below and achieves **`71.00%` (`568 / 800`, 95% CI `[67.72%, 74.12%]`)** on the full official held-out `RoboMME` `test` split (`69.29%` on untouched `ep 15..49`, `70.83%` at un-reset `k = 3`), **surpassing `T²Mem` (`56.83%`) by `+14.17 pp` ($p = 3.94 \times 10^{-19}$)**. All Phase-2 historical logs and caveats below remain preserved unmodified for scientific provenance.
 
 ---
 

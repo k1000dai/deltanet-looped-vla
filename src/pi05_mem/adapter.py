@@ -13,6 +13,7 @@ Implements `@pi05-bridge`'s `src.pi05.policy.Pi05MemoryAdapter` protocol with:
 from __future__ import annotations
 
 import math
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import weakref
@@ -1047,6 +1048,24 @@ class UnifiedGroundedHybridEvalAdapter:
         self._pending_union_map = None
         self._last_cont_vlm_ground = None
 
+    @property
+    def wants_raw_rgb(self) -> bool:
+        return bool(getattr(self.dg_adapter, "wants_raw_rgb", False))
+
+    @torch.no_grad()
+    def ingest_raw_rgb_stream(
+        self,
+        front_rgb_seq: Sequence[np.ndarray] | np.ndarray,
+        raw_states_seq: Sequence[np.ndarray] | np.ndarray,
+        *,
+        task_goal: str,
+        is_demo: bool,
+    ) -> None:
+        if hasattr(self.dg_adapter, "ingest_raw_rgb_stream"):
+            self.dg_adapter.ingest_raw_rgb_stream(
+                front_rgb_seq, raw_states_seq, task_goal=task_goal, is_demo=is_demo
+            )
+
     @torch.no_grad()
     def select_write_indices(
         self,
@@ -1465,11 +1484,12 @@ def build_deltaground_vlm_adapter(
     dgv_cfg = DeltaGroundVLMConfig.from_dict(payload["deltaground_vlm_config"])
     dgv_sys = DeltaGroundVLMSystem(dgv_cfg, pi05_model, template_vocab=payload["template_vocab"])
     dgv_sys.load_payload(payload, strict=True)
+    corm_on = os.environ.get("PI05_DISABLE_CORM", "0") != "1"
     return DeltaGroundVLMEvalAdapter(
         dgv_sys,
         restore_lora_mode="none",
-        fold_occlusion_twins=bool(dgv_cfg.v2_mode),
-        stage_entry_latch=bool(dgv_cfg.v2_mode),
+        fold_occlusion_twins=bool(dgv_cfg.v2_mode or corm_on),
+        stage_entry_latch=bool(dgv_cfg.v2_mode or corm_on),
         state_stats=payload.get("state_stats"),
     )
 

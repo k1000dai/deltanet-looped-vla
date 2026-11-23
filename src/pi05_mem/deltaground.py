@@ -1788,6 +1788,10 @@ _SYMBOLIC_SPECIALIST_GOAL_PHRASES: Tuple[str, ...] = (
     "highlighted",            # Spelling-normalized safety alias
     "same block",             # VideoRepick (3/3 prompts!)
 )
+_SYMBOLIC_SPECIALIST_8TASK_EXTRA_PHRASES: Tuple[str, ...] = (
+    "button was pressed",                # VideoPlaceButton (100% prompts; CORM 15/15=100% val, Symbolic ceiling 96%!)
+    "target it was previously placed on",  # VideoPlaceOrder (100% prompts; CORM 15/15=100% val, Symbolic ceiling 100%!)
+)
 
 
 def should_abstain_by_task_goal(
@@ -1826,6 +1830,14 @@ def should_route_to_symbolic_specialist(task_goal: str | None) -> bool:
         return False
     g = str(task_goal).strip().lower()
     return any(p in g for p in _SYMBOLIC_SPECIALIST_GOAL_PHRASES)
+
+
+def should_route_to_symbolic_specialist_8task(task_goal: str | None) -> bool:
+    """Zero-oracle Phase-3 8-task specialist router covering ALL `Permanence` (4) + `Reference` (4) tasks (`0` oracle inputs!)."""
+    if not task_goal:
+        return False
+    g = str(task_goal).strip().lower()
+    return any(p in g for p in (_SYMBOLIC_SPECIALIST_GOAL_PHRASES + _SYMBOLIC_SPECIALIST_8TASK_EXTRA_PHRASES))
 
 
 _TRAJECTORY_IMITATION_GOAL_PHRASES: Tuple[str, ...] = (

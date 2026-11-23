@@ -361,6 +361,17 @@ class Pi05RoboMMEPolicy(StatefulPolicy):
         if n == 0 or not self.needs_history_ingestion:
             return
 
+        if (
+            self.memory_adapter is not None
+            and getattr(self.memory_adapter, "wants_raw_rgb", False)
+            and hasattr(self.memory_adapter, "ingest_raw_rgb_stream")
+        ):
+            f_raw_all = [to_uint8_rgb(x) for x in front_rgb_list]
+            s_raw_all = np.stack([np.asarray(s, dtype=np.float32) for s in state_list], axis=0)
+            self.memory_adapter.ingest_raw_rgb_stream(
+                f_raw_all, s_raw_all, task_goal=task_goal, is_demo=is_demo
+            )
+
         need_wrist = self.memory_adapter is not None
         bs = self.vision_batch_size
         num_patches = (self.model.config.image_size // self.model.config.siglip_patch_size) ** 2
@@ -539,6 +550,12 @@ class Pi05RoboMMEPolicy(StatefulPolicy):
         wrist_tok_256 = both_tok[1:2]
 
         if self.memory_adapter is not None:
+            if getattr(self.memory_adapter, "wants_raw_rgb", False) and hasattr(
+                self.memory_adapter, "ingest_raw_rgb_stream"
+            ):
+                self.memory_adapter.ingest_raw_rgb_stream(
+                    [to_uint8_rgb(front_rgb)], raw_state[None, :], task_goal=task_goal, is_demo=False
+                )
             self.memory_adapter.ingest_frames(
                 front_tok_256.squeeze(0).unsqueeze(0),
                 wrist_tok_256.squeeze(0).unsqueeze(0),

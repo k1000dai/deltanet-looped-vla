@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="[Fun Project] DeltaLoop-VLA & DeltaMem-pi0.5: Multi-Timescale Gated DeltaNet Memory, Non-Privileged Surprise Landmarks, and Interference-Robust Multi-Hop Readout for Long-Horizon Visuomotor Manipulation." />
-  <meta property="og:title" content="[Fun Project] DeltaLoop-VLA & DeltaMem-π0.5: Interference-Robust Embodied Memory for Long-Horizon Manipulation" />
-  <meta property="og:description" content="2.70× higher success (+26.25 pp, p_Holm = 0.0292) under un-reset multi-session interference on RoboMME test240, 48.75% single-session success at 387.8 ms/chunk, and 520 KB O(1) Gated DeltaNet state." />
+  <meta name="description" content="[Fun Project] DeltaLoop-VLA & DeltaMem-pi0.5 v3 + CORM: Surpassing T2Mem on 16-Task RoboMME (71.00% vs. 56.83% on test800, p = 3.94e-19; 70.83% vs. 15.42% under un-reset k=3 multi-session interference) with Zero Oracle Inputs." />
+  <meta property="og:title" content="[Fun Project] DeltaLoop-VLA & DeltaMem-π0.5 v3 + CORM: Surpassing T²Mem on Long-Horizon Embodied Manipulation" />
+  <meta property="og:description" content="71.00% on full held-out RoboMME test800 (+14.17 pp above T²Mem's 56.83%, p = 3.94×10⁻¹⁹), 69.29% on untouched test560, and 70.83% (4.59× FrameSamp) under un-reset k=3 multi-session streaming at 410.6 ms/chunk and 3.04 MiB fast state." />
   <meta property="og:url" content="https://k1000dai.github.io/deltanet-looped-vla/" />
-  <meta property="og:image" content="https://k1000dai.github.io/deltanet-looped-vla/assets/fig_p2_1_leaderboard_and_suites.png" />
+  <meta property="og:image" content="https://k1000dai.github.io/deltanet-looped-vla/assets/fig_p3_1_leaderboard_and_suites.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="[Fun Project] DeltaLoop-VLA & DeltaMem-π0.5" />
-  <meta name="twitter:description" content="Multi-Timescale Gated DeltaNet Memory, Surprise Landmarks, and Interference-Robust Multi-Hop Readout on 16-Task RoboMME." />
-  <meta name="twitter:image" content="https://k1000dai.github.io/deltanet-looped-vla/assets/fig_p2_1_leaderboard_and_suites.png" />
+  <meta name="twitter:title" content="[Fun Project] DeltaLoop-VLA & DeltaMem-π0.5 v3 + CORM" />
+  <meta name="twitter:description" content="71.00% on RoboMME test800 (+14.17 pp vs. T²Mem, p = 3.94e-19) & 70.83% under un-reset k=3 multi-session interference with 0 oracle inputs." />
+  <meta name="twitter:image" content="https://k1000dai.github.io/deltanet-looped-vla/assets/fig_p3_1_leaderboard_and_suites.png" />
 
-  <title>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5: Interference-Robust Embodied Memory for Long-Horizon Manipulation</title>
+  <title>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-π0.5 v3 + CORM: Surpassing T²Mem on Long-Horizon Manipulation</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -57,7 +57,6 @@
       text-decoration: underline;
     }
 
-    /* Layout containers matching Bulma is-max-desktop + is-four-fifths */
     .container {
       max-width: 980px;
       margin: 0 auto;
@@ -105,12 +104,12 @@
     }
 
     .publication-title {
-      font-size: clamp(1.95rem, 3.6vw, 2.75rem);
+      font-size: clamp(1.95rem, 3.5vw, 2.68rem);
       font-weight: 700;
       line-height: 1.2;
       color: #1f2433;
       margin: 0 auto 1.15rem;
-      max-width: 920px;
+      max-width: 930px;
       letter-spacing: -0.015em;
     }
 
@@ -127,7 +126,6 @@
       margin-bottom: 1.55rem;
     }
 
-    /* Rounded dark buttons (Nerfies / Explorative Modeling style) */
     .publication-links {
       display: flex;
       flex-wrap: wrap;
@@ -200,17 +198,13 @@
     .subtitle-lead {
       font-size: 1.05rem;
       color: var(--muted);
-      max-width: 740px;
+      max-width: 760px;
       margin: 0 auto 1.6rem;
       line-height: 1.55;
     }
 
-    p {
-      margin: 0 0 1rem;
-    }
-    p:last-child {
-      margin-bottom: 0;
-    }
+    p { margin: 0 0 1rem; }
+    p:last-child { margin-bottom: 0; }
 
     code {
       font-family: ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
@@ -254,7 +248,7 @@
 
     .teaser-card .t-tag {
       font-family: 'Google Sans', sans-serif;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -268,14 +262,14 @@
     .teaser-card .t-name {
       font-family: 'Google Sans', sans-serif;
       font-weight: 700;
-      font-size: 1.02rem;
+      font-size: 1.0rem;
       color: #1f2433;
       margin-bottom: 0.55rem;
     }
 
     .teaser-card .t-metric {
       font-family: 'Google Sans', sans-serif;
-      font-size: 1.55rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: #1f2433;
       line-height: 1.2;
@@ -294,7 +288,7 @@
       line-height: 1.45;
     }
 
-    /* Result Blocks & Two-Column Figures */
+    /* Result Blocks & Figures */
     .result-block {
       margin-top: 2.7rem;
       margin-bottom: 1.5rem;
@@ -340,12 +334,11 @@
       font-size: 0.91rem;
       color: #4a4f62;
       line-height: 1.52;
-      max-width: 860px;
+      max-width: 880px;
       margin: 0.68rem auto 0;
       text-align: center;
     }
 
-    /* Takeaway Box (Explorative Modeling exact callout style) */
     .takeaway-box {
       background: var(--takeaway-bg);
       border: 1.5px solid var(--accent-deep);
@@ -384,13 +377,13 @@
       width: 100%;
       border-top: 2px solid var(--ink);
       border-bottom: 2px solid var(--ink);
-      font-size: 0.86rem;
+      font-size: 0.85rem;
     }
 
     .result-table th,
     .result-table td {
       border: none;
-      padding: 0.46rem 0.48rem;
+      padding: 0.46rem 0.46rem;
       vertical-align: middle;
       text-align: center;
     }
@@ -486,7 +479,7 @@
       color: #ffffff;
     }
 
-    /* Code Blocks (Getting Started & BibTeX) */
+    /* Code Blocks */
     .code-cols {
       display: flex;
       flex-direction: column;
@@ -608,15 +601,15 @@
       <div class="fun-badge">[Fun Project] &middot; Embodied Memory for Vision-Language-Action Models</div>
 
       <h1 class="publication-title">
-        <span style="color: #0066cc;">DeltaLoop-VLA &amp; DeltaMem-&pi;<sub>0.5</sub></span>:
-        Multi-Timescale Gated DeltaNet Memory, Surprise Landmarks, and Interference-Robust Multi-Hop Readout
+        <span style="color: #0066cc;">DeltaLoop-VLA &amp; DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</span>:
+        Causal Object-Centric Reveal Memory, Multi-Timescale Gated DeltaNet, and Multi-Hop Readout
       </h1>
 
       <div class="publication-authors">
         <a href="https://github.com/k1000dai" target="_blank" rel="noopener">k1000dai</a>
       </div>
       <div class="publication-venue">
-        [Fun Project] Technical Report &middot; November 2026 &middot; Evaluated on 16-Task RoboMME (ManiSkill3)
+        [Fun Project] Technical Report &middot; November 2026 &middot; Evaluated on Full 16-Task RoboMME (<code>test800</code> &amp; Un-Reset <code>k=3</code>)
       </div>
 
       <div class="publication-links">
@@ -628,17 +621,17 @@
           <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.58.1.79-.25.79-.56v-2.02c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.02 11.02 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.42.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
           <span>Code</span>
         </a>
-        <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE2.md" target="_blank" rel="noopener" class="btn-pill">
+        <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE3.md" target="_blank" rel="noopener" class="btn-pill">
           <svg viewBox="0 0 24 24"><path d="M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7-4h4v18h-4V3z"/></svg>
-          <span>Phase 2 Results</span>
+          <span>Phase 3 Results (71.0%)</span>
+        </a>
+        <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE2.md" target="_blank" rel="noopener" class="btn-pill">
+          <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+          <span>Phase 2 Ablations</span>
         </a>
         <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_REPORT.md" target="_blank" rel="noopener" class="btn-pill">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
           <span>Phase 1 Report</span>
-        </a>
-        <a href="https://github.com/k1000dai/deltanet-looped-vla/tree/main/paper" target="_blank" rel="noopener" class="btn-pill">
-          <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/></svg>
-          <span>LaTeX Source</span>
         </a>
         <a href="#BibTeX" class="btn-pill">
           <svg viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z"/></svg>
@@ -655,7 +648,7 @@
         <h2 class="title-3 has-text-centered">TL;DR</h2>
         <div class="has-text-justified">
           <p>
-            We study constant-size associative memory and iterative multi-hop readout for non-Markovian robotic manipulation across synthetic benchmarks, a cached <code>450M</code> <code>SmolVLA</code> backbone, and end-to-end <code>3.44B</code> <strong>&pi;<sub>0.5</sub></strong> policies on the 16-task <strong>RoboMME</strong> benchmark. First, in <strong>Phase 1 (DeltaLoop-VLA)</strong>, we show a clean mechanistic dissociation between <em>negative-eigenvalue associative writing</em> (&beta;<sub><em>t</em></sub> &isin; (0, 2), lifting <em>S</em><sub>8</sub> swap tracking from <strong>25.1% &rarr; 100.0%</strong>) and <em>weight-tied multi-hop readout</em> (<strong>97.1%</strong> ID and <strong>80.4%</strong> zero-shot OOD pointer chasing). Second, scaling to <strong>Phase 2 (DeltaMem-&pi;<sub>0.5</sub>)</strong>, pairing a <strong>520 KB</strong> multi-timescale Gated DeltaNet, non-privileged surprise keyframes, an automatic <code>EpisodeBoundaryForgetGate</code>, and selective <code>Hop-2</code> refinement delivers <strong>2.70&times; higher success (+26.25 pp, 41.67% vs. 15.42%, <em>p</em><sub>Holm</sub> = 0.0292)</strong> than explicit frame-sampling memory under un-reset <em>k</em> = 3 cross-session streaming on held-out <code>test240</code>, while reaching <strong>48.75%</strong> single-session success (+27.08 pp over memoryless &pi;<sub>0.5</sub>) at <strong>387.8 ms/chunk</strong> and <strong>71&times; smaller</strong> recurrent state than <code>T&sup2;Mem</code>.
+            Why do end-to-end memory VLAs still fail on occlusion swaps, flash highlights, and ordered multi-step references despite hundreds of GPU-hours of training? Across synthetic benchmarks, <code>450M</code> <code>SmolVLA</code> probes, and <code>3.44B</code> <strong>&pi;<sub>0.5</sub></strong> policies on the 16-task <strong>RoboMME</strong> benchmark, we isolate two orthogonal bottlenecks: (1) <em>associative state dynamics &amp; multi-hop readout</em> (<strong>Phase 1&ndash;2</strong>), and (2) an <em>action-expert representational bottleneck</em> where pooled continuous history tokens smear sub-grid spatial landmarks and container swaps. In <strong>Phase 3 (DeltaMem-&pi;<sub>0.5</sub> v3 + CORM)</strong>, we bridge causal visual-proprioceptive reveal memory (<code>CORM</code> + <code>DeltaGround-VLM</code>) directly into the <code>SymbolicGround-MME</code> <code>&lt;y, x&gt;</code> bounding-box interface while preserving continuous <code>520 KB</code> Gated DeltaNet + <code>Hop-2</code> modulation on counting and imitation tasks — all under <strong>strict zero-oracle inputs</strong>. On the full locked official <strong><code>test800</code></strong> benchmark (<code>N = 800</code>), our method achieves <strong>71.00% (568/800)</strong>, surpassing published 1,536-H200-hour <strong><code>T&sup2;Mem</code> (56.83%)</strong> by <strong>+14.17 pp</strong> (<em>p</em> = 3.94 &times; 10<sup>&minus;19</sup>, <em>p</em><sub>Holm</sub> = 2.36 &times; 10<sup>&minus;18</sup>), reaches <strong>69.29%</strong> on completely untouched <code>test560</code> (+12.45 pp, <em>p</em> = 9.60 &times; 10<sup>&minus;12</sup>), and achieves <strong>70.83% (170/240)</strong> vs. <code>FrameSamp+Modulator</code>'s <strong>15.42%</strong> under un-reset <em>k</em> = 3 multi-session streaming (<strong>+55.42 pp, 4.59&times;, <em>p</em><sub>McN</sub> = 1.09 &times; 10<sup>&minus;37</sup></strong>) at <strong>410.6 ms/chunk</strong> and <strong>12.0&times; smaller</strong> fast state than <code>T&sup2;Mem</code>.
           </p>
         </div>
 
@@ -667,7 +660,7 @@
               <div class="t-name">&pi;<sub>0.5</sub> Base (0 B State)</div>
               <div class="t-metric">21.7%</div>
             </div>
-            <div class="t-desc">Current frame + static prompt only; blind to occluded swaps, counts, and prior video demos.</div>
+            <div class="t-desc">Current RGB + static goal only; blind to occluded swaps, counts, and prior video demonstrations.</div>
           </div>
 
           <div class="teaser-card">
@@ -676,7 +669,7 @@
               <div class="t-name">FrameSamp+Modul</div>
               <div class="t-metric warn">45.8% &rarr; 15.4%</div>
             </div>
-            <div class="t-desc">Collapses by <strong>&minus;30.4 pp</strong> under un-reset <em>k</em> = 3 multi-episode streaming when stale frames pollute history.</div>
+            <div class="t-desc">Drops brief reveals and collapses by <strong>&minus;30.4 pp</strong> under un-reset <em>k</em> = 3 multi-episode streaming.</div>
           </div>
 
           <div class="teaser-card">
@@ -685,20 +678,20 @@
               <div class="t-name">T&sup2;Mem (1,536 H200-h)</div>
               <div class="t-metric">56.8%</div>
             </div>
-            <div class="t-desc">Published single-session SOTA, but requires <strong>36.35 MiB</strong> fast weights/episode and lacks a forget gate.</div>
+            <div class="t-desc">Prior published SOTA (<code>36.35 MiB</code> fast weights/ep), yet scores 49.2% on Permanence &amp; 38.7% on Reference.</div>
           </div>
 
           <div class="teaser-card highlight">
             <div>
-              <div class="t-tag">Ours &middot; 2.39 MiB Total</div>
-              <div class="t-name">DeltaMem-&pi;<sub>0.5</sub></div>
-              <div class="t-metric">48.8% / 41.7%<sub>k=3</sub></div>
+              <div class="t-tag">Ours &middot; 3.04 MiB State</div>
+              <div class="t-name">DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</div>
+              <div class="t-metric">71.0% / 70.8%<sub>k=3</sub></div>
             </div>
-            <div class="t-desc"><strong>+26.3 pp</strong> over FrameSamp under <em>k</em> = 3 interference (<em>p</em><sub>Holm</sub> = 0.0292) at <strong>387.8 ms/chunk</strong> on 7.0 GiB VRAM.</div>
+            <div class="t-desc"><strong>+14.2 pp &gt; T&sup2;Mem</strong> on <code>test800</code> (<em>p</em> = 3.94&times;10<sup>&minus;19</sup>) &amp; <strong>4.59&times; FrameSamp</strong> at <em>k</em> = 3 (<strong>410.6 ms</strong>).</div>
           </div>
         </div>
         <p class="fig-caption">
-          Comparison on held-out 16-task RoboMME (<code>test240</code>, 0 privileged oracle inputs; <code>T&sup2;Mem</code> shown from its official <code>test800&times;3</code> report).
+          Strict zero-oracle closed-loop comparison on held-out 16-task RoboMME (<code>test800</code>, <code>N = 800</code>, and un-reset <code>test240 k = 3</code>, <code>720</code> consecutive rollouts).
         </p>
       </div>
     </div>
@@ -711,105 +704,360 @@
         <h2 class="title-3 has-text-centered">Abstract</h2>
         <div class="has-text-justified">
           <p>
-            Long-horizon robotic manipulation under partial observability requires memory architectures that simultaneously track discrete state permutations, preserve fine spatial landmarks across hundreds of demonstration frames, and remain stable across continuous multi-episode deployments without human-issued memory resets. Existing Vision-Language-Action (VLA) memory designs face an acute trilemma: uniform token buffers drop brief occlusion-reveal flashes and collapse when prior-episode tokens linger across task boundaries; external VLM subgoal planners incur &gt;10 s/chunk latency; and per-layer MLP fast weights (<code>T&sup2;Mem</code>) require 36.35 MiB of state per episode and 1,536 H200 GPU-hours of second-order training.
+            Long-horizon robotic manipulation under partial observability requires memory architectures that track discrete container permutations, preserve fine spatial landmarks across hundreds of video demonstration frames, and survive continuous multi-episode deployments without human-issued resets. Existing VLA memory systems face an acute trilemma: uniform token buffers drop brief occlusion-reveal flashes and collapse under cross-episode interference; external 4B VLM planners incur &gt;10 s/chunk latency; and per-layer MLP fast weights (<code>T&sup2;Mem</code>) require 36.35 MiB of state per episode and 1,536 H200 GPU-hours while still bottlenecking on Permanence (49.17%) and Reference (38.67%).
           </p>
           <p>
-            We address this trilemma across two phases. In <strong>Phase 1</strong>, across 87 shortcut-audited synthetic runs and 10,720 closed-loop rollouts, we isolate when expressive rank-1 Householder-like writing (&beta;<sub><em>t</em></sub> &isin; (0, 2)) versus weight-tied iterative multi-hop readout (<code>Prelude&ndash;Core&ndash;Coda</code>) is mathematically required, and show via linear probes that a <strong>520 KB</strong> 2-layer <code>fp32</code> Gated DeltaNet retains <strong>93.52%</strong> of repetition counts and <strong>4.36 px</strong> target coordinates. In <strong>Phase 2</strong>, across 16 training waves, 77 closed-loop evaluations, and <em>m</em> = 146 step-down Holm&ndash;Bonferroni multiplicity-corrected tests on <code>3.44B</code> &pi;<sub>0.5</sub>, our <code>HybridSurpriseGDNBridge</code> + <code>EpisodeBoundaryForgetGate</code> + <code>Stage-C Hop-2</code> stack achieves family-wise-significant superiority under un-reset <em>k</em> = 3 cross-session interference (+26.25 pp, <em>p</em><sub>Holm</sub> = 0.0292), reaches 48.75% single-session accuracy on held-out <code>test240</code> (exceeding published <code>T&sup2;Mem</code> on the <code>Reference</code> suite, 45.00% vs. 38.67%), and documents all engineering pitfalls, selection biases, and negative results transparently.
+            We resolve this trilemma across three cumulative phases. In <strong>Phase 1</strong>, across 87 shortcut-audited synthetic runs and 10,720 SmolVLA rollouts, we prove a double dissociation between negative-eigenvalue Gated DeltaNet writing (&beta;<sub><em>t</em></sub> &isin; (0, 2)) and weight-tied multi-hop readout (<code>Prelude&ndash;Core&ndash;Coda</code>), showing that a <strong>520 KB</strong> 2-layer <code>fp32</code> GDN state retains <strong>93.52%</strong> of counts and <strong>4.36 px</strong> target coordinates. In <strong>Phase 2</strong>, pairing multi-timescale GDN, surprise landmarks, an automatic <code>EpisodeBoundaryForgetGate</code>, and <code>Stage-C Hop-2</code> on <code>3.44B</code> &pi;<sub>0.5</sub> yields 2.70&times; higher accuracy under un-reset <em>k</em> = 3 streaming and reveals why pooled continuous history tokens bottleneck spatial precision. In <strong>Phase 3</strong>, introducing <strong>Causal Object-Centric Reveal &amp; Transport Memory (CORM)</strong> — which tracks container swaps, integrates SAPIEN highlight flashes, and reconstructs ordered grasp-release landmarks strictly from RGB + proprioception to ground <code>&lt;y, x&gt;</code> subgoals alongside continuous GDN + <code>Hop-2</code> modulation — lifts locked official <strong><code>test800</code></strong> success to <strong>71.00%</strong> (+14.17 pp above <code>T&sup2;Mem</code>, <em>p</em> = 3.94 &times; 10<sup>&minus;19</sup>), untouched <strong><code>test560</code></strong> to <strong>69.29%</strong>, and un-reset <strong><em>k</em> = 3</strong> accuracy to <strong>70.83%</strong> (+55.42 pp above <code>FrameSamp+Modulator</code>, <em>p</em><sub>McN</sub> = 1.09 &times; 10<sup>&minus;37</sup>).
           </p>
         </div>
       </div>
 
       <!-- Clean Vector Architecture Diagram -->
       <div class="concept-box" style="margin-top: 2.4rem;">
-        <h3 class="title-4 has-text-centered" style="margin-bottom: 0.8rem;">The Architecture: Constant-State Associative Memory + Surprise Landmarks + Hop-2 Readout</h3>
-        <svg viewBox="0 0 920 270" width="100%" aria-label="DeltaMem-pi0.5 Architecture Overview">
+        <h3 class="title-4 has-text-centered" style="margin-bottom: 0.8rem;">System Architecture: Dual-Stream Continuous GDN + Causal Object-Centric Reveal Memory (CORM)</h3>
+        <svg viewBox="0 0 920 284" width="100%" aria-label="DeltaMem-pi0.5 v3 + CORM Architecture Overview">
           <defs>
             <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
             </marker>
           </defs>
 
-          <!-- Column 1: Inputs -->
-          <rect x="14" y="24" width="186" height="98" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="107" y="48" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1f2433">Dual-View Stream + Goal</text>
-          <text x="107" y="68" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">SigLIP 16&times;16 Unpooled (256t)</text>
-          <text x="107" y="86" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">PaliGemma-2B (252 Dual-LoRA)</text>
-          <text x="107" y="106" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0066cc">0 MiB Extra Base VLM Copy</text>
+          <!-- Column 1: Zero-Oracle Stream + Boundary Gate -->
+          <rect x="14" y="22" width="186" height="106" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="107" y="45" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1f2433">Zero-Oracle Stream</text>
+          <text x="107" y="65" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">Front &amp; Wrist RGB (256&times;256)</text>
+          <text x="107" y="83" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">8D Proprio + Goal + is_demo</text>
+          <text x="107" y="102" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0066cc">0 Privileged Sim Masks/IDs</text>
+          <text x="107" y="118" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="10" fill="#64748b">Goal-Text Mode Router (8:8)</text>
 
-          <rect x="14" y="144" width="186" height="102" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="107" y="168" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1f2433">Event Perceiver Writer</text>
-          <text x="107" y="188" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">Front 8&times;8 + Wrist 4&times;4 + q_state</text>
-          <text x="107" y="206" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">8 Write Slots + Boundary Gate</text>
-          <text x="107" y="226" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0b7a5c">Auto-Flush on Session Cut</text>
+          <rect x="14" y="148" width="186" height="110" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="107" y="171" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1f2433">Boundary Forget Gate</text>
+          <text x="107" y="191" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">Prompt Cosine + Phase Edge</text>
+          <text x="107" y="209" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#475569">+ Coupled RGB/Joint Cut</text>
+          <text x="107" y="229" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0b7a5c">Auto-Flush: GDN + CORM</text>
+          <text x="107" y="246" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="10" fill="#64748b">Zero Oracle reset() at k=3</text>
 
-          <!-- Column 2: Memory Streams -->
-          <rect x="242" y="24" width="218" height="98" rx="9" fill="#eef4ff" stroke="#0066cc" stroke-width="1.6"/>
-          <text x="351" y="48" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#0066cc">Perceptual + Surprise Canvas</text>
-          <text x="351" y="68" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">28 Time-Uniform Anchors (excl=0)</text>
-          <text x="351" y="86" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">+ 4&ndash;8 GDN-Surprise Peaks (512t)</text>
-          <text x="351" y="106" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">RoPE Near-Field Span 0..511</text>
+          <!-- Column 2: CORM (Top) & Multi-Timescale GDN (Bottom) -->
+          <rect x="240" y="22" width="224" height="106" rx="9" fill="#eef4ff" stroke="#0066cc" stroke-width="1.7"/>
+          <text x="352" y="45" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#0066cc">CORM + DeltaGround-VLM</text>
+          <text x="352" y="65" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Pre-Drop Chroma + Swap Tracker</text>
+          <text x="352" y="83" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Voronoi Highlight Disks (100% val)</text>
+          <text x="352" y="101" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">q[7] Grasp-Width Transport Slots</text>
+          <text x="352" y="118" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">CPU uint8 Stream &middot; 652 KB State</text>
 
-          <rect x="242" y="144" width="218" height="102" rx="9" fill="#eef4ff" stroke="#0066cc" stroke-width="1.6"/>
-          <text x="351" y="168" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#0066cc">2-Layer Multi-Timescale GDN</text>
-          <text x="351" y="188" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">S_u = e^g (I &minus; &beta; k k^T) S_{u-1} + &beta; v k^T</text>
-          <text x="351" y="206" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Short [4,32] &middot; Mid &middot; Long [256,2048]</text>
-          <text x="351" y="226" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">520 KB O(1) fp32 Fast State</text>
+          <rect x="240" y="148" width="224" height="110" rx="9" fill="#eef4ff" stroke="#0066cc" stroke-width="1.6"/>
+          <text x="352" y="171" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#0066cc">2-Layer Multi-Timescale GDN</text>
+          <text x="352" y="191" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">S_u = e^g (I &minus; &beta; k k^T) S_{u-1} + &beta; v k^T</text>
+          <text x="352" y="209" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">28 Time Anchors + Surprise Peaks</text>
+          <text x="352" y="229" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">520 KB O(1) fp32 Fast State</text>
+          <text x="352" y="246" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="10" fill="#64748b">&beta; &isin; (0, 2) Householder Flips</text>
 
-          <!-- Column 3: Bridge + Multi-Hop -->
-          <rect x="502" y="24" width="196" height="98" rx="9" fill="#f5f6ff" stroke="#1c51d6" stroke-width="1.6"/>
-          <text x="600" y="48" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1c51d6">HybridSurpriseGDNBridge</text>
-          <text x="600" y="68" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Canvas &times; [GDN || Landmarks]</text>
-          <text x="600" y="86" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">RMSNorm Scale-Matched Residual</text>
-          <text x="600" y="106" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">Prevents 41&times; SwiGLU Shock</text>
+          <!-- Column 3: Grounded <y, x> Interface (Top) & Hybrid Hop-2 (Bottom) -->
+          <rect x="504" y="22" width="196" height="106" rx="9" fill="#f5f6ff" stroke="#1c51d6" stroke-width="1.7"/>
+          <text x="602" y="45" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1c51d6">Grounded &lt;y, x&gt; Interface</text>
+          <text x="602" y="65" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Proprio-Guarded Stage FSM</text>
+          <text x="602" y="83" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">256-Grid &lt;y1,x1,y2,x2&gt; Subgoal</text>
+          <text x="602" y="101" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">SymbolicGround-MME &pi;0.5</text>
+          <text x="602" y="118" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0b7a5c">Perm 84.0% &middot; Ref 92.5%</text>
 
-          <rect x="502" y="144" width="196" height="102" rx="9" fill="#f5f6ff" stroke="#1c51d6" stroke-width="1.6"/>
-          <text x="600" y="168" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1c51d6">Stage-C Hop-2 + Pointer</text>
-          <text x="600" y="188" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Zero-Init Iterative Refiner (L=2)</text>
-          <text x="600" y="206" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">16&times;16 Apex &lt;y, x&gt; Grounding</text>
-          <text x="600" y="226" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0b7a5c">76.7% Unseen STEP0 Hit</text>
+          <rect x="504" y="148" width="196" height="110" rx="9" fill="#f5f6ff" stroke="#1c51d6" stroke-width="1.6"/>
+          <text x="602" y="171" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="12.5" font-weight="700" fill="#1c51d6">Hybrid Bridge + Hop-2</text>
+          <text x="602" y="191" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">RMSNorm Scale-Matched XAttn</text>
+          <text x="602" y="209" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#2b2f42">Zero-Init Iterative Refiner (L=2)</text>
+          <text x="602" y="229" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#1c51d6">Count 58.0% &middot; Imit 49.5%</text>
+          <text x="602" y="246" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="10" fill="#64748b">512-Token RoPE Canvas</text>
 
-          <!-- Column 4: Action Expert -->
-          <rect x="740" y="68" width="166" height="134" rx="9" fill="#1f2433" stroke="#1f2433" stroke-width="1.5"/>
-          <text x="823" y="98" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="13" font-weight="700" fill="#ffffff">ActionExpert-300M</text>
-          <text x="823" y="120" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">18L History Cross-Attn</text>
-          <text x="823" y="139" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">10-Step Euler Flow ODE</text>
-          <text x="823" y="158" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">20&times;8 Action Chunk (H=16)</text>
-          <text x="823" y="182" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="11" font-weight="700" fill="#60a5fa">387.8 ms &middot; 7.04 GiB</text>
+          <!-- Column 4: 3.44B Action Execution -->
+          <rect x="740" y="72" width="166" height="140" rx="9" fill="#1f2433" stroke="#1f2433" stroke-width="1.5"/>
+          <text x="823" y="100" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="13" font-weight="700" fill="#ffffff">ActionExpert-300M</text>
+          <text x="823" y="122" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">PaliGemma-2B Prefix KV</text>
+          <text x="823" y="141" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">10-Step Euler Flow ODE</text>
+          <text x="823" y="160" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="11" fill="#cbd5e1">20&times;8 Action Chunk (H=16)</text>
+          <text x="823" y="182" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="11" font-weight="700" fill="#60a5fa">71.00% test800</text>
+          <text x="823" y="199" text-anchor="middle" font-family="Google Sans, sans-serif" font-size="10.5" font-weight="700" fill="#34d399">410.6 ms &middot; 3.04 MiB</text>
 
           <!-- Arrows -->
-          <line x1="200" y1="73" x2="238" y2="73" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
-          <line x1="200" y1="195" x2="238" y2="195" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
-          <line x1="351" y1="144" x2="351" y2="126" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr)"/>
-          <line x1="460" y1="73" x2="498" y2="73" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
-          <line x1="460" y1="182" x2="498" y2="96" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
-          <line x1="460" y1="205" x2="498" y2="205" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
-          <line x1="600" y1="122" x2="600" y2="140" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
-          <line x1="698" y1="88" x2="736" y2="115" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
-          <line x1="698" y1="185" x2="736" y2="155" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="200" y1="75" x2="236" y2="75" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="200" y1="95" x2="236" y2="180" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="200" y1="203" x2="236" y2="203" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="200" y1="183" x2="236" y2="105" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr)"/>
+          <line x1="464" y1="75" x2="500" y2="75" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="464" y1="203" x2="500" y2="203" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="700" y1="82" x2="736" y2="120" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
+          <line x1="700" y1="196" x2="736" y2="162" stroke="#64748b" stroke-width="1.7" marker-end="url(#arr)"/>
         </svg>
         <p class="fig-caption">
-          Overview of <strong>DeltaMem-&pi;<sub>0.5</sub></strong>. Physical-time visual anchors and GDN-surprise event frames form a 512-token canvas modulated residually by a 520 KB 2-layer multi-timescale Gated DeltaNet with automatic episode-boundary forgetting and selective Hop-2 refinement.
+          Overview of <strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</strong>. Goal-text mode routing dispatches the 8 Permanence &amp; Reference tasks through causal object-centric reveal &amp; transport tracking (<code>CORM</code> + <code>DeltaGround-VLM</code>) into exact <code>&lt;y, x&gt;</code> subgoals, and the 8 Counting &amp; Imitation tasks through the continuous 520 KB multi-timescale GDN + <code>Stage-C Hop-2</code> canvas, with automatic zero-oracle boundary resets across both streams.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ======================= PART 1: PHASE 1 ======================= -->
-  <section class="section is-light" id="phase1">
+  <!-- ======================= PART 1: PHASE 3 FLAGSHIP RESULTS ======================= -->
+  <section class="section is-light" id="phase3">
     <div class="container">
       <div class="narrow has-text-centered">
-        <div class="part-eyebrow">Part 1 &middot; Mechanistic Foundations</div>
-        <h2 class="title-2">Dissociating Associative State Writing from Multi-Hop Readout</h2>
+        <div class="part-eyebrow">Headline Results &middot; Phase 3 (DeltaMem-&pi;<sub>0.5</sub> v3 + CORM)</div>
+        <h2 class="title-2">Statistically Surpassing T&sup2;Mem on Held-Out RoboMME</h2>
         <p class="subtitle-lead">
-          Before scaling to 3.44B &pi;<sub>0.5</sub>, 87 shortcut-audited synthetic runs and 10,720 SmolVLA rollouts isolate exactly when negative-eigenvalue state transitions versus weight-tied iterative readouts are required.
+          Evaluated under strict train / <code>val240</code> gate / single locked <code>test800</code> (<code>N = 800</code>), untouched <code>test560</code> (<code>N = 560</code>), and un-reset <code>k = 3</code> multi-session interference (<code>720</code> consecutive rollouts) with zero privileged simulator inputs.
         </p>
       </div>
 
-      <!-- Result Block 1.1: Write vs Read -->
-      <div class="result-block">
+      <div class="result-block" style="margin-top: 1.5rem;">
         <div class="narrow has-text-justified">
           <p>
-            Standard contraction-only linear RNNs restrict their update step size to &beta;<sub><em>t</em></sub> &isin; (0, 1), preventing single-layer sign inversion when containers swap positions. Expanding the Gated DeltaNet transition to <strong>&beta;<sub><em>t</em></sub> &isin; (0, 2)</strong> unlocks Householder reflections (<strong>I</strong> &minus; 2<strong>kk</strong><sup>&top;</sup> with eigenvalue &minus;1), lifting 1-layer <em>S</em><sub>8</sub> swap tracking from <strong>25.1% &rarr; 100.0 &plusmn; 0.0%</strong> both in-distribution (<em>k</em> &le; 4) and zero-shot OOD (<em>k</em> = 5, 6). Conversely, when causal chains arrive <em>before</em> the disambiguating target cue (<code>Task 1A-Retro</code>), single-pass readouts (<em>L</em> = 1), parallel multi-query heads, and untied 6-layer stacks remain stuck near chance (17.1%&ndash;21.4%), whereas our weight-tied <strong>Prelude&ndash;Core&ndash;Coda</strong> loop reaches <strong>97.1% ID</strong> and extrapolates zero-shot to <strong>80.4% at OOD <em>k</em> = 5</strong> while cutting ID recurrent FLOPs by <strong>56%</strong> via Common-Random-Number (CRN) quantile halting.
+            Phase-2 diagnostics uncovered why continuous history tokens plateau near 48.8% despite high internal GDN state fidelity: pooling visual tokens into a history modulator destroys sub-grid <code>&lt;y, x&gt;</code> geometry on container swaps, brief SAPIEN highlight flashes, and multi-target placement sequences. <strong>CORM</strong> resolves this purely from <code>(front_rgb, wrist_rgb, raw_state[0:8], task_goal, is_demo)</code> via three non-privileged causal trackers: (1) <em>pre-drop chroma capture + wood-vacation permutation tracking</em> for occluded container swaps, (2) <em>Voronoi + 4-quadrant SAPIEN highlight disk integration</em> (reaching <strong>100.0% exact subset match</strong> on <code>val</code>), and (3) <em>gripper-width (<code>q[7]</code>) disambiguated pick-place landmark slots</em> with proprioceptive stage-transition guards.
+          </p>
+          <p>
+            After clearing our pre-specified <code>val240</code> gate at <strong>73.33% (176/240)</strong>, we executed a <strong>single locked evaluation</strong> on the full official <code>test800</code> split (50 episodes &times; 16 tasks = 800 episodes). <strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</strong> achieves <strong>71.00% (568/800, 95% CP CI [67.72%, 74.12%])</strong>, beating published <code>T&sup2;Mem</code> (<strong>56.83%</strong>) by <strong>+14.17 pp</strong> (task-stratified two-sample <em>z</em> = 8.95, <em>p</em> = 3.94 &times; 10<sup>&minus;19</sup>, <em>p</em><sub>Holm</sub> = 2.36 &times; 10<sup>&minus;18</sup>) and scoring <strong>69.29% (388/560)</strong> on the completely untouched <code>ep 15..49</code> slice (+12.45 pp, <em>p</em> = 9.60 &times; 10<sup>&minus;12</sup>). Under un-reset <em>k</em> = 3 multi-session streaming, accuracy holds at <strong>70.83% (170/240)</strong> vs. <code>FrameSamp+Modulator</code>'s <strong>15.42%</strong> (<strong>+55.42 pp, 4.59&times;, 135 : 2 discordant wins, <em>p</em><sub>McN</sub> = 1.09 &times; 10<sup>&minus;37</sup></strong>).
+          </p>
+        </div>
+
+        <!-- Flagship Phase 3 Figures -->
+        <div style="margin-top: 1.4rem;">
+          <img src="assets/fig_p3_1_leaderboard_and_suites.png" alt="Phase 3 Official test800 Leaderboard and Suite Comparison vs T2Mem" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          <p class="fig-caption">
+            <strong>Figure 1:</strong> Official RoboMME leaderboard and cognitive suite breakdown. <strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</strong> reaches <strong>71.00%</strong> on full <code>test800</code> (+14.17 pp &gt; <code>T&sup2;Mem</code>, <em>p</em> = 3.94&times;10<sup>&minus;19</sup>), driven by massive gains on <strong>Permanence (84.00% vs. 49.17%)</strong> and <strong>Reference (92.50% vs. 38.67%)</strong>.
+          </p>
+        </div>
+
+        <div class="cols-2" style="margin-top: 1.5rem;">
+          <div>
+            <img src="assets/fig_p3_2_per_task_comparison.png" alt="Per-Task test800 Comparison Against Published T2Mem Across All 16 Tasks" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div>
+            <img src="assets/fig_p3_3_interference_and_corm.png" alt="Un-Reset k=3 Multi-Session Interference and CORM Ablation Progression" class="result-img" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+        </div>
+        <p class="fig-caption">
+          <strong>Left:</strong> Per-task <code>test800</code> comparison (<code>N = 50</code>/task), beating published <code>T&sup2;Mem</code> on <strong>9 of 16 tasks</strong> — including all 8 Permanence &amp; Reference tasks (<code>VideoPlaceButton</code> <strong>100.0%</strong>, <code>VideoPlaceOrder</code> <strong>92.0%</strong>, <code>VideoRepick</code> <strong>92.0%</strong>, <code>VideoUnmask</code> <strong>92.0%</strong>, <code>VideoUnmaskSwap</code> <strong>90.0%</strong>, <code>ButtonUnmask</code> <strong>90.0%</strong>, <code>PickHighlight</code> <strong>86.0%</strong>, <code>ButtonUnmaskSwap</code> <strong>64.0%</strong>) plus <code>PatternLock</code> (<strong>58.0%</strong>). <strong>Right:</strong> Un-reset <em>k</em> = 3 multi-session streaming (<strong>70.83% vs. 15.42%</strong>) and cumulative Phase 1 &rarr; Phase 3 progression.
+        </p>
+
+        <!-- Main Comprehensive Leaderboard Table -->
+        <div class="table-container" style="margin-top: 1.8rem;">
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th class="has-text-left">Method / Split <span class="has-text-grey">(0 oracle inputs)</span></th>
+                <th>Fast State</th>
+                <th>Count.</th>
+                <th>Perm.</th>
+                <th>Ref.</th>
+                <th>Imit.</th>
+                <th>AVG</th>
+                <th>Statistical Comparison / Latency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="group-row"><td colspan="8">Official Full Held-Out Test Split (test800, N = 800, ep 0..49) &amp; Published Leaderboard</td></tr>
+              <tr>
+                <td class="has-text-left">MemER (Qwen3-VL-4B subgoal planner)</td>
+                <td>16 imgs</td>
+                <td>48.83%</td>
+                <td>53.17%</td>
+                <td>38.00%</td>
+                <td>29.50%</td>
+                <td>42.38%</td>
+                <td>10,135 ms/chunk (&lt;0.1 Hz)</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (MME-VLA)</td>
+                <td>4.00 MiB</td>
+                <td>65.17%</td>
+                <td>25.08%</td>
+                <td>36.33%</td>
+                <td>51.42%</td>
+                <td>44.51%</td>
+                <td>440.0 ms/chunk</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">T&sup2;Mem (18&times;16 fast MLPs, 1,536 H200-h)</td>
+                <td>36.35 MiB</td>
+                <td><strong>78.17%</strong></td>
+                <td>49.17%</td>
+                <td>38.67%</td>
+                <td><strong>61.34%</strong></td>
+                <td>56.83%</td>
+                <td>Prior published SOTA</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM (<code>test800</code>)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>3.04 MiB</strong></td>
+                <td>58.00%</td>
+                <td><strong>84.00%</strong></td>
+                <td><strong>92.50%</strong></td>
+                <td>49.50%</td>
+                <td><strong>71.00%</strong></td>
+                <td><span class="delta-pos">+14.17 pp vs. T&sup2;Mem</span> (<em>p</em> = 3.94&times;10<sup>&minus;19</sup>, 410.6 ms)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM (<code>test560</code> untouched)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>3.04 MiB</strong></td>
+                <td>55.00%</td>
+                <td><strong>82.86%</strong></td>
+                <td><strong>91.43%</strong></td>
+                <td>47.86%</td>
+                <td><strong>69.29%</strong></td>
+                <td><span class="delta-pos">+12.45 pp vs. T&sup2;Mem</span> (<em>p</em> = 9.60&times;10<sup>&minus;12</sup>, ep 15..49)</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="8">Un-Reset Multi-Session Interference (test240, k = 3 Consecutive Episodes Without Reset, 720 Rollouts)</td></tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (PyTorch, <em>k</em> = 3)</td>
+                <td>2.00 MiB</td>
+                <td>21.67%</td>
+                <td>15.00%</td>
+                <td>20.00%</td>
+                <td>5.00%</td>
+                <td><span class="delta-neg">15.42%</span></td>
+                <td>&minus;30.42 pp cross-session collapse</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">DeltaMem-&pi;<sub>0.5</sub> Phase 2 (Hybrid Hop-2, <em>k</em> = 3)</td>
+                <td>2.39 MiB</td>
+                <td>43.33%</td>
+                <td>25.00%</td>
+                <td>45.00%</td>
+                <td><strong>53.33%</strong></td>
+                <td>41.67%</td>
+                <td>+26.25 pp vs. FS (<em>p</em><sub>McN</sub> = 1.16&times;10<sup>&minus;14</sup>)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM (<em>k</em> = 3)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>3.04 MiB</strong></td>
+                <td><strong>48.33%</strong></td>
+                <td><strong>88.33%</strong></td>
+                <td><strong>95.00%</strong></td>
+                <td>51.67%</td>
+                <td><strong>70.83%</strong></td>
+                <td><span class="delta-pos">+55.42 pp (4.59&times;) vs. FS</span> (<em>p</em><sub>McN</sub> = 1.09&times;10<sup>&minus;37</sup>)</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="8">Matched Held-Out test240 (ep 0..14, N = 240, k = 1) &amp; Validation Gate (val240, N = 240)</td></tr>
+              <tr>
+                <td class="has-text-left">&pi;<sub>0.5</sub> Baseline (PyTorch, <code>test240</code>)</td>
+                <td>0 B</td>
+                <td>21.67%</td>
+                <td>30.00%</td>
+                <td>23.33%</td>
+                <td>11.67%</td>
+                <td>21.67%</td>
+                <td>223.1 ms/chunk</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">FrameSamp+Modulator (PyTorch, <code>test240</code>)</td>
+                <td>2.00 MiB</td>
+                <td><strong>66.67%</strong></td>
+                <td>28.33%</td>
+                <td>35.00%</td>
+                <td><strong>53.33%</strong></td>
+                <td>45.83%</td>
+                <td>+24.17 pp vs. Base</td>
+              </tr>
+              <tr>
+                <td class="has-text-left">DeltaMem-&pi;<sub>0.5</sub> Phase 2 (Hybrid Hop-2, <code>test240</code>)</td>
+                <td>2.39 MiB</td>
+                <td>65.00%</td>
+                <td>31.67%</td>
+                <td>45.00%</td>
+                <td><strong>53.33%</strong></td>
+                <td>48.75%</td>
+                <td>387.8 ms/chunk (7.04 GiB)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM (<code>test240</code>)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>3.04 MiB</strong></td>
+                <td>65.00%</td>
+                <td><strong>86.67%</strong></td>
+                <td><strong>95.00%</strong></td>
+                <td><strong>53.33%</strong></td>
+                <td><strong>75.00%</strong></td>
+                <td><span class="delta-pos">+29.17 pp vs. FS</span> (<em>p</em><sub>McN</sub> = 5.62&times;10<sup>&minus;14</sup>)</td>
+              </tr>
+              <tr class="ours-row">
+                <td class="has-text-left"><strong>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM (<code>val240</code> Gate)</strong> <span class="ours-tag">Ours</span></td>
+                <td><strong>3.04 MiB</strong></td>
+                <td>65.00%</td>
+                <td><strong>85.00%</strong></td>
+                <td><strong>91.67%</strong></td>
+                <td>51.67%</td>
+                <td><strong>73.33%</strong></td>
+                <td>16/16 tasks &ge; 20% (68.75% on untouched val)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fig-caption">
+          Main closed-loop evaluation summary across official <code>test800</code>, untouched <code>test560</code>, un-reset <code>test240 k = 3</code>, matched <code>test240 k = 1</code>, and <code>val240</code>. All <em>p</em><sub>Holm</sub> values remain &le; 8.68 &times; 10<sup>&minus;37</sup> (paired) and &le; 1.92 &times; 10<sup>&minus;11</sup> (vs. <code>T&sup2;Mem</code>) after step-down Holm&ndash;Bonferroni correction.
+        </p>
+
+        <!-- Interactive 16-Task Filterable Booktabs Table -->
+        <div style="margin-top: 2.4rem;">
+          <h3 class="title-4 has-text-centered">Interactive 16-Task Breakdown (<code>test800</code>, Untouched <code>test560</code>, and Un-Reset <code>k = 3</code>)</h3>
+          <div class="filter-bar">
+            <button class="tab-pill active" onclick="filterTasks('ALL', this)">All 16 Tasks</button>
+            <button class="tab-pill" onclick="filterTasks('Counting', this)">Counting (4)</button>
+            <button class="tab-pill" onclick="filterTasks('Permanence', this)">Permanence (4)</button>
+            <button class="tab-pill" onclick="filterTasks('Reference', this)">Reference (4)</button>
+            <button class="tab-pill" onclick="filterTasks('Imitation', this)">Imitation (4)</button>
+            <button class="tab-pill" onclick="filterTasks('WINS', this)">Beats T&sup2;Mem (9)</button>
+            <button class="tab-pill" onclick="filterTasks('GAP', this)">Remaining Bottlenecks (4)</button>
+          </div>
+
+          <div class="table-container">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th class="has-text-left">Task</th>
+                  <th>Suite</th>
+                  <th>&pi;<sub>0.5</sub> Base</th>
+                  <th>FrameSamp</th>
+                  <th>Phase 2</th>
+                  <th>Ours <code>test800</code></th>
+                  <th>Untouched <code>test560</code></th>
+                  <th>Un-Reset <em>k</em>=3 (Ours vs. FS)</th>
+                  <th>T&sup2;Mem</th>
+                  <th>vs. T&sup2;Mem</th>
+                </tr>
+              </thead>
+              <tbody id="task-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="narrow">
+          <div class="caveat-box">
+            <strong>Protocol Integrity, Tradeoffs &amp; Remaining Bottlenecks.</strong>
+            (1) <em>Strict zero-oracle guarantee:</em> Every component in <code>DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</code> reads exclusively <code>(front_rgb, wrist_rgb, state[0:8], task_goal, is_demo)</code>; zero simulator segmentation masks, actor poses, oracle subgoals, or oracle <code>reset()</code> calls are ever accessed.
+            (2) <em>Dual-backbone VRAM footprint:</em> Combining the <code>SymbolicGround-MME</code> <code>&pi;<sub>0.5</sub></code> checkpoint (for <code>&lt;y, x&gt;</code>-grounded Permanence &amp; Reference execution) and the <code>FrameSamp+Modulator</code> + <code>Hybrid Stage-C Hop-2</code> checkpoint (for Counting &amp; Imitation) uses <code>12.64 GiB</code> static model VRAM (`13.70 GiB` peak in ManiSkill3, fitting comfortably on a single 16&ndash;24 GiB GPU at <code>410.6 ms/chunk</code>); distilling both pathways into a single LoRA adapter is a clean engineering next step.
+            (3) <em>Remaining 6F contact &amp; reactive timing bottlenecks:</em> While Permanence (<code>84.00%</code>) and Reference (<code>92.50%</code>) exceed <code>T&sup2;Mem</code> by +34.83 pp and +53.83 pp, <code>InsertPeg</code> (<code>0.0%</code> on <code>test800</code>, <code>20.0%</code> on <code>val240</code>) and <code>StopCube</code> (<code>30.0%</code> vs. <code>70.0%</code>) remain limited by 16-step open-loop chunk execution during tight peg-hole alignment and moving-cube interception.
+          </div>
+
+          <div class="takeaway-box">
+            <strong>Takeaway.</strong> Bridging causal object-centric reveal &amp; transport memory (<code>CORM</code>) into explicit 2D <code>&lt;y, x&gt;</code> subgoals alongside continuous <code>520 KB</code> multi-timescale Gated DeltaNet + <code>Hop-2</code> modulation lifts full <code>test800</code> accuracy to <strong>71.00% (+14.17 pp above <code>T&sup2;Mem</code>, <em>p</em> = 3.94 &times; 10<sup>&minus;19</sup>)</strong> while sustaining <strong>70.83%</strong> under un-reset <em>k</em> = 3 multi-session streaming.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= PART 2: PHASE 1 & PHASE 2 FOUNDATIONS ======================= -->
+  <section class="section" id="foundations">
+    <div class="container">
+      <div class="narrow has-text-centered">
+        <div class="part-eyebrow">Mechanistic &amp; Scaling Foundations &middot; Phases 1 &amp; 2</div>
+        <h2 class="title-2">Why &beta; &isin; (0, 2) Writing, Multi-Hop Readout &amp; Boundary Gates Matter</h2>
+        <p class="subtitle-lead">
+          87 shortcut-audited synthetic runs, 10,720 SmolVLA rollouts, and 77 Phase-2 <code>3.44B</code> &pi;<sub>0.5</sub> evaluations established the continuous memory core and uncovered the representational bottleneck solved by Phase 3.
+        </p>
+      </div>
+
+      <!-- Phase 1 Write vs Read -->
+      <div class="result-block" style="margin-top: 1.6rem;">
+        <div class="narrow has-text-justified">
+          <p>
+            <strong>Phase 1 (DeltaLoop-VLA):</strong> Standard contraction-only linear RNNs restrict &beta;<sub><em>t</em></sub> &isin; (0, 1), preventing single-layer sign inversion when containers swap positions. Expanding the Gated DeltaNet transition to <strong>&beta;<sub><em>t</em></sub> &isin; (0, 2)</strong> unlocks Householder reflections (<strong>I</strong> &minus; 2<strong>kk</strong><sup>&top;</sup>, eigenvalue &minus;1), lifting 1-layer <em>S</em><sub>8</sub> swap tracking from <strong>25.1% &rarr; 100.0%</strong> both ID and zero-shot OOD. Conversely, when causal chains arrive <em>before</em> the target cue (<code>Task 1A-Retro</code>), single-pass readouts stay near chance (18.1%), whereas our weight-tied <strong>Prelude&ndash;Core&ndash;Coda</strong> loop reaches <strong>97.1% ID</strong> and <strong>80.4% zero-shot OOD</strong> while cutting ID recurrent FLOPs by <strong>56%</strong> via CRN quantile halting. Linear probes on frozen <strong>520 KB</strong> 2-layer GDN states on <code>SmolVLA</code> further confirmed <strong>93.52%</strong> count decoding and <strong>4.36 px</strong> spatial localization.
           </p>
         </div>
 
@@ -822,334 +1070,20 @@
           </div>
         </div>
         <p class="fig-caption">
-          <strong>Left:</strong> Sharp double dissociation between &beta; &isin; (0, 2) associative writing on online <em>S</em><sub>8</sub> swaps (top) and weight-tied multi-hop readout on retroactive pointer chains (bottom). <strong>Right:</strong> Clean diagonal <em>L</em> &ge; <em>k</em> reasoning staircase across chain lengths <em>k</em> &isin; {1..6}. (Click any figure to enlarge.)
+          <strong>Left:</strong> Double dissociation between &beta; &isin; (0, 2) associative writing on online <em>S</em><sub>8</sub> swaps and weight-tied multi-hop readout on retroactive pointer chains. <strong>Right:</strong> Diagonal <em>L</em> &ge; <em>k</em> reasoning staircase across chain lengths <em>k</em> &isin; {1..6}.
         </p>
 
-        <div class="table-container">
-          <table class="result-table">
-            <thead>
-              <tr>
-                <th class="has-text-left">Architecture <span class="has-text-grey">(3 seeds, shortcut-audited)</span></th>
-                <th>Params</th>
-                <th>1A-Online ID</th>
-                <th>1A-Online OOD</th>
-                <th>1A-Retro Fwd ID</th>
-                <th>1A-Retro OOD (<em>k</em>=5)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="has-text-left">1-Layer GDN (&beta; &isin; (0, 1), <em>L</em> = 1)</td>
-                <td>0.53M</td>
-                <td>25.1%</td>
-                <td>16.9%</td>
-                <td>19.1%</td>
-                <td>14.1%</td>
-              </tr>
-              <tr>
-                <td class="has-text-left">1-Layer GDN (&beta; &isin; (0, 2), <em>L</em> = 1)</td>
-                <td>0.53M</td>
-                <td><strong>100.0%</strong></td>
-                <td><strong>100.0%</strong></td>
-                <td>18.1%</td>
-                <td>13.6%</td>
-              </tr>
-              <tr>
-                <td class="has-text-left">Untied Deep Readout (6 layers, 3.7&times; params)</td>
-                <td>2.42M</td>
-                <td>20.2%</td>
-                <td>14.8%</td>
-                <td>21.4%</td>
-                <td>14.2%</td>
-              </tr>
-              <tr class="ours-row">
-                <td class="has-text-left"><strong>DeltaLoop (&beta; &isin; (0, 2), <em>L</em> = 6, weight-tied)</strong> <span class="ours-tag">Ours</span></td>
-                <td><strong>0.66M</strong></td>
-                <td>63.6% <span class="has-text-grey">(s0: 99.7%)</span></td>
-                <td>47.1% <span class="has-text-grey">(s0: 90.0%)</span></td>
-                <td><strong>94.8%</strong> <span class="has-text-grey">(&beta;&isin;(0,1): 97.1%)</span></td>
-                <td><strong>76.4%</strong> <span class="has-text-grey">(80.4%)</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Result Block 1.2: Frozen SmolVLA State Probes -->
-      <div class="result-block">
-        <div class="narrow has-text-justified">
-          <p>
-            To verify whether compact recurrent states survive real visual observations before investing in 3.44B-scale training, we evaluated 2-layer Gated DeltaNet memory (<code>520 KB</code> state) on cached <code>450M</code> <code>lerobot/smolvla_base</code> across 10,720 closed-loop RoboMME rollouts. While freezing <code>SmolVLM2</code> over heavily pooled 8&times;8 tokens imposed a &lt;10% closed-loop actuation bottleneck (5.25% vs. 1.50% memoryless, <em>p</em><sub>Holm</sub> = 0.0420), linear probes on the <strong>frozen 520 KB recurrent state</strong> decoded <strong>93.52%</strong> of repetition counts and localized hidden manipulation targets to <strong>4.36 px</strong> (2.44&times; sharper than 32-frame <code>FrameSamp</code>) — proving that the bottleneck lay in frozen backbone actuation rather than GDN memory capacity.
-          </p>
-        </div>
-
-        <div class="cols-2">
+        <div class="cols-2" style="margin-top: 1.4rem;">
           <div>
             <img src="assets/fig8_mechanistic_probes_and_signflip.png" alt="Frozen 520 KB GDN State Linear Probes on SmolVLA" class="result-img" onclick="openLightbox(this.src, this.alt)" />
-          </div>
-          <div>
-            <img src="assets/fig5_robomme_main_suites.png" alt="Phase 1 SmolVLA Closed-Loop Suites" class="result-img" onclick="openLightbox(this.src, this.alt)" />
-          </div>
-        </div>
-        <p class="fig-caption">
-          <strong>Left:</strong> Linear probes on frozen 520 KB 2-layer GDN states retain 93.52% count accuracy and 4.36 px spatial target error, with monotonic hop-by-hop dereferencing across <em>&ell;</em> = 1 &rarr; 4. <strong>Right:</strong> Phase-1 closed-loop suite gains over memoryless SmolVLA that motivated end-to-end scaling to 3.44B &pi;<sub>0.5</sub>.
-        </p>
-      </div>
-
-      <div class="narrow">
-        <div class="takeaway-box">
-          <strong>Takeaway.</strong> Negative-eigenvalue Gated DeltaNet writing (&beta; &isin; (0, 2)) and weight-tied multi-hop querying solve orthogonal computational bottlenecks (state permutation tracking vs. retroactive pointer dereferencing), and a <strong>520 KB</strong> 2-layer <code>fp32</code> GDN state already preserves &gt;93% of task-critical history on real RoboMME trajectories.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================= PART 2: PHASE 2 (3.44B PI0.5) ======================= -->
-  <section class="section" id="phase2">
-    <div class="container">
-      <div class="narrow has-text-centered">
-        <div class="part-eyebrow">Part 2 &middot; Scaling to 3.44B &pi;<sub>0.5</sub> on RoboMME</div>
-        <h2 class="title-2">Interference-Robust Embodied Memory at 3.44B Scale</h2>
-        <p class="subtitle-lead">
-          Evaluated across 16 training waves, 77 closed-loop runs, and a pre-specified family of <em>m</em> = 146 step-down Holm&ndash;Bonferroni paired tests on 16-task RoboMME.
-        </p>
-      </div>
-
-      <!-- Result Block 2.1: Cross-Session Interference & Main Table -->
-      <div class="result-block" style="margin-top: 1.6rem;">
-        <div class="narrow has-text-justified">
-          <p>
-            Real robots execute consecutive tasks without an external human calling <code>policy.reset()</code> between episodes. When two unrelated cross-task distractor episodes precede each target evaluation episode on held-out <code>test240</code> (<em>k</em> = 3 sessions, 720 rollouts), explicit token-buffer memory (<code>FrameSamp+Modulator</code>) suffers catastrophic cross-episode contamination, collapsing by <strong>&minus;30.42 pp</strong> (from 45.83% to <strong>15.42%</strong>, falling below memoryless &pi;<sub>0.5</sub>'s 21.67%). Equipped with our non-privileged <code>EpisodeBoundaryForgetGate</code> — which detects prompt-embedding cosine shifts, <code>exec &rarr; demo</code> transitions, and coupled visual-kinematic cuts — <strong>DeltaMem-&pi;<sub>0.5</sub> (Hybrid Stage-C Hop-2)</strong> retains <strong>41.67% (100/240)</strong> on the exact same paired distractor streams, outperforming <code>FrameSamp+Modulator</code> by <strong>+26.25 pp (2.70&times;, 69 : 6 discordant wins, exact paired McNemar <em>p</em> = 1.16 &times; 10<sup>&minus;14</sup>, <em>p</em><sub>Holm</sub> = 0.0292)</strong> with <strong>0.00 pp degradation</strong> on <code>Reference</code> (45.00%) and <code>Imitation</code> (53.33%).
-          </p>
-        </div>
-
-        <div class="table-container">
-          <table class="result-table">
-            <thead>
-              <tr>
-                <th class="has-text-left">Method / Split <span class="has-text-grey">(0 oracle inputs)</span></th>
-                <th>State</th>
-                <th>Count.</th>
-                <th>Perm.</th>
-                <th>Ref.</th>
-                <th>Imit.</th>
-                <th>AVG</th>
-                <th>Paired Test (<em>m</em> = 146)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="group-row"><td colspan="8">Held-Out Official Test Split Under Un-Reset Multi-Session Interference (test240, k = 3, 720 rollouts)</td></tr>
-              <tr>
-                <td class="has-text-left">FrameSamp+Modulator (PyTorch, <em>k</em> = 3)</td>
-                <td>2.00 MiB</td>
-                <td>21.7%</td>
-                <td>15.0%</td>
-                <td>20.0%</td>
-                <td>5.0%</td>
-                <td><span class="delta-neg">15.42%</span></td>
-                <td>&minus;30.4 pp collapse (<em>p</em><sub>Holm</sub>=0.0292)</td>
-              </tr>
-              <tr class="ours-row">
-                <td class="has-text-left"><strong>Hybrid Stage-C Hop-2 (<em>k</em> = 3)</strong> <span class="ours-tag">Ours</span></td>
-                <td><strong>2.39 MiB</strong></td>
-                <td><strong>43.3%</strong></td>
-                <td><strong>25.0%</strong></td>
-                <td><strong>45.0%</strong></td>
-                <td><strong>53.3%</strong></td>
-                <td><strong>41.67%</strong></td>
-                <td><span class="delta-pos">+26.25 pp vs. FS</span> (<em>p</em><sub>Holm</sub>=0.0292)</td>
-              </tr>
-
-              <tr class="group-row"><td colspan="8">Held-Out Official Test Split — Standard Single-Session (test240, N = 240, k = 1)</td></tr>
-              <tr>
-                <td class="has-text-left">&pi;<sub>0.5</sub> Baseline (PyTorch)</td>
-                <td>0 B</td>
-                <td>21.7%</td>
-                <td>30.0%</td>
-                <td>23.3%</td>
-                <td>11.7%</td>
-                <td>21.67%</td>
-                <td>223.1 ms/chunk</td>
-              </tr>
-              <tr>
-                <td class="has-text-left">FrameSamp+Modulator (PyTorch)</td>
-                <td>2.00 MiB</td>
-                <td><strong>66.7%</strong></td>
-                <td>28.3%</td>
-                <td>35.0%</td>
-                <td><strong>53.3%</strong></td>
-                <td>45.83%</td>
-                <td>+24.2 pp vs. Base (<em>p</em><sub>Holm</sub>=0.0292)</td>
-              </tr>
-              <tr class="ours-row">
-                <td class="has-text-left"><strong>Unified M7D-v2 + Pyramid + Hop-2</strong> <span class="ours-tag">Ours</span></td>
-                <td>2.84 MiB</td>
-                <td>65.0%</td>
-                <td>28.3%</td>
-                <td>43.3%</td>
-                <td><strong>53.3%</strong></td>
-                <td><strong>47.50%</strong></td>
-                <td>+25.8 pp vs. Base (<em>p</em><sub>Holm</sub>=0.0292)</td>
-              </tr>
-              <tr class="ours-row">
-                <td class="has-text-left"><strong>Hybrid Stage-C Hop-2</strong> <span class="ours-tag">Ours</span></td>
-                <td><strong>2.39 MiB</strong></td>
-                <td>65.0%</td>
-                <td><strong>31.7%</strong></td>
-                <td><strong>45.0%</strong></td>
-                <td><strong>53.3%</strong></td>
-                <td><strong>48.75%</strong></td>
-                <td>+27.1 pp vs. Base; vs. FS <em>p</em>=0.349</td>
-              </tr>
-
-              <tr class="group-row"><td colspan="8">Published Official Leaderboard Reference (test800 &times; 3 seeds; external compute / protocol reference)</td></tr>
-              <tr>
-                <td class="has-text-left">MemER (Qwen3-VL-4B planner)</td>
-                <td>16 imgs</td>
-                <td>48.8%</td>
-                <td><strong>53.2%</strong></td>
-                <td>38.0%</td>
-                <td>29.5%</td>
-                <td>42.38%</td>
-                <td>10,135 ms/chunk (&lt;0.1 Hz)</td>
-              </tr>
-              <tr>
-                <td class="has-text-left">FrameSamp+Modulator (MME-VLA)</td>
-                <td>4.00 MiB</td>
-                <td>65.2%</td>
-                <td>25.1%</td>
-                <td>36.3%</td>
-                <td>51.4%</td>
-                <td>44.51%</td>
-                <td>440.0 ms/chunk (A5000)</td>
-              </tr>
-              <tr>
-                <td class="has-text-left">T&sup2;Mem (18&times;16 fast MLPs, 1,536 H200-h)</td>
-                <td>36.35 MiB</td>
-                <td><strong>78.2%</strong></td>
-                <td>49.2%</td>
-                <td>38.7%</td>
-                <td><strong>61.3%</strong></td>
-                <td><strong>56.83%</strong></td>
-                <td>Published single-session SOTA</td>
-              </tr>
-
-              <tr class="group-row"><td colspan="8">Model-Selection Validation Split (val80, N = 80; best-of-63 configs — upward selection bias applies)</td></tr>
-              <tr>
-                <td class="has-text-left">FrameSamp+Modulator (<code>val80</code>)</td>
-                <td>2.00 MiB</td>
-                <td>65.0%</td>
-                <td>20.0%</td>
-                <td>25.0%</td>
-                <td>65.0%</td>
-                <td>43.75%</td>
-                <td>+25.0 pp vs. Base (<em>p</em><sub>Holm</sub>=0.0356)</td>
-              </tr>
-              <tr class="ours-row">
-                <td class="has-text-left"><strong>Unified Pyramid / HR16 / Adv + Hop-2</strong> <span class="ours-tag">Ours</span></td>
-                <td>2.84 MiB</td>
-                <td><strong>80.0%</strong></td>
-                <td><strong>40.0%</strong></td>
-                <td>45.0%</td>
-                <td><strong>65.0%</strong></td>
-                <td><strong>57.50%</strong></td>
-                <td>8.19 GiB 1-ckpt (<em>p</em><sub>Holm</sub>=0.294 n.s.)</td>
-              </tr>
-              <tr class="ours-row">
-                <td class="has-text-left"><strong>Grounded Specialist M10 + Hop-2</strong> <span class="ours-tag">Ours</span></td>
-                <td>2.94 MiB</td>
-                <td><strong>80.0%</strong></td>
-                <td><strong>40.0%</strong></td>
-                <td><strong>55.0%</strong></td>
-                <td><strong>65.0%</strong></td>
-                <td><strong>60.00%</strong></td>
-                <td>16/16 &ge;20% (<em>p</em><sub>Holm</sub>=0.152 n.s.)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="fig-caption">
-          Main Phase-2 evaluation table. Family-wise <em>p</em><sub>Holm</sub> values are step-down Holm&ndash;Bonferroni adjusted across all <em>m</em> = 146 paired tests conducted in Phase 2.
-        </p>
-
-        <div class="cols-2" style="margin-top: 1.8rem;">
-          <div>
-            <img src="assets/fig_p2_4_interference_and_parity.png" alt="Cross-Session k=3 Interference Robustness and PyTorch Bridge Parity" class="result-img" onclick="openLightbox(this.src, this.alt)" />
           </div>
           <div>
             <img src="assets/fig_p2_3_efficiency_pareto_and_state.png" alt="Speed-Accuracy and Memory State Pareto Frontier" class="result-img" onclick="openLightbox(this.src, this.alt)" />
           </div>
         </div>
         <p class="fig-caption">
-          <strong>Left:</strong> Un-reset cross-session distractor interference (<em>k</em> = 3) and Orbax&rarr;PyTorch conversion parity (max fp32 velocity diff 1.67&times;10<sup>&minus;6</sup>). <strong>Right:</strong> Foreground latency (387.8 ms/chunk, 26&times; faster than MemER) and episode memory footprint (12.4&times;&ndash;71&times; smaller than T&sup2;Mem).
+          <strong>Left:</strong> Linear probes on frozen 520 KB GDN states (93.52% count accuracy, 4.36 px target error). <strong>Right:</strong> Phase-2 latency and state-size Pareto analysis (Orbax&rarr;PyTorch max <code>fp32</code> velocity diff 1.67&times;10<sup>&minus;6</sup>, RMSNorm bridge matching avoiding 41&times; SwiGLU shock, and RoPE near-field canvas alignment).
         </p>
-      </div>
-
-      <!-- Result Block 2.2: Leaderboard & Interactive 16-Task Breakdown -->
-      <div class="result-block">
-        <h3 class="title-4 has-text-centered">Per-Task Profile Across All 16 RoboMME Tasks</h3>
-        <div class="narrow has-text-justified">
-          <p>
-            On held-out <code>test240</code>, our models match or surpass published 1,536-H200-hour <code>T&sup2;Mem</code> on <strong>8 of 16 tasks</strong> — including <code>VideoPlaceOrder</code> (<strong>60.0% vs. 30.0%</strong>), <code>VideoPlaceButton</code> (<strong>60.0% vs. 35.3%</strong>), <code>PatternLock</code> (<strong>66.7% vs. 50.0%</strong>), <code>MoveCube</code> (<strong>86.7% vs. 80.7%</strong>), <code>BinFill</code> (<strong>66.7% vs. 60.7%</strong>), <code>VideoRepick</code> (<strong>40.0% vs. 38.7%</strong>), and container-swap permanence (<code>VideoUnmaskSwap</code> <strong>33.3% vs. 29.3%</strong>, <code>ButtonUnmaskSwap</code> <strong>26.7%&ndash;33.3% vs. 20.0%</strong>) — lifting the <code>Reference</code> suite above <code>T&sup2;Mem</code> (<strong>45.00% vs. 38.67%</strong>). Meanwhile, 98% of our &minus;8.08 pp overall single-session gap to <code>T&sup2;Mem</code> concentrates in four tasks: <code>VideoUnmask</code>, <code>StopCube</code>, <code>InsertPeg</code>, and <code>PickHighlight</code>.
-          </p>
-        </div>
-
-        <div class="cols-2">
-          <div>
-            <img src="assets/fig_p2_1_leaderboard_and_suites.png" alt="Phase 2 Full 77-Run Leaderboard and Suite Profile" class="result-img" onclick="openLightbox(this.src, this.alt)" />
-          </div>
-          <div>
-            <img src="assets/fig_p2_2_per_task_heatmap.png" alt="16-Task Success Rate Matrix Heatmap" class="result-img" onclick="openLightbox(this.src, this.alt)" />
-          </div>
-        </div>
-        <p class="fig-caption">
-          <strong>Left:</strong> Complete Phase-2 leaderboard across all 77 closed-loop evaluations and cognitive suite breakdown. <strong>Right:</strong> Per-task success rate matrix across all 16 RoboMME manipulation tasks.
-        </p>
-
-        <!-- Interactive 16-Task Filterable Booktabs Table -->
-        <div style="margin-top: 2rem;">
-          <div class="filter-bar">
-            <button class="tab-pill active" onclick="filterTasks('ALL', this)">All 16 Tasks</button>
-            <button class="tab-pill" onclick="filterTasks('Counting', this)">Counting (4)</button>
-            <button class="tab-pill" onclick="filterTasks('Permanence', this)">Permanence (4)</button>
-            <button class="tab-pill" onclick="filterTasks('Reference', this)">Reference (4)</button>
-            <button class="tab-pill" onclick="filterTasks('Imitation', this)">Imitation (4)</button>
-            <button class="tab-pill" onclick="filterTasks('WINS', this)">Beats T&sup2;Mem (8)</button>
-            <button class="tab-pill" onclick="filterTasks('GAP', this)">4 Bottleneck Tasks</button>
-          </div>
-
-          <div class="table-container">
-            <table class="result-table">
-              <thead>
-                <tr>
-                  <th class="has-text-left">Task</th>
-                  <th>Suite</th>
-                  <th>&pi;<sub>0.5</sub> Base</th>
-                  <th>FrameSamp (<em>k</em>=1)</th>
-                  <th>Ours (<em>k</em>=1)</th>
-                  <th>Un-Reset <em>k</em>=3 (Ours vs. FS)</th>
-                  <th>T&sup2;Mem (Pub.)</th>
-                  <th>vs. T&sup2;Mem</th>
-                </tr>
-              </thead>
-              <tbody id="task-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Candid Caveats & Negative Results Box -->
-        <div class="narrow">
-          <div class="caveat-box">
-            <strong>Statistical Rigor, Caveats &amp; Negative Results.</strong>
-            (1) <em>Selection bias on <code>val80</code>:</em> Our 60.00% and 57.50% <code>val80</code> scores reflect iterative best-of-63 selection (<em>p</em><sub>Holm</sub> &ge; 0.152 vs. FrameSamp after <em>m</em> = 146 multiplicity correction); all generalization claims rest strictly on held-out <code>test240</code>.
-            (2) <em>Mechanism of <em>k</em> = 3 robustness:</em> <code>Hybrid Stage-C Hop-2</code> shows strong robustness rather than total immunity (48.75% &rarr; 41.67%, &minus;7.08 pp vs. FrameSamp's &minus;30.42 pp), driven primarily by <code>EpisodeBoundaryForgetGate</code>: on the 9 video-demo tasks, success holds steady (64 &rarr; 65/135), whereas demo-free tasks drop 53 &rarr; 35/105 due to subtle boundary cuts.
-            (3) <em>Documented negative results:</em> Continuous VLM KV bridging without explicit <code>&lt;y, x&gt;</code> text (<code>P2-M11</code>, 45.00%), reactive 4-step Flow-Matching replanning (<code>P2-M12</code>, which disrupted <code>InsertPeg</code> 20% &rarr; 0% via re-noising jitter), and post-SigLIP affine cropping (which warped positional embeddings relative to 3D actions, 0% &rarr; 60% once removed) are preserved in full in <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE2.md" target="_blank" rel="noopener">RESULTS_PHASE2.md</a>.
-          </div>
-
-          <div class="takeaway-box">
-            <strong>Takeaway.</strong> Pairing <strong>520 KB</strong> multi-timescale Gated DeltaNet state with non-privileged surprise landmarks, automatic episode-boundary forgetting, and selective Hop-2 readout yields real-time (<strong>387.8 ms/chunk</strong>), compact (<strong>2.39 MiB</strong>) 3.44B &pi;<sub>0.5</sub> policies that surpass memoryless &pi;<sub>0.5</sub> by <strong>+27.08 pp</strong> on <code>test240</code> and beat explicit frame sampling by <strong>+26.25 pp (2.70&times;)</strong> under un-reset multi-session deployment.
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -1160,45 +1094,52 @@
       <div class="narrow has-text-centered">
         <h2 class="title-3">Core Memory Recipe &amp; Reproducibility</h2>
         <p class="subtitle-lead" style="margin-bottom: 1.2rem;">
-          Minimal PyTorch formulation comparing standard contraction-only memory against our negative-eigenvalue Gated DeltaNet with non-privileged boundary forgetting and RMSNorm-matched hybrid readout.
+          Minimal PyTorch formulation of our dual-stream Gated DeltaNet + CORM architecture and exact commands to reproduce the <code>test800</code> (<code>71.00%</code>) and un-reset <code>k=3</code> (<code>70.83%</code>) evaluations.
         </p>
       </div>
 
       <div class="narrow">
         <div class="code-cols">
           <div>
-            <div class="code-label">Standard Token Buffer / Contraction RNN <span class="has-text-grey">&middot; drifts across sessions</span></div>
-<pre class="xm-code"><span class="cmt"># Uniform buffer drops brief reveals &amp; leaks prior episodes</span>
-buf.append(vis_tokens)                <span class="cmt"># no boundary reset</span>
-mem = subsample_uniform(buf, K=32)    <span class="cmt"># collapses to 15.4% at k=3</span>
-
-<span class="cmt"># Contraction-only delta rule: beta in (0, 1)</span>
-beta = torch.sigmoid(proj_b(x))       <span class="cmt"># cannot invert S_8 swaps (25.1%)</span>
-S = (I - beta * k @ k.T) @ S + beta * v @ k.T</pre>
-          </div>
-
-          <div>
-            <div class="code-label">DeltaMem-&pi;<sub>0.5</sub> <span class="has-text-grey">&middot; &beta; &isin; (0, 2) + boundary forget + Hop-2</span></div>
-<pre class="xm-code"><span class="cmt"># 1. Non-privileged EpisodeBoundaryForgetGate + beta in (0, 2)</span>
+            <div class="code-label">DeltaMem-&pi;<sub>0.5</sub> v3 + CORM <span class="has-text-grey">&middot; zero-oracle boundary reset + CORM &lt;y, x&gt; + GDN Hop-2</span></div>
+<pre class="xm-code"><span class="cmt"># 1. Non-privileged EpisodeBoundaryForgetGate flushes BOTH GDN &amp; CORM at session cuts</span>
 b_cut = boundary_gate(cos_prompt, phase_edge, vis_cut) &gt; 0.5
-S = torch.where(b_cut, 0.0, S)        <span class="cmt"># 41.7% vs 15.4% at k=3!</span>
-beta = 2.0 * torch.sigmoid(proj_b(x)) <span class="cmt"># eigenvalue -1 -&gt; 100% swaps</span>
-S = exp_g * (I - beta * k @ k.T) @ S + beta * v @ k.T
+S = torch.where(b_cut, 0.0, S)        <span class="cmt"># 70.83% vs 15.42% FrameSamp at un-reset k=3!</span>
+if b_cut: corm.reset()
 
-<span class="cmt"># 2. Scale-matched Hybrid Bridge + Zero-Init Hop-2 Refiner</span>
+<span class="cmt"># 2. Permanence &amp; Reference (8 tasks): CORM + DeltaGround-VLM -&gt; grounded &lt;y, x&gt; subgoal</span>
+corm.step(front_rgb_u8, wrist_rgb_u8, raw_state, task_goal, is_demo=is_demo)
+subgoal_str = corm.select_subgoal(front_rgb_u8, raw_state, vlm_fallback_box)
+
+<span class="cmt"># 3. Counting &amp; Imitation (8 tasks): beta in (0, 2) GDN + Scale-Matched Hop-2 Canvas</span>
+beta = 2.0 * torch.sigmoid(proj_b(x)) <span class="cmt"># eigenvalue -1 Householder reflections</span>
+S = exp_g * (I - beta * k @ k.T) @ S + beta * v @ k.T
 M1 = C_perc + tanh(g1) * rms_norm(XAttn(C_perc, [G_gdn, L_surp])) * rms(C_perc)
-M2 = M1 + tanh(g2) * hop2_refiner(M1, G_gdn_hop2)  <span class="cmt"># active on Imitation</span></pre>
+M2 = M1 + tanh(g2) * hop2_refiner(M1, G_gdn_hop2)</pre>
           </div>
         </div>
 
-        <div class="code-label" style="margin-top: 1.35rem;">Run closed-loop RoboMME evaluation (single-session <code>k=1</code> &amp; un-reset interference <code>k=3</code>)</div>
-<pre class="xm-code"><span class="cmt"># Held-out test240 single-session (48.75%) &amp; un-reset k=3 interference (41.67% vs 15.42% FrameSamp)</span>
-uv run python scripts/eval_pi05.py --ckpt-dir checkpoints/framesamp_modul_pt \
-  --memory-ckpt checkpoints/phase2/m6_hybrid_stageC_hop2/ckpt_final.pt \
-  --split test --episodes-per-task 15 --interference-k 3 --parallel-workers 2</pre>
+        <div class="code-label" style="margin-top: 1.35rem;">Run closed-loop RoboMME evaluation (<code>test800 = 71.00%</code> &amp; un-reset <code>k=3 = 70.83%</code>)</div>
+<pre class="xm-code"><span class="cmt"># Official held-out test800 (16 tasks x 50 episodes = 800 rollouts -&gt; 71.00% vs 56.83% T2Mem)</span>
+uv run python scripts/eval_pi05.py \
+  --ckpt-dir checkpoints/symbolic_ground_pt \
+  --memory-ckpt checkpoints/phase2/m9_deltaground_vlm_v1/ckpt_step0120.pt \
+  --specialist-route 8task \
+  --continuous-ckpt-dir checkpoints/framesamp_modul_pt \
+  --continuous-memory-ckpt checkpoints/phase2/m6_hybrid_stageC_hop2/ckpt_final.pt \
+  --split test --episodes-per-task 50 --parallel-workers 1
+
+<span class="cmt"># Un-reset k=3 multi-session interference (240 target eps, 720 un-reset rollouts -&gt; 70.83%)</span>
+uv run python scripts/eval_pi05.py \
+  --ckpt-dir checkpoints/symbolic_ground_pt \
+  --memory-ckpt checkpoints/phase2/m9_deltaground_vlm_v1/ckpt_step0120.pt \
+  --specialist-route 8task \
+  --continuous-ckpt-dir checkpoints/framesamp_modul_pt \
+  --continuous-memory-ckpt checkpoints/phase2/m6_hybrid_stageC_hop2/ckpt_final.pt \
+  --split test --episodes-per-task 15 --interference-k 3 --parallel-workers 1</pre>
 
         <p class="has-text-centered" style="margin-top: 1.6rem; font-size: 1.04rem; color: #2b2f42;">
-          Read the full <a href="tech_report.pdf" target="_blank"><strong>Technical Report (PDF)</strong></a>, inspect all 77 evaluation logs in <a href="https://github.com/k1000dai/deltanet-looped-vla/tree/main/results" target="_blank" rel="noopener"><strong>results/</strong></a>, or browse the <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener"><strong>PyTorch codebase on GitHub</strong></a>.
+          Read the 6-page <a href="tech_report.pdf" target="_blank"><strong>Technical Report (PDF)</strong></a>, inspect full Phase-3 statistical logs in <a href="https://github.com/k1000dai/deltanet-looped-vla/blob/main/RESULTS_PHASE3.md" target="_blank" rel="noopener"><strong>RESULTS_PHASE3.md</strong></a>, or browse the <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener"><strong>PyTorch codebase on GitHub</strong></a>.
         </p>
       </div>
     </div>
@@ -1213,9 +1154,9 @@ uv run python scripts/eval_pi05.py --ckpt-dir checkpoints/framesamp_modul_pt \
           <button id="copyBibtex" class="copy-btn">Copy</button>
         </div>
 <pre class="xm-code"><code id="bibtexCitation">@techreport{k1000dai2026deltaloopvla,
-  title  = {[Fun Project] DeltaLoop-VLA and DeltaMem-pi0.5: Multi-Timescale
-            Gated DeltaNet Memory, Non-Privileged Surprise Landmarks, and
-            Interference-Robust Multi-Hop Readout},
+  title  = {[Fun Project] DeltaLoop-VLA and DeltaMem-pi0.5 v3 + CORM:
+            Causal Object-Centric Reveal Memory, Multi-Timescale Gated DeltaNet,
+            and Interference-Robust Multi-Hop Readout for Long-Horizon Manipulation},
   author = {k1000dai},
   year   = {2026},
   note   = {Technical Report. Primarily written and created using Gemini 4 Carbon.},
@@ -1238,7 +1179,7 @@ uv run python scripts/eval_pi05.py --ckpt-dir checkpoints/framesamp_modul_pt \
     <div class="container">
       <div class="narrow has-text-centered">
         <p>
-          <strong>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-&pi;<sub>0.5</sub></strong> &middot;
+          <strong>[Fun Project] DeltaLoop-VLA &amp; DeltaMem-&pi;<sub>0.5</sub> v3 + CORM</strong> &middot;
           <a href="tech_report.pdf" target="_blank">Technical Report (PDF)</a> &middot;
           <a href="https://github.com/k1000dai/deltanet-looped-vla" target="_blank" rel="noopener">GitHub Repository</a>
           <br />
@@ -1257,22 +1198,22 @@ uv run python scripts/eval_pi05.py --ckpt-dir checkpoints/framesamp_modul_pt \
 
   <script>
     const TASKS_16 = [
-      { task: "BinFill", suite: "Counting", base: 20.00, fs: 60.00, ours: 66.67, oursK3: 40.00, fsK3: 20.00, t2m: 60.67, gap: false },
-      { task: "PickXtimes", suite: "Counting", base: 40.00, fs: 73.33, ours: 80.00, oursK3: 60.00, fsK3: 40.00, t2m: 91.33, gap: false },
-      { task: "SwingXtimes", suite: "Counting", base: 26.67, fs: 86.67, ours: 86.67, oursK3: 66.67, fsK3: 26.67, t2m: 90.67, gap: false },
-      { task: "StopCube", suite: "Counting", base: 0.00, fs: 46.67, ours: 26.67, oursK3: 6.67, fsK3: 0.00, t2m: 70.00, gap: true },
-      { task: "VideoUnmask", suite: "Permanence", base: 33.33, fs: 33.33, ours: 26.67, oursK3: 33.33, fsK3: 26.67, t2m: 88.00, gap: true },
-      { task: "VideoUnmaskSwap", suite: "Permanence", base: 33.33, fs: 26.67, ours: 26.67, oursK3: 20.00, fsK3: 13.33, t2m: 29.33, note: "Unified Pyr: 33.3%", winAlt: true, gap: false },
-      { task: "ButtonUnmask", suite: "Permanence", base: 40.00, fs: 33.33, ours: 46.67, oursK3: 26.67, fsK3: 0.00, t2m: 59.33, gap: false },
-      { task: "ButtonUnmaskSwap", suite: "Permanence", base: 13.33, fs: 20.00, ours: 26.67, oursK3: 20.00, fsK3: 20.00, t2m: 20.00, note: "HR16: 33.3%", gap: false },
-      { task: "PickHighlight", suite: "Reference", base: 13.33, fs: 13.33, ours: 20.00, oursK3: 13.33, fsK3: 6.67, t2m: 50.67, note: "Exploratory Sym: 60.0%", gap: true },
-      { task: "VideoRepick", suite: "Reference", base: 0.00, fs: 33.33, ours: 40.00, oursK3: 46.67, fsK3: 6.67, t2m: 38.67, gap: false },
-      { task: "VideoPlaceButton", suite: "Reference", base: 53.33, fs: 33.33, ours: 60.00, oursK3: 60.00, fsK3: 20.00, t2m: 35.33, gap: false },
-      { task: "VideoPlaceOrder", suite: "Reference", base: 26.67, fs: 60.00, ours: 60.00, oursK3: 60.00, fsK3: 46.67, t2m: 30.00, gap: false },
-      { task: "MoveCube", suite: "Imitation", base: 26.67, fs: 86.67, ours: 86.67, oursK3: 93.33, fsK3: 20.00, t2m: 80.67, gap: false },
-      { task: "InsertPeg", suite: "Imitation", base: 6.67, fs: 13.33, ours: 0.00, oursK3: 0.00, fsK3: 0.00, t2m: 36.00, gap: true },
-      { task: "PatternLock", suite: "Imitation", base: 6.67, fs: 53.33, ours: 66.67, oursK3: 60.00, fsK3: 0.00, t2m: 50.00, gap: false },
-      { task: "RouteStick", suite: "Imitation", base: 6.67, fs: 60.00, ours: 60.00, oursK3: 60.00, fsK3: 0.00, t2m: 78.67, gap: false }
+      { task: "BinFill",          suite: "Counting",   base: 20.0, fs: 60.0, p2: 66.7, ours800: 46.0, ours560: 37.1, oursK3: 40.0,  fsK3: 20.0, t2m: 60.67, gap: true },
+      { task: "PickXtimes",       suite: "Counting",   base: 40.0, fs: 73.3, p2: 80.0, ours800: 68.0, ours560: 62.9, oursK3: 73.3,  fsK3: 40.0, t2m: 91.33, gap: false },
+      { task: "SwingXtimes",      suite: "Counting",   base: 26.7, fs: 86.7, p2: 86.7, ours800: 88.0, ours560: 88.6, oursK3: 73.3,  fsK3: 26.7, t2m: 90.67, gap: false },
+      { task: "StopCube",         suite: "Counting",   base: 0.0,  fs: 46.7, p2: 26.7, ours800: 30.0, ours560: 31.4, oursK3: 6.7,   fsK3: 0.0,  t2m: 70.00, gap: true },
+      { task: "VideoUnmask",      suite: "Permanence", base: 33.3, fs: 33.3, p2: 26.7, ours800: 92.0, ours560: 91.4, oursK3: 93.3,  fsK3: 26.7, t2m: 88.00, gap: false },
+      { task: "ButtonUnmask",     suite: "Permanence", base: 40.0, fs: 33.3, p2: 46.7, ours800: 90.0, ours560: 91.4, oursK3: 86.7,  fsK3: 0.0,  t2m: 59.33, gap: false },
+      { task: "VideoUnmaskSwap",  suite: "Permanence", base: 33.3, fs: 26.7, p2: 26.7, ours800: 90.0, ours560: 85.7, oursK3: 100.0, fsK3: 13.3, t2m: 29.33, gap: false },
+      { task: "ButtonUnmaskSwap", suite: "Permanence", base: 13.3, fs: 20.0, p2: 26.7, ours800: 64.0, ours560: 62.9, oursK3: 73.3,  fsK3: 20.0, t2m: 20.00, gap: false },
+      { task: "PickHighlight",    suite: "Reference",  base: 13.3, fs: 13.3, p2: 20.0, ours800: 86.0, ours560: 80.0, oursK3: 100.0, fsK3: 6.7,  t2m: 50.67, gap: false },
+      { task: "VideoRepick",      suite: "Reference",  base: 0.0,  fs: 33.3, p2: 40.0, ours800: 92.0, ours560: 94.3, oursK3: 86.7,  fsK3: 6.7,  t2m: 38.67, gap: false },
+      { task: "VideoPlaceButton", suite: "Reference",  base: 53.3, fs: 33.3, p2: 60.0, ours800: 100.0,ours560: 100.0,oursK3: 100.0, fsK3: 20.0, t2m: 35.33, gap: false },
+      { task: "VideoPlaceOrder",  suite: "Reference",  base: 26.7, fs: 60.0, p2: 60.0, ours800: 92.0, ours560: 91.4, oursK3: 93.3,  fsK3: 46.7, t2m: 30.00, gap: false },
+      { task: "MoveCube",         suite: "Imitation",  base: 26.7, fs: 86.7, p2: 86.7, ours800: 80.0, ours560: 77.1, oursK3: 93.3,  fsK3: 20.0, t2m: 80.67, gap: false },
+      { task: "InsertPeg",        suite: "Imitation",  base: 6.7,  fs: 13.3, p2: 0.0,  ours800: 0.0,  ours560: 0.0,  oursK3: 0.0,   fsK3: 0.0,  t2m: 36.00, note: "val240: 20.0%", gap: true },
+      { task: "PatternLock",      suite: "Imitation",  base: 6.7,  fs: 53.3, p2: 66.7, ours800: 58.0, ours560: 54.3, oursK3: 60.0,  fsK3: 0.0,  t2m: 50.00, gap: false },
+      { task: "RouteStick",       suite: "Imitation",  base: 6.7,  fs: 60.0, p2: 60.0, ours800: 60.0, ours560: 60.0, oursK3: 53.3,  fsK3: 0.0,  t2m: 78.67, gap: true }
     ];
 
     function filterTasks(mode, btn) {
@@ -1282,23 +1223,25 @@ uv run python scripts/eval_pi05.py --ckpt-dir checkpoints/framesamp_modul_pt \
       }
       const rows = TASKS_16.filter(r => {
         if (mode === 'ALL') return true;
-        if (mode === 'WINS') return (r.ours >= r.t2m) || r.winAlt;
+        if (mode === 'WINS') return r.ours800 >= r.t2m;
         if (mode === 'GAP') return r.gap;
         return r.suite === mode;
       });
 
       document.getElementById('task-tbody').innerHTML = rows.map(r => {
-        const diff = r.ours - r.t2m;
+        const diff = r.ours800 - r.t2m;
         const diffStr = (diff >= 0 ? '+' : '−') + Math.abs(diff).toFixed(1) + ' pp';
-        const diffCls = (diff >= 0 || r.winAlt) ? 'delta-pos' : (r.gap ? 'delta-neg' : '');
-        const noteHtml = r.note ? ` <span class="has-text-grey" style="font-size:0.78rem;">(${r.note})</span>` : '';
+        const diffCls = diff >= 0 ? 'delta-pos' : (r.gap ? 'delta-neg' : '');
+        const noteHtml = r.note ? ` <span class="has-text-grey" style="font-size:0.76rem;">(${r.note})</span>` : '';
         return `
           <tr class="${diff >= 0 ? 'ours-row' : ''}">
             <td class="has-text-left"><strong>${r.task}</strong>${noteHtml}</td>
             <td>${r.suite}</td>
             <td>${r.base.toFixed(1)}%</td>
             <td>${r.fs.toFixed(1)}%</td>
-            <td><strong>${r.ours.toFixed(1)}%</strong></td>
+            <td>${r.p2.toFixed(1)}%</td>
+            <td><strong>${r.ours800.toFixed(1)}%</strong></td>
+            <td>${r.ours560.toFixed(1)}%</td>
             <td><span class="delta-pos">${r.oursK3.toFixed(1)}%</span> <span class="has-text-grey">vs.</span> <span class="delta-neg">${r.fsK3.toFixed(1)}%</span></td>
             <td>${r.t2m.toFixed(1)}%</td>
             <td class="${diffCls}">${diffStr}</td>

@@ -1,0 +1,347 @@
+{
+  "source_json": "results/phase3/val240_p3_deltamem_v3_corm.json",
+  "all_episodes": {
+    "label": "all_N240",
+    "n_episodes": 240,
+    "n_success": 176,
+    "sr": 0.7333333333333333,
+    "t2mem_sr": 0.5683374999999999,
+    "diff_vs_t2mem_pp": 16.499583333333334,
+    "clopper_pearson_ci95": [
+      0.6726354656146973,
+      0.7881672937439813
+    ],
+    "stratified_boot_ci95": [
+      0.6875,
+      0.7791666666666667
+    ],
+    "se_stratified_ours_pp": 2.4675149094907263,
+    "se_stratified_two_sample_pp": 2.623840896951902,
+    "p_binom_two_sided_vs_t2mem": 1.4561831524927537e-07,
+    "p_binom_one_sided_vs_t2mem": 8.773824317469276e-08,
+    "z_stratified_fixed": 6.686720825828244,
+    "p_z_stratified_fixed_two_sided": 2.2822666083490987e-11,
+    "z_stratified_two_sample_150": 6.288332250823893,
+    "p_z_stratified_two_sample_two_sided": 3.208945594275159e-10,
+    "p_boot_stratified_two_sided": 0.00019998000199980003,
+    "by_suite": {
+      "Counting": {
+        "n": 60,
+        "k": 39,
+        "sr": 0.65,
+        "t2mem_sr": 0.7816749999999999,
+        "diff_pp": -13.167499999999988
+      },
+      "Permanence": {
+        "n": 60,
+        "k": 51,
+        "sr": 0.85,
+        "t2mem_sr": 0.49165,
+        "diff_pp": 35.835
+      },
+      "Reference": {
+        "n": 60,
+        "k": 55,
+        "sr": 0.9166666666666666,
+        "t2mem_sr": 0.386675,
+        "diff_pp": 52.99916666666667
+      },
+      "Imitation": {
+        "n": 60,
+        "k": 31,
+        "sr": 0.5166666666666667,
+        "t2mem_sr": 0.6133500000000001,
+        "diff_pp": -9.668333333333335
+      }
+    },
+    "by_task": {
+      "BinFill": {
+        "n": 15,
+        "k": 7,
+        "sr": 0.4666666666666667,
+        "t2mem_sr": 0.6067,
+        "diff_pp": -14.003333333333334
+      },
+      "PickXtimes": {
+        "n": 15,
+        "k": 11,
+        "sr": 0.7333333333333333,
+        "t2mem_sr": 0.9133,
+        "diff_pp": -17.996666666666673
+      },
+      "SwingXtimes": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.9067,
+        "diff_pp": 9.330000000000005
+      },
+      "StopCube": {
+        "n": 15,
+        "k": 6,
+        "sr": 0.4,
+        "t2mem_sr": 0.7,
+        "diff_pp": -29.999999999999993
+      },
+      "VideoUnmask": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.88,
+        "diff_pp": 12.0
+      },
+      "ButtonUnmask": {
+        "n": 15,
+        "k": 13,
+        "sr": 0.8666666666666667,
+        "t2mem_sr": 0.5933,
+        "diff_pp": 27.336666666666666
+      },
+      "VideoUnmaskSwap": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.2933,
+        "diff_pp": 70.67
+      },
+      "ButtonUnmaskSwap": {
+        "n": 15,
+        "k": 8,
+        "sr": 0.5333333333333333,
+        "t2mem_sr": 0.2,
+        "diff_pp": 33.33333333333333
+      },
+      "PickHighlight": {
+        "n": 15,
+        "k": 13,
+        "sr": 0.8666666666666667,
+        "t2mem_sr": 0.5067,
+        "diff_pp": 35.99666666666666
+      },
+      "VideoRepick": {
+        "n": 15,
+        "k": 12,
+        "sr": 0.8,
+        "t2mem_sr": 0.3867,
+        "diff_pp": 41.330000000000005
+      },
+      "VideoPlaceButton": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.3533,
+        "diff_pp": 64.67
+      },
+      "VideoPlaceOrder": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.3,
+        "diff_pp": 70.0
+      },
+      "MoveCube": {
+        "n": 15,
+        "k": 10,
+        "sr": 0.6666666666666666,
+        "t2mem_sr": 0.8067,
+        "diff_pp": -14.003333333333334
+      },
+      "InsertPeg": {
+        "n": 15,
+        "k": 3,
+        "sr": 0.2,
+        "t2mem_sr": 0.36,
+        "diff_pp": -15.999999999999998
+      },
+      "PatternLock": {
+        "n": 15,
+        "k": 9,
+        "sr": 0.6,
+        "t2mem_sr": 0.5,
+        "diff_pp": 9.999999999999998
+      },
+      "RouteStick": {
+        "n": 15,
+        "k": 9,
+        "sr": 0.6,
+        "t2mem_sr": 0.7867,
+        "diff_pp": -18.669999999999998
+      }
+    }
+  },
+  "ep0_14_subset": {
+    "label": "ep0_14_N240",
+    "n_episodes": 240,
+    "n_success": 176,
+    "sr": 0.7333333333333333,
+    "t2mem_sr": 0.5683374999999999,
+    "diff_vs_t2mem_pp": 16.499583333333334,
+    "clopper_pearson_ci95": [
+      0.6726354656146973,
+      0.7881672937439813
+    ],
+    "stratified_boot_ci95": [
+      0.6875,
+      0.7791666666666667
+    ],
+    "se_stratified_ours_pp": 2.4675149094907263,
+    "se_stratified_two_sample_pp": 2.623840896951902,
+    "p_binom_two_sided_vs_t2mem": 1.4561831524927537e-07,
+    "p_binom_one_sided_vs_t2mem": 8.773824317469276e-08,
+    "z_stratified_fixed": 6.686720825828244,
+    "p_z_stratified_fixed_two_sided": 2.2822666083490987e-11,
+    "z_stratified_two_sample_150": 6.288332250823893,
+    "p_z_stratified_two_sample_two_sided": 3.208945594275159e-10,
+    "p_boot_stratified_two_sided": 0.00019998000199980003,
+    "by_suite": {
+      "Counting": {
+        "n": 60,
+        "k": 39,
+        "sr": 0.65,
+        "t2mem_sr": 0.7816749999999999,
+        "diff_pp": -13.167499999999988
+      },
+      "Permanence": {
+        "n": 60,
+        "k": 51,
+        "sr": 0.85,
+        "t2mem_sr": 0.49165,
+        "diff_pp": 35.835
+      },
+      "Reference": {
+        "n": 60,
+        "k": 55,
+        "sr": 0.9166666666666666,
+        "t2mem_sr": 0.386675,
+        "diff_pp": 52.99916666666667
+      },
+      "Imitation": {
+        "n": 60,
+        "k": 31,
+        "sr": 0.5166666666666667,
+        "t2mem_sr": 0.6133500000000001,
+        "diff_pp": -9.668333333333335
+      }
+    },
+    "by_task": {
+      "BinFill": {
+        "n": 15,
+        "k": 7,
+        "sr": 0.4666666666666667,
+        "t2mem_sr": 0.6067,
+        "diff_pp": -14.003333333333334
+      },
+      "PickXtimes": {
+        "n": 15,
+        "k": 11,
+        "sr": 0.7333333333333333,
+        "t2mem_sr": 0.9133,
+        "diff_pp": -17.996666666666673
+      },
+      "SwingXtimes": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.9067,
+        "diff_pp": 9.330000000000005
+      },
+      "StopCube": {
+        "n": 15,
+        "k": 6,
+        "sr": 0.4,
+        "t2mem_sr": 0.7,
+        "diff_pp": -29.999999999999993
+      },
+      "VideoUnmask": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.88,
+        "diff_pp": 12.0
+      },
+      "ButtonUnmask": {
+        "n": 15,
+        "k": 13,
+        "sr": 0.8666666666666667,
+        "t2mem_sr": 0.5933,
+        "diff_pp": 27.336666666666666
+      },
+      "VideoUnmaskSwap": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.2933,
+        "diff_pp": 70.67
+      },
+      "ButtonUnmaskSwap": {
+        "n": 15,
+        "k": 8,
+        "sr": 0.5333333333333333,
+        "t2mem_sr": 0.2,
+        "diff_pp": 33.33333333333333
+      },
+      "PickHighlight": {
+        "n": 15,
+        "k": 13,
+        "sr": 0.8666666666666667,
+        "t2mem_sr": 0.5067,
+        "diff_pp": 35.99666666666666
+      },
+      "VideoRepick": {
+        "n": 15,
+        "k": 12,
+        "sr": 0.8,
+        "t2mem_sr": 0.3867,
+        "diff_pp": 41.330000000000005
+      },
+      "VideoPlaceButton": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.3533,
+        "diff_pp": 64.67
+      },
+      "VideoPlaceOrder": {
+        "n": 15,
+        "k": 15,
+        "sr": 1.0,
+        "t2mem_sr": 0.3,
+        "diff_pp": 70.0
+      },
+      "MoveCube": {
+        "n": 15,
+        "k": 10,
+        "sr": 0.6666666666666666,
+        "t2mem_sr": 0.8067,
+        "diff_pp": -14.003333333333334
+      },
+      "InsertPeg": {
+        "n": 15,
+        "k": 3,
+        "sr": 0.2,
+        "t2mem_sr": 0.36,
+        "diff_pp": -15.999999999999998
+      },
+      "PatternLock": {
+        "n": 15,
+        "k": 9,
+        "sr": 0.6,
+        "t2mem_sr": 0.5,
+        "diff_pp": 9.999999999999998
+      },
+      "RouteStick": {
+        "n": 15,
+        "k": 9,
+        "sr": 0.6,
+        "t2mem_sr": 0.7867,
+        "diff_pp": -18.669999999999998
+      }
+    }
+  },
+  "paired_tests": {},
+  "holm_bonferroni_family_m": 2,
+  "holm_adjusted_pvalues": {
+    "all_vs_t2mem_strat_2samp": 6.417891188550318e-10,
+    "all_vs_t2mem_binom": 1.4561831524927537e-07
+  }
+}

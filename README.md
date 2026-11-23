@@ -1,7 +1,8 @@
-# DeltaLoop-VLA: Expressive Associative Memory Writing and Iterative Multi-Hop Readout for Long-Horizon Robotic Manipulation
+# [Fun Project] DeltaLoop-VLA & DeltaMem-π0.5: Expressive Associative Memory Writing and Iterative Multi-Hop Readout for Long-Horizon Robotic Manipulation
 
-**DeltaLoop-VLA** & **Pretrained `SmolVLA-DeltaLoop`** — Constant-$O(1)$ Motion-Gated Negative-Eigenvalue Gated DeltaNet Memory (`520 KB`) + Weight-Tied Dynamic Multi-Hop Readout (`Prelude–Recurrent Core–Coda`) + Two-Stage Common-Random-Number (`CRN`) Adaptive Halting for Non-Markovian Visuomotor Control on [RoboMME](https://github.com/RoboMME/robomme_benchmark) (`16` Tasks, `10 Hz` ManiSkill3) and Multi-Session Un-Reset Deployment.
+**[Fun Project]** • **DeltaLoop-VLA** & **Pretrained `SmolVLA-DeltaLoop`** & **`DeltaMem-π0.5`** — Constant-$O(1)$ Motion-Gated Negative-Eigenvalue Gated DeltaNet Memory (`520 KB`) + Weight-Tied Dynamic Multi-Hop Readout (`Prelude–Recurrent Core–Coda`) + Two-Stage Common-Random-Number (`CRN`) Adaptive Halting for Non-Markovian Visuomotor Control on [RoboMME](https://github.com/RoboMME/robomme_benchmark) (`16` Tasks, `10 Hz` ManiSkill3) and Multi-Session Un-Reset Deployment.
 
+[![Fun Project](https://img.shields.io/badge/Tag-%5BFun_Project%5D-7C3AED)](#)
 [![Project Page](https://img.shields.io/badge/Project_Page-GitHub_Pages-2563EB)](https://k1000dai.github.io/deltanet-looped-vla/)
 [![Tech Report PDF](https://img.shields.io/badge/Tech_Report_(LaTeX)-paper%2Ftech__report.pdf-B31B1B)](paper/tech_report.pdf)
 [![Report](https://img.shields.io/badge/Report-RESULTS__REPORT.md-0072B2)](RESULTS_REPORT.md)

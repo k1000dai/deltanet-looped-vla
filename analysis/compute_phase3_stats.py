@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
-"""Rigorous Phase-3 Statistical Verification Suite (`compute_phase3_stats.py`).
+"""Phase-3 Statistical Verification Suite (`compute_phase3_stats.py`).
 
 Computes:
-  1. Exact Clopper-Pearson 95% CI, Wilson 95% CI, and 10,000-resample task-stratified bootstrap 95% CI.
-  2. Exact two-sided binomial test vs. published `T^2Mem` (`56.83%`, `arXiv:2609.36720`).
-  3. Task-stratified two-sample z-test & bootstrap p-value vs. `T^2Mem`'s published 16-task vector
-     (accounting for both our per-task variance `p_hat_t(1 - p_hat_t)/n_t` AND `T^2Mem`'s published
-     3-seed `N=150`/task variance `p_t2(1 - p_t2)/150`!).
-  4. Separate reporting on:
-     - Full official `test` leaderboard split (`ep 0..49`, `N = 800`),
-     - Completely untouched `test` subset (`ep 15..49`, `N = 560`),
-     - Matched `test240` subset (`ep 0..14`, `N = 240`) with exact paired McNemar + Holm-Bonferroni
-       vs. `pi05_baseline_pt` (`21.67%`), `perceptual_framesamp_modul_pt` (`45.83%`), and Phase-2
-       `p2_m5_hybrid_v3_stageC_hop2_imitation_l2` (`48.75%`),
-     - Matched `k = 3` un-reset multi-session interference (`N = 240`) vs. `FrameSamp+Modul` (`15.42%`).
+  1. Exact Clopper-Pearson 95% CI and 10,000-resample task-stratified bootstrap 95% CI.
+  2. Conservative task-stratified two-sample z-test vs. `T^2Mem`'s published 16-task vector
+     treating `T^2Mem`'s 3 seeds over the same 50 episodes/task as effective `N_eff = 50`/task
+     (plus `N = 150`/task and fixed-benchmark binomial reference values).
+  3. Separate reporting on:
+     - Clean untouched `test560` subset (`ep 15..49`, `N = 560`, never evaluated in Phases 1-3),
+     - Full official `test800` split (`ep 0..49`, `N = 800`),
+     - Matched `test240` subset (`ep 0..14`, `N = 240`) with exact paired McNemar tests,
+     - Un-reset `k = 3` multi-session interference (`N = 240`), including both head-to-head vs.
+       `FrameSamp+Modulator` (`15.42%`) AND own `k = 3` vs. `k = 1` degradation overall and per suite.
 """
 from __future__ import annotations
 
@@ -21,12 +19,12 @@ import argparse
 import json
 import math
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 from scipy import stats
 
-T2MEM_PUBLISHED_OVERALL = 0.5683375  # 909.34 / 1600 = 56.83%
+T2MEM_PUBLISHED_OVERALL = 0.5683375
 T2MEM_BY_TASK: Dict[str, float] = {
     "BinFill": 0.6067,
     "PickXtimes": 0.9133,
@@ -87,7 +85,7 @@ def exact_mcnemar(eps_a: List[dict], eps_b: List[dict]) -> Dict[str, object]:
     }
 
 
-def analyze_subset(episodes: List[dict], label: str, n_t2mem_per_task: int = 150) -> Dict[str, object]:
+def analyze_subset(episodes: List[dict], label: str) -> Dict[str, object]:
     n = len(episodes)
     k = sum(1 for e in episodes if e["success"])
     sr = k / max(n, 1)
@@ -97,7 +95,8 @@ def analyze_subset(episodes: List[dict], label: str, n_t2mem_per_task: int = 150
 
     by_task: Dict[str, Dict[str, float]] = {}
     var_ours_sum = 0.0
-    var_two_sample_sum = 0.0
+    var_two_sample_150_sum = 0.0
+    var_two_sample_50_sum = 0.0
     rng = np.random.default_rng(7)
     boot_means = np.zeros(10000, dtype=np.float64)
 
@@ -114,24 +113,26 @@ def analyze_subset(episodes: List[dict], label: str, n_t2mem_per_task: int = 150
             "t2mem_sr": p_t2,
             "diff_pp": (pt - p_t2) * 100.0,
         }
-        # Conservative Jeffreys-smoothed variance bound when pt in {0, 1}
         pt_v = min(max(pt, 0.5 / (nt + 1.0)), 1.0 - 0.5 / (nt + 1.0))
         var_ours_sum += (pt_v * (1.0 - pt_v)) / nt
-        var_two_sample_sum += (pt_v * (1.0 - pt_v)) / nt + (p_t2 * (1.0 - p_t2)) / float(n_t2mem_per_task)
+        var_two_sample_150_sum += (pt_v * (1.0 - pt_v)) / nt + (p_t2 * (1.0 - p_t2)) / 150.0
+        var_two_sample_50_sum += (pt_v * (1.0 - pt_v)) / nt + (p_t2 * (1.0 - p_t2)) / 50.0
         arr = np.asarray(teps, dtype=np.float64)
         idx = rng.integers(0, nt, size=(10000, nt))
         boot_means += arr[idx].mean(axis=1) / len(tasks_present)
 
     n_tasks = max(len(tasks_present), 1)
     se_strat_ours = math.sqrt(var_ours_sum) / n_tasks
-    se_strat_two_sample = math.sqrt(var_two_sample_sum) / n_tasks
+    se_strat_150 = math.sqrt(var_two_sample_150_sum) / n_tasks
+    se_strat_50 = math.sqrt(var_two_sample_50_sum) / n_tasks
     t2_mean = float(np.mean([T2MEM_BY_TASK[t] for t in tasks_present]))
     z_fixed = (sr - t2_mean) / max(se_strat_ours, 1e-12)
-    z_two_sample = (sr - t2_mean) / max(se_strat_two_sample, 1e-12)
+    z_150 = (sr - t2_mean) / max(se_strat_150, 1e-12)
+    z_50 = (sr - t2_mean) / max(se_strat_50, 1e-12)
     p_z_fixed_two = float(2.0 * stats.norm.sf(abs(z_fixed)))
-    p_z_two_sample_two = float(2.0 * stats.norm.sf(abs(z_two_sample)))
+    p_z_150_two = float(2.0 * stats.norm.sf(abs(z_150)))
+    p_z_50_two = float(2.0 * stats.norm.sf(abs(z_50)))
     boot_lo, boot_hi = float(np.percentile(boot_means, 2.5)), float(np.percentile(boot_means, 97.5))
-    # Phipson-Smyth exact Monte Carlo p-value vs T2Mem
     b_le = int(np.sum(boot_means <= t2_mean))
     p_boot_one = (b_le + 1.0) / 10001.0
     p_boot_two = min(1.0, 2.0 * min(p_boot_one, (int(np.sum(boot_means >= t2_mean)) + 1.0) / 10001.0))
@@ -161,13 +162,16 @@ def analyze_subset(episodes: List[dict], label: str, n_t2mem_per_task: int = 150
         "clopper_pearson_ci95": [cp_lo, cp_hi],
         "stratified_boot_ci95": [boot_lo, boot_hi],
         "se_stratified_ours_pp": se_strat_ours * 100.0,
-        "se_stratified_two_sample_pp": se_strat_two_sample * 100.0,
+        "se_stratified_two_sample_conservative_50_pp": se_strat_50 * 100.0,
+        "se_stratified_two_sample_pp": se_strat_150 * 100.0,
         "p_binom_two_sided_vs_t2mem": p_binom_two,
         "p_binom_one_sided_vs_t2mem": p_binom_gt,
         "z_stratified_fixed": z_fixed,
         "p_z_stratified_fixed_two_sided": p_z_fixed_two,
-        "z_stratified_two_sample_150": z_two_sample,
-        "p_z_stratified_two_sample_two_sided": p_z_two_sample_two,
+        "z_stratified_two_sample_conservative_50": z_50,
+        "p_z_stratified_two_sample_conservative_50_two_sided": p_z_50_two,
+        "z_stratified_two_sample_150": z_150,
+        "p_z_stratified_two_sample_two_sided": p_z_150_two,
         "p_boot_stratified_two_sided": p_boot_two,
         "by_suite": by_suite,
         "by_task": by_task,
@@ -194,7 +198,6 @@ def main() -> None:
     if eps_0_14:
         report["ep0_14_subset"] = analyze_subset(eps_0_14, f"ep0_14_N{len(eps_0_14)}")
 
-    # Paired tests on test240 if dataset == "test"
     repo = Path(__file__).resolve().parents[1]
     if not (repo / "results").exists():
         repo = Path("/home/kohei/codes/ghq/github.com/k1000dai/deltanet-looped-vla")
@@ -205,11 +208,7 @@ def main() -> None:
             "vs_framesamp_modul_test240": repo / "results/phase2/test_framesamp_modul.json",
             "vs_phase2_champion_hop2_test240": repo / "results/phase2/test_m5_hybrid_v3_stageC_hop2_imitation_l2.json",
         }
-        # check exact framesamp test filename
         if not refs["vs_framesamp_modul_test240"].exists():
-            cand = list((repo / "results/phase2").glob("test*framesamp*k1*.json")) + list(
-                (repo / "results/phase2").glob("m1_framesamp*test*.json")
-            )
             for p in (repo / "results/phase2").glob("*.json"):
                 if "framesamp" in p.name and "test" in p.name and "interfk3" not in p.name and "shard" not in p.name:
                     refs["vs_framesamp_modul_test240"] = p
@@ -226,22 +225,28 @@ def main() -> None:
             paired["interfk3_vs_framesamp_k3"] = exact_mcnemar(k3_eps, json.loads(fs_k3.read_text())["episodes"])
         if eps_0_14:
             paired["interfk3_vs_own_k1"] = exact_mcnemar(k3_eps, eps_0_14)
+            by_suite_k3_own: Dict[str, object] = {}
+            for s_name, s_tasks in SUITES.items():
+                by_suite_k3_own[s_name] = exact_mcnemar(
+                    [e for e in k3_eps if e["task"] in s_tasks],
+                    [e for e in eps_0_14 if e["task"] in s_tasks],
+                )
+            report["interfk3_vs_own_k1_by_suite"] = by_suite_k3_own
 
-    # Step-down Holm-Bonferroni across Phase-3 pre-registered primary hypothesis family
+    # Step-down Holm-Bonferroni across primary hypothesis family (including conservative N_eff=50 tests)
     primary_pvals: List[Tuple[str, float]] = [
-        ("all_vs_t2mem_binom", report["all_episodes"]["p_binom_two_sided_vs_t2mem"]),
-        ("all_vs_t2mem_strat_2samp", report["all_episodes"]["p_z_stratified_two_sample_two_sided"]),
+        ("all_vs_t2mem_strat_2samp_conserv50", report["all_episodes"]["p_z_stratified_two_sample_conservative_50_two_sided"]),
+        ("all_vs_t2mem_strat_2samp_150", report["all_episodes"]["p_z_stratified_two_sample_two_sided"]),
     ]
     if "untouched_ep15_49" in report:
         primary_pvals.append(
-            ("untouched560_vs_t2mem_binom", report["untouched_ep15_49"]["p_binom_two_sided_vs_t2mem"])
+            ("untouched560_vs_t2mem_strat_2samp_conserv50", report["untouched_ep15_49"]["p_z_stratified_two_sample_conservative_50_two_sided"])
         )
         primary_pvals.append(
-            ("untouched560_vs_t2mem_strat_2samp", report["untouched_ep15_49"]["p_z_stratified_two_sample_two_sided"])
+            ("untouched560_vs_t2mem_strat_2samp_150", report["untouched_ep15_49"]["p_z_stratified_two_sample_two_sided"])
         )
     for k_name, p_obj in paired.items():
-        if k_name != "interfk3_vs_own_k1":
-            primary_pvals.append((k_name, p_obj["p_mcnemar_two_sided"]))
+        primary_pvals.append((k_name, p_obj["p_mcnemar_two_sided"]))
 
     sorted_p = sorted(primary_pvals, key=lambda x: x[1])
     m_fam = len(sorted_p)
@@ -260,25 +265,15 @@ def main() -> None:
     if args.out_json:
         args.out_json.parent.mkdir(parents=True, exist_ok=True)
         args.out_json.write_text(text_out)
-    for key in ("all_episodes", "untouched_ep15_49", "ep0_14_subset", "interfk3"):
+    for key in ("untouched_ep15_49", "all_episodes", "ep0_14_subset", "interfk3"):
         if key in report:
             r = report[key]
             print(
                 f"[{r['label']}] SR = {r['sr']*100:.2f}% ({r['n_success']}/{r['n_episodes']}) "
                 f"vs T2Mem {r['t2mem_sr']*100:.2f}% ({r['diff_vs_t2mem_pp']:+.2f} pp) | "
                 f"CP95=[{r['clopper_pearson_ci95'][0]*100:.2f}, {r['clopper_pearson_ci95'][1]*100:.2f}] | "
-                f"p_binom={r['p_binom_two_sided_vs_t2mem']:.3e} | "
-                f"p_strat2s={r['p_z_stratified_two_sample_two_sided']:.3e}"
+                f"p_conserv50={r['p_z_stratified_two_sample_conservative_50_two_sided']:.3e}"
             )
-            for s_name, s_d in r["by_suite"].items():
-                print(
-                    f"   {s_name:<12}: {s_d['sr']*100:6.2f}% ({s_d['k']:3d}/{s_d['n']:3d}) "
-                    f"vs T2Mem {s_d['t2mem_sr']*100:5.2f}% ({s_d['diff_pp']:+6.2f} pp)"
-                )
-    if holm:
-        print(f"\n[Holm-Bonferroni Family m={m_fam}]:")
-        for k_h, pv_h in holm.items():
-            print(f"   {k_h:<38}: p_Holm = {pv_h:.4e}")
 
 
 if __name__ == "__main__":

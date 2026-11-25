@@ -73,30 +73,30 @@ def main() -> None:
     # Figure 1: Leaderboard Overall + 4-Suite Breakdown
     # -------------------------------------------------------------------------
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(14.0, 5.3), gridspec_kw={"width_ratios": [1.14, 1.0], "wspace": 0.24}
+        1, 2, figsize=(14.2, 5.4), gridspec_kw={"width_ratios": [1.16, 1.0], "wspace": 0.24}
     )
 
     methods = [
         "π0.5 Base\n(Published)",
         "MemER\n(Qwen3-VL-4B)",
         "FrameSamp+\nModulator",
+        "Ours Phase-2\n(Learned GDN, test240)",
         "Dual-Stream\n(Mask-Sup.)",
-        "Ours Phase-2\n(test240)",
         "T²Mem\n(1,536 H200-h)",
-        "Ours v3+CORM\n(Untouched N=560)",
-        "Ours v3+CORM\n(Official N=800)",
+        "Ours v3+CORM*\n(Clean test560)",
+        "Ours v3+CORM*\n(Full test800)",
     ]
     vals = [
-        17.93, 42.38, 44.51, 49.22, 48.75, 56.83,
+        17.93, 42.38, 44.51, 48.75, 49.22, 56.83,
         r560["sr"] * 100.0, r800["sr"] * 100.0,
     ]
     colors = [
-        "#94a3b8", "#64748b", "#3b82f6", "#0ea5e9", "#6366f1",
+        "#94a3b8", "#64748b", "#3b82f6", "#6366f1", "#0ea5e9",
         "#d97706", "#059669", "#047857",
     ]
     y_pos = np.arange(len(methods))
     bars = ax1.barh(y_pos, vals, color=colors, height=0.66, edgecolor="#1e293b", linewidth=0.6)
-    ax1.axvline(56.83, color="#d97706", linestyle="--", linewidth=1.4, alpha=0.85, label="T²Mem SOTA (56.83%)")
+    ax1.axvline(56.83, color="#d97706", linestyle="--", linewidth=1.4, alpha=0.85, label="T²Mem E2E SOTA (56.83%)")
 
     hi_map = {}
     for idx_b, r_obj in [(6, r560), (7, r800)]:
@@ -108,41 +108,47 @@ def main() -> None:
     for i, (b, v) in enumerate(zip(bars, vals)):
         fw = "bold" if i >= 5 else "normal"
         x_txt = (hi_map[i] + 1.1) if i in hi_map else (v + 1.1)
-        ax1.text(x_txt, b.get_y() + b.get_height() / 2, f"{v:.2f}%", va="center", fontsize=9.4, fontweight=fw, color="#0f172a")
+        ax1.text(x_txt, b.get_y() + b.get_height() / 2, f"{v:.2f}%", va="center", fontsize=9.3, fontweight=fw, color="#0f172a")
 
     ax1.set_yticks(y_pos)
-    ax1.set_yticklabels(methods, fontsize=9.2)
+    ax1.set_yticklabels(methods, fontsize=9.0)
     ax1.set_xlim(0, 88)
-    ax1.set_xlabel("16-Task Closed-Loop Success Rate (%)", fontsize=10.5, fontweight="bold")
-    p_str = f"p = {r800['p_z_stratified_two_sample_two_sided']:.2e}"
-    ax1.set_title(f"(a) Held-Out RoboMME test Leaderboard ({p_str} vs. T²Mem)", fontsize=10.8)
-    ax1.legend(loc="lower right", frameon=True, fontsize=8.8)
+    ax1.set_xlabel("16-Task Closed-Loop Success Rate (%)", fontsize=10.3, fontweight="bold")
+    p_c = r560.get("p_z_stratified_two_sample_conservative_50_two_sided", r560["p_z_stratified_two_sample_two_sided"])
+    ax1.set_title(f"(a) RoboMME test Leaderboard (test560 p={p_c:.2e} vs. T²Mem)", fontsize=10.5)
+    ax1.legend(loc="lower right", frameon=True, fontsize=8.6)
 
     # Panel (b): Suite breakdown
-    suites = ["Counting", "Permanence", "Reference", "Imitation"]
+    suites = ["Counting\n(Learned GDN)", "Permanence\n(CORM+VLM)", "Reference\n(CORM+VLM)", "Imitation\n(Learned GDN)"]
+    suite_keys = ["Counting", "Permanence", "Reference", "Imitation"]
     fs_s = [65.22, 25.11, 36.33, 51.39]
     p2_s = [65.00, 31.67, 45.00, 53.33]
     t2_s = [78.17, 49.17, 38.67, 61.34]
-    p3_s = [r800["by_suite"][s]["sr"] * 100.0 for s in suites]
+    p3_s = [r800["by_suite"][s]["sr"] * 100.0 for s in suite_keys]
 
     x = np.arange(len(suites))
     w = 0.20
     ax2.bar(x - 1.5 * w, fs_s, w, label="FrameSamp+Modul", color="#3b82f6", edgecolor="#1e293b", linewidth=0.5)
-    ax2.bar(x - 0.5 * w, p2_s, w, label="Ours Phase-2 (Hop-2)", color="#6366f1", edgecolor="#1e293b", linewidth=0.5)
-    ax2.bar(x + 0.5 * w, t2_s, w, label="T²Mem (Published)", color="#d97706", edgecolor="#1e293b", linewidth=0.5)
-    rects_p3 = ax2.bar(x + 1.5 * w, p3_s, w, label="Ours v3 + CORM (test800)", color="#047857", edgecolor="#1e293b", linewidth=0.6)
+    ax2.bar(x - 0.5 * w, p2_s, w, label="Ours Phase-2 (Learned)", color="#6366f1", edgecolor="#1e293b", linewidth=0.5)
+    ax2.bar(x + 0.5 * w, t2_s, w, label="T²Mem (E2E Fast MLP)", color="#d97706", edgecolor="#1e293b", linewidth=0.5)
+    rects_p3 = ax2.bar(x + 1.5 * w, p3_s, w, label="Ours v3 + CORM* (test800)", color="#047857", edgecolor="#1e293b", linewidth=0.6)
 
     for rect in rects_p3:
         h = rect.get_height()
-        ax2.text(rect.get_x() + rect.get_width() / 2.0, h + 1.4, f"{h:.1f}", ha="center", va="bottom", fontsize=8.8, fontweight="bold", color="#064e3b")
+        ax2.text(rect.get_x() + rect.get_width() * 0.62, h + 1.4, f"{h:.1f}", ha="center", va="bottom", fontsize=8.1, fontweight="bold", color="#064e3b")
 
     ax2.set_xticks(x)
-    ax2.set_xticklabels(suites, fontsize=10.0, fontweight="bold")
+    ax2.set_xticklabels(suites, fontsize=9.0, fontweight="bold")
     ax2.set_ylim(0, 118)
-    ax2.set_ylabel("Suite Success Rate (%)", fontsize=10.5, fontweight="bold")
-    ax2.set_title("(b) Suite-Level Dissection on Official test Split (N = 200 / Suite)", fontsize=10.8)
-    ax2.legend(loc="upper left", ncol=2, frameon=True, fontsize=8.3)
+    ax2.set_ylabel("Suite Success Rate (%)", fontsize=10.3, fontweight="bold")
+    ax2.set_title("(b) Suite Dissection on test800 (N = 200 / Suite)", fontsize=10.5)
+    ax2.legend(loc="upper left", ncol=2, frameon=True, fontsize=8.2)
 
+    fig.text(
+        0.5, -0.02,
+        "*Ours v3+CORM combines benchmark-specific non-privileged rule/FSM tracking (CORM + GroundSG π0.5 on Perm/Ref: 88.25%) with learned GDN+Hop-2 (Count/Imit: 53.75%).",
+        ha="center", fontsize=8.4, color="#334155", style="italic",
+    )
     save_both(fig, "fig_p3_1_leaderboard_and_suites")
 
     # -------------------------------------------------------------------------
@@ -156,8 +162,8 @@ def main() -> None:
     p3_16 = [r800["by_task"][t]["sr"] * 100.0 for t in TASKS_16]
 
     ax.bar(x16 - bw, fs_16, bw, label="FrameSamp+Modul (44.51%)", color="#93c5fd", edgecolor="#1e293b", linewidth=0.45)
-    ax.bar(x16, t2_16, bw, label="T²Mem SOTA (56.83%)", color="#f59e0b", edgecolor="#1e293b", linewidth=0.45)
-    b_ours = ax.bar(x16 + bw, p3_16, bw, label=f"Ours: DeltaMem-π0.5 v3 + CORM ({r800['sr']*100:.2f}%)", color="#059669", edgecolor="#0f172a", linewidth=0.55)
+    ax.bar(x16, t2_16, bw, label="T²Mem E2E SOTA (56.83%)", color="#f59e0b", edgecolor="#1e293b", linewidth=0.45)
+    b_ours = ax.bar(x16 + bw, p3_16, bw, label=f"Ours v3 + CORM* ({r800['sr']*100:.2f}%)", color="#059669", edgecolor="#0f172a", linewidth=0.55)
 
     for i, rect in enumerate(b_ours):
         h = rect.get_height()
@@ -172,60 +178,61 @@ def main() -> None:
     ax.set_xticklabels(SHORT_NAMES, rotation=25, ha="right", fontsize=9.2, fontweight="bold")
     ax.set_ylim(0, 115)
     ax.set_ylabel("Test Success Rate (%, N = 50 / Task)", fontsize=10.5, fontweight="bold")
-    ax.set_title("Per-Task Official RoboMME test Performance (50 Episodes × 16 Tasks = 800 Rollouts, Zero Privileged Inputs)", fontsize=11.5)
+    ax.set_title("Per-Task RoboMME test800 Breakdown (Tasks 5–12: CORM + GroundSG; Tasks 1–4 & 13–16: Learned GDN + Hop-2)", fontsize=11.0)
     ax.legend(loc="upper right", ncol=3, frameon=True, fontsize=9.2)
     fig.tight_layout()
     save_both(fig, "fig_p3_2_per_task_comparison")
 
     # -------------------------------------------------------------------------
-    # Figure 3: Un-Reset k=3 Interference + Fast-State Footprint Pareto
+    # Figure 3: Un-Reset k=3 Interference Overall + Per-Suite Own-Drop Analysis
     # -------------------------------------------------------------------------
-    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(13.8, 4.9), gridspec_kw={"wspace": 0.25})
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(14.0, 5.0), gridspec_kw={"wspace": 0.25})
 
-    labels_k = ["FrameSamp+Modul\n(PyTorch test240)", "Ours Phase-2\n(Hybrid Hop-2)", "Ours Phase-3\n(v3 + CORM)"]
+    labels_k = ["FrameSamp+Modul\n(PyTorch test240)", "Ours Phase-2\n(Learned GDN)", "Ours Phase-3*\n(v3 + CORM)"]
     k1_vals = [45.83, 48.75, r240["sr"] * 100.0]
     k3_vals = [15.42, 41.67, (rk3["sr"] * 100.0 if rk3 else r240["sr"] * 100.0)]
     xk = np.arange(len(labels_k))
     wk = 0.32
-    b_k1 = ax_a.bar(xk - wk / 2, k1_vals, wk, label="Clean Single-Episode (k = 1)", color="#3b82f6", edgecolor="#1e293b", linewidth=0.6)
-    b_k3 = ax_a.bar(xk + wk / 2, k3_vals, wk, label="Un-Reset Multi-Session (k = 3, +2 Distractors)", color="#059669", edgecolor="#1e293b", linewidth=0.6)
+    b_k1 = ax_a.bar(xk - wk / 2, k1_vals, wk, label="Single-Session (k = 1, with reset)", color="#3b82f6", edgecolor="#1e293b", linewidth=0.6)
+    b_k3 = ax_a.bar(xk + wk / 2, k3_vals, wk, label="Un-Reset Cross-Task (k = 3, +2 distractors)", color="#059669", edgecolor="#1e293b", linewidth=0.6)
 
     for r_bar in list(b_k1) + list(b_k3):
         hv = r_bar.get_height()
-        ax_a.text(r_bar.get_x() + r_bar.get_width() / 2, hv + 1.3, f"{hv:.1f}%", ha="center", va="bottom", fontsize=9.0, fontweight="bold")
+        ax_a.text(r_bar.get_x() + r_bar.get_width() / 2, hv + 1.3, f"{hv:.1f}%", ha="center", va="bottom", fontsize=8.9, fontweight="bold")
 
     ax_a.set_xticks(xk)
-    ax_a.set_xticklabels(labels_k, fontsize=9.6, fontweight="bold")
-    ax_a.set_ylim(0, 92)
+    ax_a.set_xticklabels(labels_k, fontsize=9.4, fontweight="bold")
+    ax_a.set_ylim(0, 94)
     ax_a.set_ylabel("Held-Out test240 Success Rate (%)", fontsize=10.2, fontweight="bold")
-    ax_a.set_title("(a) Un-Reset Cross-Session Interference (k = 1 vs. k = 3)", fontsize=10.6)
-    ax_a.legend(loc="upper left", frameon=True, fontsize=8.8)
+    ax_a.set_title("(a) Un-Reset Cross-Task Interference (75.0% → 70.8%, p=0.031)", fontsize=10.3)
+    ax_a.legend(loc="upper left", frameon=True, fontsize=8.6)
 
-    # Panel (b): Fast-state size vs Official test SR Pareto
-    pts = [
-        ("π0.5 Base", 0.01, 17.93, "#94a3b8", (1.6, 17.0)),
-        ("FrameSamp+Modul", 4.00, 44.51, "#3b82f6", (5.8, 40.5)),
-        ("Ours Phase-2 (Hop-2)", 2.39, 48.75, "#6366f1", (1.2, 52.8)),
-        ("T²Mem (36.35 MiB)", 36.35, 56.83, "#d97706", (25.5, 60.0)),
-        ("Ours v3 + CORM", 3.04, r800["sr"] * 100.0, "#047857", (4.8, r800["sr"] * 100.0 + 1.5)),
-    ]
-    for name, mem_mb, sr_v, col, (tx, ty) in pts:
-        sz = 200 if "v3 + CORM" in name else 115
-        ax_b.scatter([mem_mb], [sr_v], s=sz, color=col, edgecolors="#0f172a", linewidths=1.1, zorder=4)
-        ax_b.annotate(
-            f"{name}\n({sr_v:.2f}%)",
-            (mem_mb, sr_v),
-            xytext=(tx, ty),
-            fontsize=8.8,
-            fontweight="bold" if "CORM" in name else "normal",
-        )
+    # Panel (b): Honest per-suite k=1 vs k=3 dissection showing Counting drop (-16.7 pp, p=0.006) vs CORM stability
+    s_labels = ["Counting\n(Learned GDN)", "Permanence\n(CORM Reset)", "Reference\n(CORM Reset)", "Imitation\n(Learned GDN)"]
+    s_k1 = [r240["by_suite"][s]["sr"] * 100.0 for s in suite_keys]
+    s_k3 = [rk3["by_suite"][s]["sr"] * 100.0 for s in suite_keys]
+    xs = np.arange(len(suite_keys))
+    ws = 0.36
+    bs1 = ax_b.bar(xs - ws / 2, s_k1, ws, label="Ours v3+CORM (k = 1)", color="#60a5fa", edgecolor="#1e293b", linewidth=0.6)
+    bs3 = ax_b.bar(xs + ws / 2, s_k3, ws, label="Ours v3+CORM (k = 3 un-reset)", color="#047857", edgecolor="#1e293b", linewidth=0.6)
 
-    ax_b.axhline(56.83, color="#d97706", linestyle="--", linewidth=1.1, alpha=0.8)
-    ax_b.set_xlim(-2, 41)
-    ax_b.set_ylim(10, 86)
-    ax_b.set_xlabel("Per-Episode Fast Memory State Footprint (MiB, Lower is Better)", fontsize=10.0, fontweight="bold")
-    ax_b.set_ylabel("Official test Success Rate (%)", fontsize=10.2, fontweight="bold")
-    ax_b.set_title("(b) Test SR vs. Fast-State Footprint (12× Smaller than T²Mem)", fontsize=10.6)
+    for idx_s, r_bar in enumerate(bs1):
+        hv = r_bar.get_height()
+        ax_b.text(r_bar.get_x() + r_bar.get_width() * 0.42, hv + 1.3, f"{hv:.1f}%", ha="center", va="bottom", fontsize=8.0, fontweight="bold")
+    for idx_s, r_bar in enumerate(bs3):
+        hv = r_bar.get_height()
+        ax_b.text(r_bar.get_x() + r_bar.get_width() * 0.58, hv + 1.3, f"{hv:.1f}%", ha="center", va="bottom", fontsize=8.0, fontweight="bold")
+
+    ax_b.annotate("-16.7 pp\n(p = 0.006)", xy=(0.16, 48.3), xytext=(0.36, 30.0),
+                  arrowprops=dict(arrowstyle="->", color="#be123c", lw=1.3),
+                  fontsize=8.6, fontweight="bold", color="#be123c")
+
+    ax_b.set_xticks(xs)
+    ax_b.set_xticklabels(s_labels, fontsize=9.0, fontweight="bold")
+    ax_b.set_ylim(0, 114)
+    ax_b.set_ylabel("Suite Success Rate on test240 (%)", fontsize=10.2, fontweight="bold")
+    ax_b.set_title("(b) Suite-Level k = 1 → k = 3 Dissection (Learned vs. CORM)", fontsize=10.3)
+    ax_b.legend(loc="upper left", frameon=True, fontsize=8.6)
 
     save_both(fig, "fig_p3_3_interference_and_corm")
 
